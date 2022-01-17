@@ -10,25 +10,33 @@ namespace Padoru.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void StartApplication()
         {
-            ConfigLog();
-            SetupProjectContext();
+            var settings = Resources.Load<Settings>(Constants.SETTINGS_OBJECT_NAME);
+
+            if(settings == null)
+            {
+                Debug.LogError($"Failed to initialize application. Could not find settings object.");
+                return;
+            }
+
+            ConfigLog(settings);
+            SetupProjectContext(settings);
         }
 
-        private static void ConfigLog()
+        private static void ConfigLog(Settings settings)
         {
             var logSettings = new LogSettings()
             {
-                LogType = Padoru.Diagnostics.LogType.Info,
-                StacktraceLogType = Padoru.Diagnostics.LogType.Info,
+                LogType = settings.LogType,
+                StacktraceLogType = settings.StacktraceLogType,
             };
 
             Debug.Configure(logSettings, new UnityDefaultLogFormatter(), new UnityDefaultStackTraceFormatter());
             Debug.AddOutput(new UnityConsoleOutput());
         }
 
-        private static void SetupProjectContext()
+        private static void SetupProjectContext(Settings settings)
         {
-            var projectContextPrefab = Resources.Load<Context>(Constants.PROJECT_CONTEXT_PREFAB_NAME);
+            var projectContextPrefab = Resources.Load<Context>(settings.ProjectContextPrefabName);
 
             if (projectContextPrefab == null)
             {

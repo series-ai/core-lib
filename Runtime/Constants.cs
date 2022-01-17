@@ -2,6 +2,6 @@ namespace Padoru.Core
 {
     public class Constants
     {
-        public const string PROJECT_CONTEXT_PREFAB_NAME = "ProjectContext";
+        public const string SETTINGS_OBJECT_NAME = "PadoruSettings";
     }
 }
