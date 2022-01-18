@@ -14,8 +14,7 @@ namespace Padoru.Core
 			var type = typeof(T);
 			if (services.ContainsKey(type))
 			{
-				Debug.LogError($"A service of type {type} is already registered");
-				return;
+				throw new Exception($"A service of type {type} is already registered");
 			}
 
 			var service = new S();
@@ -27,8 +26,7 @@ namespace Padoru.Core
 			var type = typeof(T);
 			if (!services.ContainsKey(type))
 			{
-				Debug.LogError($"There is no service of type {type} registered");
-				return;
+				throw new Exception($"There is no service of type {type} registered");
 			}
 
 			services.Remove(type);
@@ -39,11 +37,15 @@ namespace Padoru.Core
 			var type = typeof(T);
 			if (!services.TryGetValue(type, out var service))
 			{
-				Debug.LogError($"There is no service of type {type} registered");
-				return default;
+				throw new Exception($"There is no service of type {type} registered");
 			}
 
 			return (T)service;
+		}
+
+		public static void Clear()
+		{
+			services.Clear();
 		}
 	}
 }
