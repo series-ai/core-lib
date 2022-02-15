@@ -9,13 +9,19 @@ namespace Padoru.Core
 
 		public void RegisterService<T, S>() where S : T, new()
 		{
+			var service = new S();
+
+			RegisterService<T>(service);
+		}
+
+		public void RegisterService<T>(T service)
+		{
 			var type = typeof(T);
 			if (services.ContainsKey(type))
 			{
 				throw new Exception($"A service of type {type} is already registered");
 			}
 
-			var service = new S();
 			services.Add(type, service);
 		}
 

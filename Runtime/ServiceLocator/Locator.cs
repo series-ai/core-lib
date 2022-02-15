@@ -14,6 +14,11 @@ namespace Padoru.Core
 			serviceLocator.RegisterService<T, S>();
 		}
 
+		public static void RegisterService<T>(T service)
+		{
+			serviceLocator.RegisterService<T>(service);
+		}
+
 		public static void UnregisterService<T>()
 		{
 			serviceLocator.UnregisterService<T>();
