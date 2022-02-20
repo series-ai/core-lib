@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 using Debug = Padoru.Diagnostics.Debug;
@@ -9,7 +10,7 @@ namespace Padoru.Core
     {
         [SerializeField] private bool initializeOnAwake = true;
 
-        private bool initialized;
+        public bool IsInitialized { get; private set; }
 
         private void Awake()
         {
@@ -21,10 +22,9 @@ namespace Padoru.Core
 
         public void Init()
         {
-            if (initialized)
+            if (IsInitialized)
             {
-                Debug.LogWarning($"Trying to initialize context more than once", gameObject);
-                return;
+                throw new Exception($"Trying to initialize context more than once {gameObject.name}");
             }
 
             var initializables = GetComponentsInChildren<IInitializable>();
@@ -33,15 +33,14 @@ namespace Padoru.Core
                 item.Init();
             }
 
-            initialized = true;
+            IsInitialized = true;
         }
 
         public void Shutdown()
         {
-            if (!initialized)
+            if (!IsInitialized)
             {
-                Debug.LogWarning($"Trying to shutdown context more than once", gameObject);
-                return;
+                throw new Exception($"Trying to shutdown context more than once {gameObject.name}");
             }
 
             var shutdownables = GetComponentsInChildren<IShutdowneable>();
@@ -50,7 +49,7 @@ namespace Padoru.Core
                 item.Shutdown();
             }
 
-            initialized = false;
+            IsInitialized = false;
         }
     }
 }
