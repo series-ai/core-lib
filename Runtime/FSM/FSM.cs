@@ -9,34 +9,63 @@ namespace Padoru.Core
 	{
 		private Dictionary<TState, State> states;
 		private List<Transition<TState, TTrigger>> transitions;
+		private TState initialStateId;
 
-		private State currentState;
-		private TState initialState;
+		public State CurrentState { get; private set; }
+		public bool IsActive { get; private set; }
 
-		public FSM(TState initialState)
+		public FSM(TState initialStateId)
 		{
 			states = new Dictionary<TState, State>();
 			transitions = new List<Transition<TState, TTrigger>>();
 
-			this.initialState = initialState;
+			this.initialStateId = initialStateId;
 
 			CreateStates();
 		}
 
 		public void Start()
 		{
-			ChangeState(initialState);
+			if (IsActive)
+			{
+				throw new Exception("Could not start FSM, it is already active");
+			}
+
+			ChangeState(initialStateId);
+			IsActive = true;
+		}
+
+		public void Stop()
+		{
+			if (!IsActive)
+			{
+				throw new Exception("Could not stop FSM, it is not active");
+			}
+
+			ChangeState(null);
+			IsActive = false;
 		}
 
 		public void AddTransition(TState initialState, TState targetState, TTrigger trigger)
 		{
-			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'");
 			var transition = new Transition<TState, TTrigger>()
 			{
 				initialState = initialState,
 				targetState = targetState,
 				trigger = trigger,
 			};
+
+			if(initialState.Equals(targetState))
+			{
+				throw new Exception("Could not add transition, initial and target states cannot be the same");
+			}
+
+			if (IsTransitionAlreadyRegistered(transition))
+			{
+				throw new Exception("Could not add transition, it was already registered");
+			}
+
+			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'");
 
 			transitions.Add(transition);
 		}
@@ -59,8 +88,21 @@ namespace Padoru.Core
 
 		private bool ShouldTransition(Transition<TState, TTrigger> transition, TTrigger trigger)
 		{
-			return states[transition.initialState].Equals(currentState) &&
+			return states[transition.initialState].Equals(CurrentState) &&
 				   transition.trigger.Equals(trigger);
+		}
+
+		private bool IsTransitionAlreadyRegistered(Transition<TState, TTrigger> transition)
+		{
+			foreach (var existingTransition in transitions)
+			{
+				if (existingTransition.Equals(transition))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void CreateStates()
@@ -82,13 +124,22 @@ namespace Padoru.Core
 
 		private void ChangeState(TState stateId)
 		{
-			if(currentState != null)
+			ChangeState(GetState(stateId));
+		}
+
+		private void ChangeState(State state)
+		{
+			if(CurrentState != null)
 			{
-				currentState.OnStateExit();
+				CurrentState.OnStateExit();
 			}
 
-			currentState = states[stateId];
-			currentState.OnStateEnter();
+			CurrentState = state;
+
+			if(CurrentState != null)
+			{
+				CurrentState.OnStateEnter();
+			}
 		}
 	}
 }
