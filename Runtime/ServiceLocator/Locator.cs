@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Padoru.Core
 {
 	public static class Locator
@@ -44,7 +46,7 @@ namespace Padoru.Core
 			return serviceLocator.GetService<T>();
 		}
 
-		public static T[] GetAllServices<T>()
+		public static List<T> GetAllServices<T>()
 		{
 			return serviceLocator.GetAllServices<T>();
 		}

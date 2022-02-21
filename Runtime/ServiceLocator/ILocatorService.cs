@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Padoru.Core
 {
 	public interface IServiceLocator
@@ -18,7 +20,7 @@ namespace Padoru.Core
 
 		T GetService<T>(string tag);
 
-		T[] GetAllServices<T>();
+		List<T> GetAllServices<T>();
 
 		void Clear();
 	}

@@ -88,7 +88,7 @@ namespace Padoru.Core
 			return (T)service;
 		}
 
-		public T[] GetAllServices<T>()
+		public List<T> GetAllServices<T>()
 		{
 			var servicesOfTypeT = new List<T>();
 
@@ -108,7 +108,7 @@ namespace Padoru.Core
 				}
 			}
 
-			return servicesOfTypeT.ToArray();
+			return servicesOfTypeT;
 		}
 
 		public void Clear()
