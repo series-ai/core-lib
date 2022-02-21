@@ -19,14 +19,34 @@ namespace Padoru.Core
 			serviceLocator.RegisterService<T>(service);
 		}
 
+		public static void RegisterService<T, S>(string tag) where S : T, new()
+		{
+			serviceLocator.RegisterService<T, S>(tag);
+		}
+
+		public static void RegisterService<T>(T service, string tag)
+		{
+			serviceLocator.RegisterService<T>(service, tag);
+		}
+
 		public static void UnregisterService<T>()
 		{
 			serviceLocator.UnregisterService<T>();
 		}
 
+		public static void UnregisterService<T>(string tag)
+		{
+			serviceLocator.UnregisterService<T>(tag);
+		}
+
 		public static T GetService<T>()
 		{
 			return serviceLocator.GetService<T>();
+		}
+
+		public static T[] GetAllServices<T>()
+		{
+			return serviceLocator.GetAllServices<T>();
 		}
 
 		public static void Clear()

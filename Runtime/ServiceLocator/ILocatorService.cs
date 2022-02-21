@@ -6,9 +6,19 @@ namespace Padoru.Core
 
 		void RegisterService<T>(T service);
 
+		void RegisterService<T, S>(string tag) where S : T, new();
+
+		void RegisterService<T>(T service, string tag);
+
 		void UnregisterService<T>();
 
+		void UnregisterService<T>(string tag);
+
 		T GetService<T>();
+
+		T GetService<T>(string tag);
+
+		T[] GetAllServices<T>();
 
 		void Clear();
 	}
