@@ -154,7 +154,7 @@ namespace Padoru.Core.Tests
 
             var services = locator.GetAllServices<IEnumerable<GameObject>>();
 
-            Assert.AreEqual(2, services.Length);
+            Assert.AreEqual(2, services.Count);
         }
 
         [Test]
