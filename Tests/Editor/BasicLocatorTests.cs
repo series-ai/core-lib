@@ -61,6 +61,18 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
+        public void RegisterServiceWithoutTag_WhenServiceNull_ShouldThrow()
+        {
+            Assert.Throws<Exception>(() => locator.RegisterService<IEnumerable<GameObject>>(null));
+        }
+
+        [Test]
+        public void RegisterServiceWithTag_WhenServiceNull_ShouldThrow()
+        {
+            Assert.Throws<Exception>(() => locator.RegisterService<IEnumerable<GameObject>>(null, tag1));
+        }
+
+        [Test]
         public void UnregisterServiceWithoutTag_WhenServiceNotRegistered_ShouldThrow()
         {
             Assert.Throws<Exception>(locator.UnregisterService<IEnumerable<GameObject>>);

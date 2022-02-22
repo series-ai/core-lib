@@ -17,6 +17,11 @@ namespace Padoru.Core
 
 		public void RegisterService<T>(T service)
 		{
+			if(service == null)
+			{
+				throw new Exception($"Trying to register a null service");
+			}
+
 			var type = typeof(T);
 			if (services.ContainsKey(type))
 			{
@@ -35,6 +40,11 @@ namespace Padoru.Core
 
 		public void RegisterService<T>(T service, string tag)
 		{
+			if (service == null)
+			{
+				throw new Exception($"Trying to register a null service");
+			}
+
 			var type = typeof(T);
 			if (taggedServices.ContainsKey((tag, type)))
 			{
