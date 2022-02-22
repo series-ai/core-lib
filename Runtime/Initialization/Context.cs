@@ -34,13 +34,15 @@ namespace Padoru.Core
             }
 
             IsInitialized = true;
+
+            Debug.Log($"Context initialized: {gameObject.name}", gameObject);
         }
 
         public void Shutdown()
         {
             if (!IsInitialized)
             {
-                throw new Exception($"Trying to shutdown context more than once {gameObject.name}");
+                throw new Exception($"Trying to shutdown context when not initialized: {gameObject.name}");
             }
 
             var shutdownables = GetComponentsInChildren<IShutdowneable>();
@@ -50,6 +52,8 @@ namespace Padoru.Core
             }
 
             IsInitialized = false;
+
+            Debug.Log($"Context shutdowned: {gameObject.name}", gameObject);
         }
     }
 }
