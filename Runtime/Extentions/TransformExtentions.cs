@@ -6,7 +6,7 @@ namespace Padoru.Core
 {
     public static class TransformExtentions
     {
-        public static void Clear(this Transform transform)
+        public static void DestroyAllChildren(this Transform transform)
         {
             if (transform == null) return;
 
