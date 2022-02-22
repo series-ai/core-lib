@@ -46,6 +46,11 @@ namespace Padoru.Core
 			return serviceLocator.GetService<T>();
 		}
 
+		public static T GetService<T>(string tag)
+		{
+			return serviceLocator.GetService<T>(tag);
+		}
+
 		public static List<T> GetAllServices<T>()
 		{
 			return serviceLocator.GetAllServices<T>();
