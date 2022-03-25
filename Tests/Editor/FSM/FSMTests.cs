@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Padoru.Core.Tests
 {
-	public class FSMTests : MonoBehaviour
+	public class FSMTests
     {
         private FSM<TestStates, TestTriggers> fsm;
         private TestStates startState = TestStates.State1;
