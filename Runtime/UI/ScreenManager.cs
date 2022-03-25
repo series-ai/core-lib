@@ -56,6 +56,16 @@ namespace Padoru.Core
             return promise;
         }
 
+        public void Clear()
+        {
+            ParentCanvas = null;
+
+            foreach (var screen in screens)
+            {
+                CloseScreen(screen);
+            }
+        }
+
         private IPromise<IScreen> LoadScreen(IScreenProvider provider)
         {
             if (ParentCanvas == null)
@@ -84,16 +94,6 @@ namespace Padoru.Core
         {
             screens.Remove(screen);
             screen.Dispose();
-        }
-
-        public void Clear()
-        {
-            ParentCanvas = null;
-
-            foreach (var screen in screens)
-            {
-                CloseScreen(screen);
-            }
         }
     }
 }
