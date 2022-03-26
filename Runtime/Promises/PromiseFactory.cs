@@ -18,14 +18,14 @@ namespace Padoru.Core
 			return promise;
 		}
 
-		public static IPromise CreateFailed(Exception exception = null)
+		public static IPromise CreateFailed(Exception exception)
 		{
 			var promise = new Promise();
 			promise.Fail(exception);
 			return promise;
 		}
 
-		public static IPromise<T> CreateFailed<T>(Exception exception = null)
+		public static IPromise<T> CreateFailed<T>(Exception exception)
 		{
 			var promise = new Promise<T>();
 			promise.Fail(exception);

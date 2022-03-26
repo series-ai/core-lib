@@ -33,7 +33,7 @@ namespace Padoru.Core.Tests
         public void Complete_WhenFailed_ShouldThrow()
         {
             var promise = new Promise();
-            promise.Fail(null);
+            promise.Fail(new Exception());
 
             Assert.Throws<Exception>(promise.Complete);
         }
@@ -58,7 +58,7 @@ namespace Padoru.Core.Tests
             var promise = new Promise();
             promise.OnFail(OnFailCallback);
 
-            Assert.DoesNotThrow(() => promise.Fail(null));
+            Assert.DoesNotThrow(() => promise.Fail(new Exception()));
             Assert.IsTrue(failed);
         }
 
@@ -68,16 +68,16 @@ namespace Padoru.Core.Tests
             var promise = new Promise();
             promise.Complete();
 
-            Assert.Throws<Exception>(() => promise.Fail(null));
+            Assert.Throws<Exception>(() => promise.Fail(new Exception()));
         }
 
         [Test]
         public void Fail_WhenFailed_ShouldThrow()
         {
             var promise = new Promise();
-            promise.Fail(null);
+            promise.Fail(new Exception());
 
-            Assert.Throws<Exception>(() => promise.Fail(null));
+            Assert.Throws<Exception>(() => promise.Fail(new Exception()));
         }
 
         [Test]
@@ -85,12 +85,20 @@ namespace Padoru.Core.Tests
         {
             failed = false;
             var promise = new Promise();
-            promise.Fail(null);
+            promise.Fail(new Exception());
             promise.Reset();
             promise.OnFail(OnFailCallback);
 
-            Assert.DoesNotThrow(() => promise.Fail(null));
+            Assert.DoesNotThrow(() => promise.Fail(new Exception()));
             Assert.IsTrue(failed);
+        }
+
+        [Test]
+        public void Fail_WhenExceptionNull_ShouldThrow()
+        {
+            var promise = new Promise();
+
+            Assert.Throws<Exception>(() => promise.Fail(null));
         }
 
         private void OnCompleteCallback()

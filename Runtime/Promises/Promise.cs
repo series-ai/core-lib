@@ -54,6 +54,11 @@ namespace Padoru.Core
 
 		public void Fail(Exception exception)
 		{
+			if(exception == null)
+			{
+				throw new Exception("Cannot fail a promise with a null exception");
+			}
+
 			if (finished)
 			{
 				throw new Exception("Cannot fail an already finished promise");
@@ -61,6 +66,7 @@ namespace Padoru.Core
 
 			finished = true;
 			failed = true;
+			this.exception = exception;
 			onFailActions?.Invoke(exception);
 			onFailActions = null;
 		}
