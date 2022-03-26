@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Padoru.Core
 {
-    public class ScreenManager : MonoBehaviour, IScreenManager, IInitializable, IShutdowneable
+    public class ScreenManager : IScreenManager
     {
         private List<IScreen> screens = new List<IScreen>();
 
@@ -13,45 +13,40 @@ namespace Padoru.Core
 
         public Transform ParentCanvas { get; set; }
 
-        public void Init()
+        public IPromise<IScreen> ShowScreen(IScreenProvider provider)
         {
-            Locator.RegisterService<IScreenManager>(this);
-        }
-
-        public void Shutdown()
-        {
-            Locator.UnregisterService<IScreenManager>();
-        }
-
-        public IPromise ShowScreen(IScreenProvider provider)
-        {
-            if(provider == null)
+            var promise = new Promise<IScreen>();
+            LoadScreen(provider).OnFail((e) => promise.Fail(e)).OnComplete((screen) =>
             {
-                throw new Exception($"Cannot show a null screen");
-            }
-
-            var promise = new Promise();
-            LoadScreen(provider).OnComplete((screen) =>
-            {
-                PresentScreen(screen).OnComplete(promise.Complete);
+                PresentScreen(screen).OnFail((e) => promise.Fail(e)).OnComplete(() => promise.Complete(screen));
             });
             return promise;
         }
 
         public IPromise CloseScreen(IScreen screen)
         {
+            if (screen == null)
+            {
+                return PromiseFactory.CreateFailed(new Exception("Screen is null"));
+            }
+
+            if (!screens.Contains(screen))
+            {
+                return PromiseFactory.CreateFailed(new Exception("Screen is not opened"));
+            }
+
             return DismissScreen(screen).OnComplete(() => 
             {
                 DisposeScreen(screen);
             });
         }
 
-        public IPromise CloseAndShowScreen(IScreenProvider provider)
+        public IPromise<IScreen> CloseAndShowScreen(IScreenProvider provider)
         {
-            var promise = new Promise();
-            CloseScreen(currentScreen).OnComplete(() =>
+            var promise = new Promise<IScreen>();
+            CloseScreen(currentScreen).OnFail((e) => promise.Fail(e)).OnComplete(() =>
             {
-                ShowScreen(provider).OnComplete(promise.Complete);
+                ShowScreen(provider).OnFail((e) => promise.Fail(e)).OnComplete((screen) => promise.Complete(screen));
             });
             return promise;
         }
@@ -60,17 +55,19 @@ namespace Padoru.Core
         {
             ParentCanvas = null;
 
-            foreach (var screen in screens)
+            var screensClone = new List<IScreen>(screens);
+            foreach (var screen in screensClone)
             {
                 CloseScreen(screen);
             }
+            screens.Clear();
         }
 
         private IPromise<IScreen> LoadScreen(IScreenProvider provider)
         {
-            if (ParentCanvas == null)
+            if(provider == null)
             {
-                return PromiseFactory.CreateFailed<IScreen>(new Exception("ParentCanvas is not set"));   
+                return PromiseFactory.CreateFailed<IScreen>(new Exception("ScreenProvider is null"));
             }
 
             return provider.GetScreen(ParentCanvas).OnComplete(screen => screen.Initialize());
@@ -90,10 +87,12 @@ namespace Padoru.Core
             return screen.PlayOutroAnimation();
         }
 
-        private void DisposeScreen(IScreen screen)
+        private IPromise DisposeScreen(IScreen screen)
         {
             screens.Remove(screen);
             screen.Dispose();
+
+            return PromiseFactory.CreateCompleted();
         }
     }
 }
