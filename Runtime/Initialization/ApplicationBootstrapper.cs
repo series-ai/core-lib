@@ -46,6 +46,7 @@ namespace Padoru.Core
 
             Debug.Log($"Instantiating ProjectContext");
             var projectContext = Object.Instantiate(projectContextPrefab);
+            Object.DontDestroyOnLoad(projectContext);
 
             Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}");
             Locator.RegisterService(projectContext, settings.ProjectContextPrefabName);
