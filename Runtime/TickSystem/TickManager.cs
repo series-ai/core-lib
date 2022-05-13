@@ -9,9 +9,9 @@ namespace Padoru.Core
 
 		private void Update()
 		{
-			foreach (var tickable in tickables)
+			for (int i = 0; i < tickables.Count; i++)
 			{
-				tickable.Tick(Time.deltaTime);
+				tickables[i].Tick(Time.deltaTime);
 			}
 		}
 
