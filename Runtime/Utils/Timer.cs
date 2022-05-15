@@ -7,10 +7,10 @@ namespace Padoru.Core.Utils
 	{
 		private ITickManager tickManager;
 		private float tickInterval;
-		private Action callback;
+		private Action<float> callback;
 		private float lastTickTime;
 
-		public Timer(float tickInterval, Action callback)
+		public Timer(float tickInterval, Action<float> callback)
 		{
 			tickManager = Locator.GetService<ITickManager>();
 
@@ -39,7 +39,7 @@ namespace Padoru.Core.Utils
 			if(Time.time - lastTickTime >= tickInterval)
 			{
 				lastTickTime = Time.time;
-				callback?.Invoke();
+				callback?.Invoke(deltaTime);
 			}
 		}
 	}
