@@ -6,15 +6,23 @@ namespace Padoru.Core.Utils
 	public class Timer : ITickable
 	{
 		private ITickManager tickManager;
-		private float tickInterval;
+		private ModifiableValue<float, FloatCalculator> tickInterval;
 		private Action<float> callback;
 		private float lastTickTime;
+
+		public Timer(ModifiableValue<float, FloatCalculator> tickInterval, Action<float> callback)
+		{
+			tickManager = Locator.GetService<ITickManager>();
+
+			this.tickInterval = tickInterval;
+			this.callback = callback;
+		}
 
 		public Timer(float tickInterval, Action<float> callback)
 		{
 			tickManager = Locator.GetService<ITickManager>();
 
-			this.tickInterval = tickInterval;
+			this.tickInterval = new ModifiableValue<float, FloatCalculator>(tickInterval);
 			this.callback = callback;
 		}
 
@@ -36,7 +44,7 @@ namespace Padoru.Core.Utils
 
 		public void Tick(float deltaTime)
 		{
-			if(Time.time - lastTickTime >= tickInterval)
+			if(Time.time - lastTickTime >= tickInterval.Value)
 			{
 				lastTickTime = Time.time;
 				callback?.Invoke(deltaTime);
