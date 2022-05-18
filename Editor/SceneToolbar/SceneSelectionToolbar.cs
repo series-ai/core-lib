@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,8 +16,8 @@ namespace Padoru.Core.Editor
         private const string TOOLBAR_SCENES_KEY = "SceneSelectionToolbar.Scenes";
         private const string TOOLBAR_LAST_OPENED_SCENE_KEY = "SceneSelectionToolbar.LatestOpenedScene";
 
-        private static List<ToolbarSceneInfo> scenes;
-        private static ToolbarSceneInfo sceneOpened;
+        private static Dictionary<string, ToolbarSceneInfo> scenes;
+        private static ToolbarSceneInfo currentScene;
         private static int selectedIndex;
         private static string[] displayedOptions;
 
@@ -31,26 +32,27 @@ namespace Padoru.Core.Editor
 
         private static void OnToolbarGUI()
         {
+            GUILayout.Space(20);
             GUILayout.FlexibleSpace();
 
-            selectedIndex = EditorGUILayout.Popup(selectedIndex, displayedOptions); ;
+            selectedIndex = EditorGUILayout.Popup(selectedIndex, displayedOptions);
 
             GUI.enabled = selectedIndex == 0;
             if (GUILayout.Button("+"))
             {
-                AddScene(sceneOpened);
+                AddScene(currentScene);
             }
 
             GUI.enabled = selectedIndex > 0;
             if (GUILayout.Button("-"))
             {
-                RemoveScene(sceneOpened);
+                RemoveScene(currentScene);
             }
 
             GUI.enabled = true;
             if (GUI.changed && selectedIndex > 0 && scenes.Count > selectedIndex - 1)
-            {                
-                OpenScene(scenes[selectedIndex - 1]);
+            {
+                OpenScene(scenes.Values.ElementAt(selectedIndex - 1));
             }
         }
 
@@ -72,47 +74,43 @@ namespace Padoru.Core.Editor
             displayedOptions = new string[scenes.Count + 1];
             displayedOptions[0] = "Click on '+' to add current scene";
 
-            for (int i = 0; i < scenes.Count; i++)
+            var index = 1;
+            foreach (var scene in scenes.Values)
             {
-                displayedOptions[i + 1] = scenes[i].Name;
+                displayedOptions[index] = scene.Name;
+                index++;
             }
         }
 
         private static void HandleSceneOpened(Scene scene, OpenSceneMode mode)
         {
-            SetOpenedScene(new ToolbarSceneInfo(scene));
+            SetOpenedScene(GetSceneInfo(scene));
         }
 
         private static void SetOpenedScene(ToolbarSceneInfo scene)
         {
-            if (scene == null || string.IsNullOrEmpty(scene.Path)) return;
-
-            for (int i = 0; i < scenes.Count; i++)
+            if(scene == null)
             {
-                if (scenes[i].Path == scene.Path)
-                {
-                    sceneOpened = scenes[i];
-                    selectedIndex = i + 1;
-                    SaveToPlayerPrefs(true);
-                    return;
-                }
+                return;
             }
 
-            sceneOpened = scene;
-            selectedIndex = 0;
+            currentScene = scene;
+
+            selectedIndex = scenes.ContainsKey(scene.GUID) ?
+                            scenes.Keys.ToList().IndexOf(scene.GUID) + 1 : 
+                            0;
+
             SaveToPlayerPrefs(true);
         }
 
         private static void AddScene(ToolbarSceneInfo scene)
         {
-            if (scene == null) return;
-
-            if (scenes.Any(s => s.Path == scene.Path))
+            if (scenes.ContainsKey(scene.GUID))
             {
                 RemoveScene(scene);
             }
 
-            scenes.Add(scene);
+            scenes.Add(scene.GUID, scene);
             selectedIndex = scenes.Count;
             SetOpenedScene(scene);
             RefreshDisplayedOptions();
@@ -121,7 +119,12 @@ namespace Padoru.Core.Editor
 
         private static void RemoveScene(ToolbarSceneInfo scene)
         {
-            scenes.Remove(scene);
+            if (!scenes.ContainsKey(scene.GUID))
+            {
+                return;
+            }
+
+            scenes.Remove(scene.GUID);
             selectedIndex = 0;
             RefreshDisplayedOptions();
             SaveToPlayerPrefs();
@@ -131,35 +134,55 @@ namespace Padoru.Core.Editor
         {
             if (!onlyLatestOpenedScene)
             {
-                var serialized = string.Join(";", scenes.Where(s => !string.IsNullOrEmpty(s.Path)).Select(s => s.Path));
-                SetPref(TOOLBAR_SCENES_KEY, serialized);
+                var scenesGUIDs = string.Join(";", scenes.Values.Where(s => !string.IsNullOrEmpty(s.GUID)).Select(s => s.GUID));
+                SetPref(TOOLBAR_SCENES_KEY, scenesGUIDs);
             }
 
-            if (sceneOpened != null)
+            if (currentScene != null)
             {
-                SetPref(TOOLBAR_LAST_OPENED_SCENE_KEY, sceneOpened.Path);
+                SetPref(TOOLBAR_LAST_OPENED_SCENE_KEY, currentScene.GUID);
             }
         }
 
         private static void LoadFromPlayerPrefs()
         {
-            var serialized = GetPref(TOOLBAR_SCENES_KEY);
+            scenes = GetSavedScenes();
 
-            scenes = serialized.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => new ToolbarSceneInfo(s)).ToList();
+            var lastOpenedScene = GetLastOpenedScene();
 
-            if (scenes == null)
-            {
-                scenes = new List<ToolbarSceneInfo>();
-            }
-
-            serialized = GetPref(TOOLBAR_LAST_OPENED_SCENE_KEY);
-
-            if (!string.IsNullOrEmpty(serialized))
-            {
-                SetOpenedScene(new ToolbarSceneInfo(serialized));
-            }
+            SetOpenedScene(lastOpenedScene);
 
             RefreshDisplayedOptions();
+        }
+
+        private static Dictionary<string, ToolbarSceneInfo> GetSavedScenes()
+        {
+            var scenes = new Dictionary<string, ToolbarSceneInfo>();
+
+            var scencesString = GetPref(TOOLBAR_SCENES_KEY);
+            var scenesList = scencesString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => new ToolbarSceneInfo(s)).ToList();
+
+            if (scenesList != null)
+            {
+                foreach (var sceneInfo in scenesList)
+                {
+                    scenes.Add(sceneInfo.GUID, sceneInfo);
+                }
+            }
+
+            return scenes;
+        }
+
+        private static ToolbarSceneInfo GetLastOpenedScene()
+        {
+            var lastOpenedSceneGIUD = GetPref(TOOLBAR_LAST_OPENED_SCENE_KEY);
+
+            if (string.IsNullOrEmpty(lastOpenedSceneGIUD))
+            {
+                return null;
+            }
+
+            return GetSceneInfo(lastOpenedSceneGIUD);
         }
 
         private static void SetPref(string name, string value)
@@ -170,6 +193,24 @@ namespace Padoru.Core.Editor
         private static string GetPref(string name)
         {
             return EditorPrefs.GetString($"{Application.productName}_{name}");
+        }
+
+        private static ToolbarSceneInfo GetSceneInfo(Scene scene)
+        {
+            var sceneGUID = AssetDatabase.AssetPathToGUID(scene.path);
+            return GetSceneInfo(sceneGUID);
+        }
+
+        private static ToolbarSceneInfo GetSceneInfo(string sceneGUID)
+        {
+            if (scenes.ContainsKey(sceneGUID))
+            {
+                return scenes[sceneGUID];
+            }
+            else
+            {
+                return new ToolbarSceneInfo(sceneGUID);
+            }
         }
     }
 }
