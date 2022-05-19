@@ -55,11 +55,6 @@ namespace Padoru.Core
 				trigger = trigger,
 			};
 
-			if(initialState.Equals(targetState))
-			{
-				throw new Exception("Could not add transition, initial and target states cannot be the same");
-			}
-
 			if (IsTransitionAlreadyRegistered(transition))
 			{
 				throw new Exception("Could not add transition, it was already registered");
