@@ -20,6 +20,11 @@ namespace Padoru.Core
             }
         }
 
+        private void OnDestroy()
+        {
+            Shutdown();
+        }
+
         public void Init()
         {
             if (IsInitialized)
