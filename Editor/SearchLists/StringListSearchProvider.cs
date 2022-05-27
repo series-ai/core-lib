@@ -11,7 +11,7 @@ namespace Padoru.Core.Editor
         private string listTitle;
         private Action<string> onSetEntryCallback;
 
-        public StringListSearchProvider(string listTitle, List<string> items, Action<string> onSetEntryCallback)
+        public void Init(string listTitle, List<string> items, Action<string> onSetEntryCallback)
         {
             items.Sort();
 
