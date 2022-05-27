@@ -170,7 +170,7 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void ClearServices_WhenNormalAndTaggedServicesRegistered_ShouldThrow()
+        public void GetServices_WhenServicesCleared_ShouldThrow()
         {
             locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>();
             locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
