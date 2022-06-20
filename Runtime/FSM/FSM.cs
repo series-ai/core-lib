@@ -5,11 +5,12 @@ using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
-	public class FSM<TState, TTrigger> : IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
 	{
 		private Dictionary<TState, State> states;
 		private List<Transition<TState, TTrigger>> transitions;
 		private TState initialStateId;
+		private ITickManager tickManager;
 
 		public State CurrentState { get; private set; }
 		public bool IsActive { get; private set; }
@@ -20,6 +21,8 @@ namespace Padoru.Core
 			transitions = new List<Transition<TState, TTrigger>>();
 
 			this.initialStateId = initialStateId;
+
+			tickManager = Locator.GetService<ITickManager>();
 
 			CreateStates();
 		}
@@ -33,6 +36,7 @@ namespace Padoru.Core
 
 			ChangeState(initialStateId);
 			IsActive = true;
+			tickManager.Register(this);
 		}
 
 		public void Stop()
@@ -44,6 +48,12 @@ namespace Padoru.Core
 
 			ChangeState(null);
 			IsActive = false;
+			tickManager.Unregister(this);
+		}
+
+		public void Tick(float deltaTime)
+		{
+			CurrentState?.OnStateUpdate();
 		}
 
 		public void AddTransition(TState initialState, TState targetState, TTrigger trigger)

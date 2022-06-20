@@ -8,6 +8,7 @@ namespace Padoru.Core
 		private string stateName;
 
 		public event Action OnStateEnterEvent;
+		public event Action OnStateUpdateEvent;
 		public event Action OnStateExitEvent;
 
 		public State(string stateName)
@@ -19,6 +20,11 @@ namespace Padoru.Core
 		{
 			Debug.Log(stateName);
 			OnStateEnterEvent?.Invoke();
+		}
+
+		internal void OnStateUpdate()
+		{
+			OnStateUpdateEvent?.Invoke();
 		}
 
 		internal void OnStateExit()
