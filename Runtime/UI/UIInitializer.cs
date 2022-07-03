@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
@@ -13,15 +12,21 @@ namespace Padoru.Core
 
         public void Init()
         {
-            if(initialScreenProvider == null || canvas == null)
+            screenManager = new ScreenManager();
+            Locator.RegisterService(screenManager);
+
+            if (canvas == null)
             {
-                Debug.LogError($"Could not initialize {nameof(UIInitializer)} due to missing references");
+                Debug.LogError($"Could not initialize {nameof(UIInitializer)} due to null canvas parent", gameObject);
                 return;
             }
 
-            screenManager = Locator.GetService<IScreenManager>();
-            screenManager.ParentCanvas = canvas.transform;
-            screenManager.ShowScreen(initialScreenProvider).OnFail(LogException);
+            screenManager.ParentCanvas = canvas;
+
+            if (initialScreenProvider != null)
+            {
+                screenManager.ShowScreen(initialScreenProvider);
+            }
         }
 
         public void Shutdown()
@@ -32,11 +37,8 @@ namespace Padoru.Core
             }
 
             screenManager.Clear();
-        }
 
-        private void LogException(Exception e)
-        {
-            Debug.LogException(e);
+            Locator.UnregisterService<IScreenManager>();
         }
     }
 }

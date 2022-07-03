@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using Debug = Padoru.Diagnostics.Debug;
+
 namespace Padoru.Core
 {
     public class ScreenManager : IScreenManager
@@ -11,12 +13,24 @@ namespace Padoru.Core
 
         private IScreen currentScreen => screens.LastOrDefault();
 
-        public Transform ParentCanvas { get; set; }
+        public Canvas ParentCanvas { get; set; }
 
         public IPromise<IScreen> ShowScreen(IScreenProvider provider)
         {
+            if(ParentCanvas == null)
+            {
+                var e = new Exception("ParentCanvas is not set. Cannot show screen");
+                Debug.LogException(e);
+                return PromiseFactory.CreateFailed<IScreen>(e);
+            }
+            
             var promise = new Promise<IScreen>();
-            LoadScreen(provider).OnFail((e) => promise.Fail(e)).OnComplete((screen) =>
+
+            LoadScreen(provider).OnFail((e) =>
+            {
+                Debug.LogException(e);
+                promise.Fail(e);
+            }).OnComplete((screen) =>
             {
                 PresentScreen(screen).OnFail((e) => promise.Fail(e)).OnComplete(() => promise.Complete(screen));
             });
@@ -70,7 +84,7 @@ namespace Padoru.Core
                 return PromiseFactory.CreateFailed<IScreen>(new Exception("ScreenProvider is null"));
             }
 
-            return provider.GetScreen(ParentCanvas).OnComplete(screen => screen.Initialize());
+            return provider.GetScreen(ParentCanvas.transform).OnComplete(screen => screen.Initialize());
         }
 
         private IPromise PresentScreen(IScreen screen)

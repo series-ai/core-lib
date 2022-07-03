@@ -8,7 +8,7 @@ namespace Padoru.Core
     {
         [SerializeField] private GameObject screenPrefab;
 
-        public override IPromise<IScreen> GetScreen(Transform parent = null)
+        public override IPromise<IScreen> GetScreen(Transform parent)
         {
             var promise = new Promise<IScreen>();
 
@@ -18,10 +18,10 @@ namespace Padoru.Core
             if(screen == null)
             {
                 promise.Fail(new Exception($"Screen provider screen does not contain an IScreen component"));
+                return promise;
             }
 
             promise.Complete(screen);
-
             return promise;
         }
     }
