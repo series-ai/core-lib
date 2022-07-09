@@ -28,9 +28,9 @@ namespace Padoru.Core.Editor
 				OnAddButtonClick(keysProperty, valuesProperty);
 			}
 
-			if (true)//show)
+			if (show)
 			{
-				DrawKeyAndValues(position, keysProperty, valuesProperty);
+				DrawKeyAndValues(position, property, keysProperty, valuesProperty);
 			}
 
 			EditorGUI.EndProperty();
@@ -42,17 +42,23 @@ namespace Padoru.Core.Editor
 			valuesProperty.arraySize++;
 		}
 
-		private void DrawKeyAndValues(Rect position, SerializedProperty keysProperty, SerializedProperty valuesProperty)
+		private void DrawKeyAndValues(Rect position, SerializedProperty dictionaryProperty, SerializedProperty keysProperty, SerializedProperty valuesProperty)
 		{
-			// Definir posicion inicial
 			// Definir ancho de key y value
-			
+
 			var keyValueRect = new Rect(position);
 			var yOffset = position.height + SPACING;
+
+			var serializedObject = dictionaryProperty.serializedObject;
+			serializedObject.Update();
+
 			for (int i = 0; i < keysProperty.arraySize; i++)
 			{
 				keyValueRect.y = position.y + yOffset * (i + 1);
-				GUI.Box(keyValueRect, "ASD");
+				var element = keysProperty.GetArrayElementAtIndex(i);
+
+				EditorGUI.PropertyField(keyValueRect, element, true);
+
 
 				// Obtener position del key
 				// Obtener position del value
@@ -65,6 +71,7 @@ namespace Padoru.Core.Editor
 
 				// offsetear la posicion apra el siguiente elemento
 			}
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }
