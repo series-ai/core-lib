@@ -8,6 +8,7 @@ namespace Padoru.Core.Editor
 	public class SerializedDictionaryDrawer<T> : PropertyDrawer where T : IDictionary
 	{
 		private const int ADD_BUTTON_WIDTH = 20;
+		private const int SPACING = 10;
 
 		private bool show;
 
@@ -27,7 +28,7 @@ namespace Padoru.Core.Editor
 				OnAddButtonClick(keysProperty, valuesProperty);
 			}
 
-			if (show)
+			if (true)//show)
 			{
 				DrawKeyAndValues(position, keysProperty, valuesProperty);
 			}
@@ -39,17 +40,20 @@ namespace Padoru.Core.Editor
 		{
 			keysProperty.arraySize++;
 			valuesProperty.arraySize++;
-
-			Debug.LogError($"{keysProperty.arraySize} / {valuesProperty.arraySize}");
 		}
 
 		private void DrawKeyAndValues(Rect position, SerializedProperty keysProperty, SerializedProperty valuesProperty)
 		{
 			// Definir posicion inicial
 			// Definir ancho de key y value
-
+			
+			var keyValueRect = new Rect(position);
+			var yOffset = position.height + SPACING;
 			for (int i = 0; i < keysProperty.arraySize; i++)
 			{
+				keyValueRect.y = position.y + yOffset * (i + 1);
+				GUI.Box(keyValueRect, "ASD");
+
 				// Obtener position del key
 				// Obtener position del value
 				// Key y value height?
