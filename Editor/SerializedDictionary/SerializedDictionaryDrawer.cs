@@ -9,11 +9,13 @@ namespace Padoru.Core.Editor
 	{
 		private const int ADD_BUTTON_WIDTH = 20;
 		private const int SPACING = 10;
+		private const float KEY_WIDTH_MULTIPLIER = 0.4f;
 
 		private bool show;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
 			EditorGUI.BeginProperty(position, label, property);
 
 			var keysProperty = property.FindPropertyRelative("keys");
@@ -44,8 +46,6 @@ namespace Padoru.Core.Editor
 
 		private void DrawKeyAndValues(Rect position, SerializedProperty dictionaryProperty, SerializedProperty keysProperty, SerializedProperty valuesProperty)
 		{
-			// Definir ancho de key y value
-
 			var keyValueRect = new Rect(position);
 			var yOffset = position.height + SPACING;
 
@@ -55,22 +55,27 @@ namespace Padoru.Core.Editor
 			for (int i = 0; i < keysProperty.arraySize; i++)
 			{
 				keyValueRect.y = position.y + yOffset * (i + 1);
-				var element = keysProperty.GetArrayElementAtIndex(i);
+				var keyRect = new Rect(keyValueRect.x, keyValueRect.y, keyValueRect.width * KEY_WIDTH_MULTIPLIER, keyValueRect.height);
+				var valueRect = new Rect(keyValueRect.x + (keyValueRect.width * KEY_WIDTH_MULTIPLIER) + SPACING, keyValueRect.y, keyValueRect.width * (1 - KEY_WIDTH_MULTIPLIER), keyValueRect.height);
 
-				EditorGUI.PropertyField(keyValueRect, element, true);
+				var key = keysProperty.GetArrayElementAtIndex(i);
+				var value = valuesProperty.GetArrayElementAtIndex(i);
 
+				var keySO = key.serializedObject;
+				var valueSO = value.serializedObject;
 
-				// Obtener position del key
-				// Obtener position del value
+				keySO.Update();
+				valueSO.Update();
+
+				EditorGUI.PropertyField(keyValueRect, key, true);
+				//EditorGUI.PropertyField(valueRect, value, true);
+
+				keySO.ApplyModifiedProperties();
+				valueSO.ApplyModifiedProperties();
+
 				// Key y value height?
-
-
-				// Dibujar el key
-				// Dibujar el value
-
-
-				// offsetear la posicion apra el siguiente elemento
 			}
+
 			serializedObject.ApplyModifiedProperties();
 		}
 	}
