@@ -26,12 +26,7 @@ namespace Padoru.Core
                 throw new ArgumentException($"Invalid protocol '{protocolHeader}'. Only word characters allowed.");
             }
 
-            var protocol = new FileSystemProtocol
-            {
-                ProtocolHeader = protocolHeader,
-                Serializer = serializer,
-                FileSystem = fileSystem
-            };
+            var protocol = new FileSystemProtocol(protocolHeader, serializer, fileSystem);
 
             protocols.Add(protocolHeader, protocol);
         }
@@ -62,12 +57,7 @@ namespace Padoru.Core
                 }
             }
 
-            return new FileSystemProtocol
-            {
-                FileSystem = defaultFileSystem,
-                ProtocolHeader = "",
-                Serializer = defaultSerializer
-            };
+            return new FileSystemProtocol("", defaultSerializer, defaultFileSystem);
         }
 
         public void Get<T>(string uri, Action<File<T>> OnFinish)

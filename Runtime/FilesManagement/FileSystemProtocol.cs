@@ -2,8 +2,15 @@
 {
     public class FileSystemProtocol
     {
-        public string ProtocolHeader;
-        public ISerializer Serializer;
-        public IFileSystem FileSystem;
+        public readonly string ProtocolHeader;
+        public readonly ISerializer Serializer;
+        public readonly IFileSystem FileSystem;
+        
+        public FileSystemProtocol(string protocolHeader, ISerializer serializer, IFileSystem fileSystem)
+        {
+            ProtocolHeader = protocolHeader;
+            Serializer = serializer;
+            FileSystem = fileSystem;
+        }
     }
 }
