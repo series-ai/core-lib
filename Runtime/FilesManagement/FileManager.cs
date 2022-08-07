@@ -101,10 +101,7 @@ namespace Padoru.Core
         {
             commandsQueue.QueueCommand(command);
 
-            if (!commandsQueue.IsExecuting)
-            {
-                commandsQueue.Execute();
-            }
+            commandsQueue.Execute();
         }
     }
 }

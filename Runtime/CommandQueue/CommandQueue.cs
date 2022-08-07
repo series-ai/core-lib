@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Debug = Padoru.Diagnostics.Debug;
 
@@ -9,8 +10,6 @@ namespace Padoru.Core
         private Queue<ICommand> commands;
         private ICommand currentCommand;
 
-        public bool IsExecuting { get; private set; }
-
         private bool IsQueueEmpty => commands.Count <= 0;
 
         public CommandQueue()
@@ -20,17 +19,25 @@ namespace Padoru.Core
 
         public void QueueCommand(ICommand command)
         {
+            if(command == null)
+            {
+                throw new Exception($"Cannot register a null command");
+            }
+
+            if (commands.Contains(command))
+            {
+                throw new Exception($"Command already registered {command}");
+            }
+
             commands.Enqueue(command);
         }
 
         public void Execute()
         {
-            if (IsExecuting || IsQueueEmpty)
+            if (IsQueueEmpty)
             {
                 return;
             }
-
-            IsExecuting = true;
 
             ExecuteNextCommand();
         }
@@ -41,12 +48,12 @@ namespace Padoru.Core
 
             if(result == OpResult.Failed)
             {
-                Debug.LogError($"Command execution failed: {currentCommand}.");
+                Debug.LogWarning($"Command execution failed: {currentCommand}.");
             }
 
             if(IsQueueEmpty)
             {
-                ResetQueue();
+                OnFinishExecuting();
             }
             else
             {
@@ -54,9 +61,8 @@ namespace Padoru.Core
             }
         }
 
-        private void ResetQueue()
+        private void OnFinishExecuting()
         {
-            IsExecuting = false;
             currentCommand = null;
         }
 
@@ -69,7 +75,16 @@ namespace Padoru.Core
 
             currentCommand = commands.Dequeue();
             currentCommand.OnFinish += OnCommandFinished;
-            currentCommand.Execute();
+
+            try
+            {
+                currentCommand.Execute();
+            }
+            catch (Exception e)
+            {
+                OnCommandFinished(OpResult.Failed);
+                Debug.LogException(e);
+            }
         }
     }
 }
