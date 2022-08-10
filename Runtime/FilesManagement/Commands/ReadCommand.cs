@@ -23,19 +23,29 @@ namespace Padoru.Core
         {
             try
             {
-                protocol.FileSystem.Get(uri, (file) =>
+                if (protocol.FileSystem.Exists(uri))
                 {
-                    var bytes = file.Data;
+                    protocol.FileSystem.Get(uri, (file) =>
+                    {
+                        var bytes = file.Data;
 
-                    protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
+                        protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
 
-                    finishCallback?.Invoke(new File<T>(uri, (T)result));
-                    OnFinish?.Invoke(OpResult.Succeeded);
-                });
+                        finishCallback?.Invoke(new File<T>(uri, (T)result));
+                        OnFinish?.Invoke(OpResult.Succeeded);
+                    });
+                }
+                else
+                {
+                    Debug.LogError($"Cannot read file because it does not exist: {uri}");
+                    finishCallback?.Invoke(null);
+                    OnFinish?.Invoke(OpResult.Failed);
+                }
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
+                finishCallback?.Invoke(null);
                 OnFinish?.Invoke(OpResult.Failed);
             }
         }

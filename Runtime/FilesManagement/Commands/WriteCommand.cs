@@ -38,6 +38,7 @@ namespace Padoru.Core
             catch (Exception e)
             {
                 Debug.LogException(e);
+                finishCallback?.Invoke(null);
                 OnFinish?.Invoke(OpResult.Failed);
             }
         }

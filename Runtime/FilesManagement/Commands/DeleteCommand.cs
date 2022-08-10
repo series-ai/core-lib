@@ -23,8 +23,16 @@ namespace Padoru.Core
         {
             try
             {
-                protocol.FileSystem.Delete(uri, finishCallback);
-                OnFinish?.Invoke(OpResult.Succeeded);
+                if (protocol.FileSystem.Exists(uri))
+                {
+                    protocol.FileSystem.Delete(uri, finishCallback);
+                    OnFinish?.Invoke(OpResult.Succeeded);
+                }
+                else
+                {
+                    Debug.LogError($"Cannot delete file because it does not exists: {uri}");
+                    OnFinish?.Invoke(OpResult.Failed);
+                }
             }
             catch (Exception e)
             {

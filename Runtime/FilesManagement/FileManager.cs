@@ -1,29 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
     public class FileManager : IFileManager
     {
         private const string PROTOCOL_HEADER_REGEX = @"^\w+://$";
+        private const string DEFAULT_PROTOCOL_HEADER_REGEX = "default://";
 
-        private readonly IFileSystem defaultFileSystem = new MemoryFileSystem();
-        private readonly ISerializer defaultSerializer = new JsonSerializer();
         private readonly Dictionary<string, FileSystemProtocol> protocols = new Dictionary<string, FileSystemProtocol>();
         private readonly Regex protocolRegex;
         private readonly CommandQueue commandsQueue = new CommandQueue();
+        private readonly FileSystemProtocol defaultProtocol;
 
-        public FileManager()
+        public FileManager(ISerializer defaultSerializer, IFileSystem defaultFileSystem)
         {
             protocolRegex = new Regex(PROTOCOL_HEADER_REGEX);
+
+            defaultProtocol = new FileSystemProtocol(DEFAULT_PROTOCOL_HEADER_REGEX, defaultSerializer, defaultFileSystem);
         }
 
         public void Register(string protocolHeader, ISerializer serializer, IFileSystem fileSystem)
         {
             if (!protocolRegex.IsMatch(protocolHeader ?? string.Empty))
             {
-                throw new ArgumentException($"Invalid protocol '{protocolHeader}'. Only word characters allowed.");
+                throw new Exception($"Invalid protocol '{protocolHeader}'. Only word characters allowed.");
+            }
+
+            if (serializer == null)
+            {
+                throw new Exception($"Cannot register protocol with a null {nameof(ISerializer)}");
+            }
+
+            if (fileSystem == null)
+            {
+                throw new Exception($"Cannot register protocol with a null {nameof(IFileSystem)}");
+            }
+
+            if (protocols.ContainsKey(protocolHeader))
+            {
+                throw new Exception($"Cannot register protocol {protocolHeader}, it is already registered");
             }
 
             var protocol = new FileSystemProtocol(protocolHeader, serializer, fileSystem);
@@ -57,7 +75,9 @@ namespace Padoru.Core
                 }
             }
 
-            return new FileSystemProtocol("", defaultSerializer, defaultFileSystem);
+            Debug.LogWarning($"There is not protocol registered for the uri : {uri}. Returning default protocol");
+
+            return defaultProtocol;
         }
 
         public void Get<T>(string uri, Action<File<T>> OnFinish)
