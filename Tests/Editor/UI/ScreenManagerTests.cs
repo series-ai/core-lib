@@ -1,12 +1,28 @@
 ﻿using NUnit.Framework;
-using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Padoru.Core.Tests
 {
     [TestFixture]
     public class ScreenManagerTests
     {
+        private Canvas parentCanvas;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            var canvasGO = new GameObject("ParentCanvas");
+            parentCanvas = canvasGO.AddComponent<Canvas>();
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            Object.DestroyImmediate(parentCanvas.gameObject);
+        }
+
         [Test]
         public void ShowScreen_WhenProviderNotNullAndScreenNotNull_ShouldNotReturnFailedPromise()
         {
@@ -14,6 +30,8 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
+
+            screenManager.ParentCanvas = parentCanvas;
 
             screenManager.ShowScreen(provider).OnFail((e) =>
             {
@@ -31,6 +49,10 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager();
             var provider = new TestNullScreenProvider();
 
+            screenManager.ParentCanvas = parentCanvas;
+
+            LogAssert.Expect(LogType.Error, new Regex(""));
+
             screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true);
 
             Assert.IsTrue(promiseFailed);
@@ -42,6 +64,10 @@ namespace Padoru.Core.Tests
             var promiseFailed = false;
 
             var screenManager = new ScreenManager();
+
+            screenManager.ParentCanvas = parentCanvas;
+
+            LogAssert.Expect(LogType.Error, new Regex(""));
 
             screenManager.ShowScreen(null).OnFail((e) => promiseFailed = true);
 
@@ -55,6 +81,8 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
+
+            screenManager.ParentCanvas = parentCanvas;
 
             screenManager.ShowScreen(provider).OnComplete((screen) =>
             {
@@ -71,7 +99,9 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
-            
+
+            screenManager.ParentCanvas = parentCanvas;
+
             provider.GetScreen().OnComplete((screen) =>
             {
                 screenManager.CloseScreen(screen).OnFail((e) => promiseFailed = true);
@@ -87,6 +117,8 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
 
+            screenManager.ParentCanvas = parentCanvas;
+
             screenManager.CloseScreen(null).OnFail((e) => promiseFailed = true);
 
             Assert.IsTrue(promiseFailed);
@@ -99,6 +131,8 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
+
+            screenManager.ParentCanvas = parentCanvas;
 
             screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
             {
@@ -117,6 +151,8 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
+            screenManager.ParentCanvas = parentCanvas;
+
             screenManager.CloseAndShowScreen(provider).OnFail((e) => promiseFailed = true);
 
             Assert.IsTrue(promiseFailed);
@@ -130,6 +166,8 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager();
             var provider1 = new TestScreenProvider();
             var provider2 = new TestScreenProvider();
+
+            screenManager.ParentCanvas = parentCanvas;
 
             screenManager.ShowScreen(provider1).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
             {
@@ -146,6 +184,10 @@ namespace Padoru.Core.Tests
 
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
+
+            screenManager.ParentCanvas = parentCanvas;
+
+            LogAssert.Expect(LogType.Error, new Regex(""));
 
             screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
             {
@@ -164,6 +206,10 @@ namespace Padoru.Core.Tests
             var provider1 = new TestScreenProvider();
             var provider2 = new TestNullScreenProvider();
 
+            screenManager.ParentCanvas = parentCanvas;
+
+            LogAssert.Expect(LogType.Error, new Regex(""));
+
             screenManager.ShowScreen(provider1).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
             {
                 screenManager.CloseAndShowScreen(provider2).OnFail((e) => promiseFailed = true);
@@ -176,7 +222,8 @@ namespace Padoru.Core.Tests
         public void GetParentCanvas_WhenCleared_ShouldBeNull()
         {
             var screenManager = new ScreenManager();
-            // TODO: Set screenManager.ParentCanvas
+
+            screenManager.ParentCanvas = parentCanvas;
 
             screenManager.Clear();
 
