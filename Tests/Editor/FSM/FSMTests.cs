@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using System;
-using UnityEngine;
 
 namespace Padoru.Core.Tests
 {
@@ -8,6 +7,19 @@ namespace Padoru.Core.Tests
     {
         private FSM<TestStates, TestTriggers> fsm;
         private TestStates startState = TestStates.State1;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            var tickManager = new MockTickManager();
+            Locator.RegisterService<ITickManager>(tickManager);
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            Locator.UnregisterService<ITickManager>();
+        }
 
         [Test]
         public void StartFSM_WhenNotStarted_InitialStateShouldBeTheOneSet()
@@ -69,14 +81,6 @@ namespace Padoru.Core.Tests
             fsm.AddTransition(TestStates.State1, TestStates.State2, TestTriggers.Trigger1);
 
             Assert.Throws<Exception>(() => fsm.AddTransition(TestStates.State1, TestStates.State2, TestTriggers.Trigger1));
-        }
-
-        [Test]
-        public void AddTransition_WhenInitialAndTargetStatesAreTheSame_ShouldThrow()
-        {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
-
-            Assert.Throws<Exception>(() => fsm.AddTransition(TestStates.State1, TestStates.State1, TestTriggers.Trigger1));
         }
 
         [Test]
