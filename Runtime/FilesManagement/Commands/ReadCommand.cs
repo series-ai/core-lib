@@ -2,7 +2,7 @@
 
 using Debug = Padoru.Diagnostics.Debug;
 
-namespace Padoru.Core
+namespace Padoru.Core.Files
 {
     public class ReadCommand<T> : ICommand
     {

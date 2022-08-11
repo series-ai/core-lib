@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Padoru.Core.Tests
+namespace Padoru.Core.Files.Tests
 {
     public class ReadCommandTests
     {

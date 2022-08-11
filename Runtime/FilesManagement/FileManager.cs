@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Debug = Padoru.Diagnostics.Debug;
 
-namespace Padoru.Core
+namespace Padoru.Core.Files
 {
     public class FileManager : IFileManager
     {

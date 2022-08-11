@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Padoru.Core
+namespace Padoru.Core.Files
 {
     public class MemoryFileSystem : IFileSystem
     {
