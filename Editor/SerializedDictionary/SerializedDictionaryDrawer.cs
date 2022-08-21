@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Padoru.Core.Editor
 {
-    public class SerializedDictionaryDrawer<T> : PropertyDrawer where T : IDictionary
+    public abstract class SerializedDictionaryDrawer<T> : PropertyDrawer where T : class, IDictionary
 	{
 		private const int ADD_BUTTON_WIDTH = 20;
 		private const int VERTICAL_SPACING = 10;
@@ -13,9 +13,18 @@ namespace Padoru.Core.Editor
 		private int itemsCount;
 		private bool initialized;
 
+		private SerializedProperty keysProperty;
+		private SerializedProperty valuesProperty;
+		private SerializedProperty addedValueThroughEditorProperty;
+		private SerializedObject serializedObject;
+
 		private void Initialize(SerializedProperty property)
 		{
-			var keysProperty = property.FindPropertyRelative("keys");
+			serializedObject = property.serializedObject;
+
+			keysProperty = property.FindPropertyRelative("keys");
+			valuesProperty = property.FindPropertyRelative("values");
+			addedValueThroughEditorProperty = property.FindPropertyRelative("addedItemThroughEditor");
 
 			itemsCount = keysProperty.arraySize;
 		}
@@ -30,39 +39,41 @@ namespace Padoru.Core.Editor
 
 			EditorGUI.BeginProperty(position, label, property);
 
-			var keysProperty = property.FindPropertyRelative("keys");
-			var valuesProperty = property.FindPropertyRelative("values");
-
 			var titlePosition = new Rect(position.x, position.y, position.width - ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
 			var addButtonPosition = new Rect(position.width - ADD_BUTTON_WIDTH, position.y, ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
 			
 			show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
 			if(GUI.Button(addButtonPosition, "+"))
 			{
-				OnAddButtonClick(keysProperty, valuesProperty);
+				OnAddButtonClick();
 			}
 
 			if (show)
 			{
-				DrawKeyAndValues(position, property, keysProperty, valuesProperty);
+				DrawKeyAndValues(position);
 			}
 
 			EditorGUI.EndProperty();
 		}
 
-		private void OnAddButtonClick(SerializedProperty keysProperty, SerializedProperty valuesProperty)
+		private void OnAddButtonClick()
 		{
+			serializedObject.Update();
+
+			addedValueThroughEditorProperty.boolValue = true;
+
 			keysProperty.arraySize++;
 			valuesProperty.arraySize++;
 			itemsCount++;
+
+			serializedObject.ApplyModifiedProperties();
 		}
 
-		private void DrawKeyAndValues(Rect position, SerializedProperty dictionaryProperty, SerializedProperty keysProperty, SerializedProperty valuesProperty)
+		private void DrawKeyAndValues(Rect position)
 		{
 			var keyValueRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
 			var yOffset = keyValueRect.y + VERTICAL_SPACING;
 
-			var serializedObject = dictionaryProperty.serializedObject;
 			serializedObject.Update();
 
 			for (int i = 0; i < keysProperty.arraySize; i++)
@@ -80,11 +91,11 @@ namespace Padoru.Core.Editor
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			var keysProperty = property.FindPropertyRelative("keys");
-			var valuesProperty = property.FindPropertyRelative("values");
 			var titleHeight = EditorGUIUtility.singleLineHeight;
 
-			if (keysProperty.arraySize <= 0 || valuesProperty.arraySize <= 0 || !show)
+			if (keysProperty == null || keysProperty.arraySize <= 0 || 
+				valuesProperty == null || valuesProperty.arraySize <= 0 || 
+				!show)
 			{
 				return titleHeight;
 			}
