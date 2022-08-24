@@ -7,16 +7,18 @@ namespace Padoru.Core.Editor
     public abstract class SerializedDictionaryDrawer<T> : PropertyDrawer where T : class, IDictionary
 	{
 		private const int ADD_BUTTON_WIDTH = 20;
-		private const int VERTICAL_SPACING = 10;
+		private const int VERTICAL_SPACING = 5;
 
 		private bool show = true;
 		private int itemsCount;
 		private bool initialized;
+		private bool shouldCheckIfValueWasAdded;
 
 		private SerializedProperty keysProperty;
 		private SerializedProperty valuesProperty;
 		private SerializedProperty addedValueThroughEditorProperty;
 		private SerializedObject serializedObject;
+		private KeyValueDrawer keyValueDrawer;
 
 		private void Initialize(SerializedProperty property)
 		{
@@ -37,11 +39,23 @@ namespace Padoru.Core.Editor
 				Initialize(property);
 			}
 
+			if (shouldCheckIfValueWasAdded)
+			{
+				shouldCheckIfValueWasAdded = false;
+				if (itemsCount > keysProperty.arraySize)
+				{
+					itemsCount = keysProperty.arraySize;
+				}
+			}
+
 			EditorGUI.BeginProperty(position, label, property);
 
 			var titlePosition = new Rect(position.x, position.y, position.width - ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
 			var addButtonPosition = new Rect(position.width - ADD_BUTTON_WIDTH, position.y, ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
-			
+
+			// Add the title height and some spacing
+			position.y += EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
+
 			show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
 			if(GUI.Button(addButtonPosition, "+"))
 			{
@@ -66,24 +80,36 @@ namespace Padoru.Core.Editor
 			valuesProperty.arraySize++;
 			itemsCount++;
 
+			shouldCheckIfValueWasAdded = true;
+
 			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawKeyAndValues(Rect position)
 		{
+			if(keysProperty.arraySize <= 0)
+			{
+				return;
+			}
+
+			if (keyValueDrawer == null)
+			{
+				CreateKeyValueDrawer();
+			}
+
 			var keyValueRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-			var yOffset = keyValueRect.y + VERTICAL_SPACING;
+			var yOffset = keyValueDrawer.KeyValueHeight + VERTICAL_SPACING;
 
 			serializedObject.Update();
 
 			for (int i = 0; i < keysProperty.arraySize; i++)
 			{
-				keyValueRect.y = position.y + yOffset * (i + 1);
-
 				var key = keysProperty.GetArrayElementAtIndex(i);
 				var value = valuesProperty.GetArrayElementAtIndex(i);
 
-				KeyValueDrawer.Draw(keyValueRect, key, value);
+				keyValueDrawer.Draw(keyValueRect, key, value);
+
+				keyValueRect.y += yOffset;
 			}
 
 			serializedObject.ApplyModifiedProperties();
@@ -91,13 +117,26 @@ namespace Padoru.Core.Editor
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			var titleHeight = EditorGUIUtility.singleLineHeight;
+			var titleHeight = EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
 
-			if (keysProperty == null || keysProperty.arraySize <= 0 || 
-				valuesProperty == null || valuesProperty.arraySize <= 0 || 
-				!show)
+			if (keyValueDrawer == null || !show)
 			{
 				return titleHeight;
+			}
+
+			var propertiesHeight = (keyValueDrawer.KeyValueHeight + VERTICAL_SPACING) * itemsCount;
+
+			var height = titleHeight + propertiesHeight;
+
+			return height;
+		}
+
+		private void CreateKeyValueDrawer()
+		{
+			if (keysProperty.arraySize <= 0)
+			{
+				Debug.LogError($"Cannot create {typeof(KeyValueDrawer)} because there are no elements in the array so the height cannot be calculated");
+				return;
 			}
 
 			var firstKey = keysProperty.GetArrayElementAtIndex(0);
@@ -105,11 +144,8 @@ namespace Padoru.Core.Editor
 
 			var highestPropertyHeight = Mathf.Max(EditorGUI.GetPropertyHeight(firstKey),
 										EditorGUI.GetPropertyHeight(firstValue));
-			var propertiesHeight = (highestPropertyHeight + KeyValueDrawer.BOX_BORDER * 2) * itemsCount;
 
-			var height = titleHeight + VERTICAL_SPACING + propertiesHeight + EditorGUIUtility.singleLineHeight;
-
-			return height;
+			keyValueDrawer = new KeyValueDrawer(highestPropertyHeight);
 		}
 	}
 }

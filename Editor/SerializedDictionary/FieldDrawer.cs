@@ -30,7 +30,7 @@ namespace Padoru.Core.Editor
 		{
 			var labelWidth = EditorGUIUtility.labelWidth;
 
-			//property.isExpanded = true;
+			property.isExpanded = true;
 
 			// TODO: remove folding arrow and indentation
 			// Checkout -> https://github.com/starikcetin/Unity-SerializableDictionary/blob/master/Assets/SerializableDictionary/Editor/SerializableDictionaryPropertyDrawer.cs

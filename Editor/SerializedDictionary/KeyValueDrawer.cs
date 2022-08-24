@@ -3,30 +3,32 @@ using UnityEngine;
 
 namespace Padoru.Core.Editor
 {
-	public static class KeyValueDrawer
+	public class KeyValueDrawer
 	{
-		public const float BOX_BORDER = 8;
-
+		private const float BOX_BORDER = 8;
 		private const float KEY_AND_VALUE_SPACING = 10;
 		private const float KEY_WIDTH_MULTIPLIER = 0.3f;
 		private const float LINE_WIDTH = 1;
 
-		private static Color boxColor = new Color(0.2f, 0.2f, 0.2f);
-		private static Color lineColor = new Color(0.15f, 0.15f, 0.15f);
+		private Color boxColor = new Color(0.2f, 0.2f, 0.2f);
+		private Color lineColor = new Color(0.15f, 0.15f, 0.15f);
 
-		public static void Draw(Rect keyValueRect, SerializedProperty key, SerializedProperty value)
+		public float KeyValueHeight { get; private set; }
+
+		public KeyValueDrawer(float highestPropertyHeight)
 		{
-			var highestPropertyHeight = Mathf.Max(EditorGUI.GetPropertyHeight(key),
-										EditorGUI.GetPropertyHeight(value));
+			KeyValueHeight = highestPropertyHeight;
+			KeyValueHeight += BOX_BORDER * 2;
+		}
 
-			highestPropertyHeight += BOX_BORDER * 2;
-
-			DrawBoxAndLine(keyValueRect, highestPropertyHeight);
+		public void Draw(Rect keyValueRect, SerializedProperty key, SerializedProperty value)
+		{
+			DrawBoxAndLine(keyValueRect, KeyValueHeight);
 
 			DrawFields(keyValueRect, key, value);
 		}
 
-		private static void DrawBoxAndLine(Rect keyValueRect, float boxHeight)
+		private void DrawBoxAndLine(Rect keyValueRect, float boxHeight)
 		{
 			var boxRect = GetBoxRect(keyValueRect, boxHeight);
 			var lineRect = GetLineRect(keyValueRect, boxHeight);
@@ -35,7 +37,7 @@ namespace Padoru.Core.Editor
 			EditorGUI.DrawRect(lineRect, lineColor);
 		}
 
-		private static void DrawFields(Rect keyValueRect, SerializedProperty key, SerializedProperty value)
+		private void DrawFields(Rect keyValueRect, SerializedProperty key, SerializedProperty value)
 		{
 			var keyRect = GetKeyRect(keyValueRect);
 			var valueRect = GetValueRect(keyValueRect);
@@ -44,7 +46,7 @@ namespace Padoru.Core.Editor
 			FieldDrawer.DrawField(value, valueRect);
 		}
 
-		private static Rect GetBoxRect(Rect keyValueRect, float boxHeight)
+		private Rect GetBoxRect(Rect keyValueRect, float boxHeight)
 		{
 			return new Rect(keyValueRect.x,
 							keyValueRect.y,
@@ -52,7 +54,7 @@ namespace Padoru.Core.Editor
 							boxHeight);
 		}
 
-		private static Rect GetLineRect(Rect keyValueRect, float boxHeight)
+		private Rect GetLineRect(Rect keyValueRect, float boxHeight)
 		{
 			return new Rect(keyValueRect.x + (keyValueRect.width * KEY_WIDTH_MULTIPLIER) - LINE_WIDTH / 2f + BOX_BORDER, 
 							keyValueRect.y + BOX_BORDER,
@@ -60,7 +62,7 @@ namespace Padoru.Core.Editor
 							boxHeight - BOX_BORDER * 2f);
 		}
 
-		private static Rect GetKeyRect(Rect keyValueRect)
+		private Rect GetKeyRect(Rect keyValueRect)
 		{
 			return new Rect(keyValueRect.x + BOX_BORDER, 
 							keyValueRect.y + BOX_BORDER, 
@@ -68,7 +70,7 @@ namespace Padoru.Core.Editor
 							keyValueRect.height);
 		}
 
-		private static Rect GetValueRect(Rect keyValueRect)
+		private Rect GetValueRect(Rect keyValueRect)
 		{
 			return new Rect(keyValueRect.x + (keyValueRect.width * KEY_WIDTH_MULTIPLIER) + BOX_BORDER + KEY_AND_VALUE_SPACING * 2f, // <-- Spacing multiplied by 2 because of the folding arrow. Remove if able to remove the folding arrow
 							keyValueRect.y + BOX_BORDER, 
