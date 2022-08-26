@@ -58,7 +58,7 @@ namespace Padoru.Core.Editor
 
 			show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
 
-			if(GUI.Button(addButtonPosition, UnityIcons.GetPlusIcon(), GUIStyle.none))
+			if (GUI.Button(addButtonPosition, UnityIcons.GetPlusIcon(), GUIStyles.ListButtonStyle))
 			{
 				OnAddButtonClick();
 			}

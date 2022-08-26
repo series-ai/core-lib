@@ -54,15 +54,13 @@ namespace Padoru.Core.Editor
 
 		private void DrawRemoveButton(Rect keyValueRect, Action onRemoveButtonClick)
 		{
-			var style = GUIStyle.none;
+			var style = GUIStyles.ListButtonStyle;
 			var minusIcon = UnityIcons.GetMinusIcon();
-			var size = style.CalcSize(minusIcon);
 
 			var buttonBoxRect = GetMinusButtonBoxRect(keyValueRect);
-			var buttonRect = GetMinusButtonRect(buttonBoxRect, size);
+			var buttonRect = GetMinusButtonRect(buttonBoxRect, style, minusIcon);
 
 			EditorGUI.DrawRect(buttonBoxRect, boxColor);
-
 			if (GUI.Button(buttonRect, minusIcon, style))
 			{
 				onRemoveButtonClick?.Invoke();
@@ -109,8 +107,10 @@ namespace Padoru.Core.Editor
 							MINUS_BUTTON_HEIGHT);
 		}
 
-		private Rect GetMinusButtonRect(Rect buttonBoxRect, Vector2 size)
+		private Rect GetMinusButtonRect(Rect buttonBoxRect, GUIStyle style, GUIContent minusIcon)
 		{
+			var size = style.CalcSize(minusIcon);
+
 			return new Rect(buttonBoxRect.x + buttonBoxRect.width / 2f - size.x / 2f,
 							buttonBoxRect.y,
 							size.x,
