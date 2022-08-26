@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ namespace Padoru.Core.Editor
 		private const float KEY_AND_VALUE_SPACING = 10;
 		private const float KEY_WIDTH_MULTIPLIER = 0.3f;
 		private const float LINE_WIDTH = 1;
+		private const float MINUS_BUTTON_WIDTH = 30;
+		private const float MINUS_BUTTON_HEIGHT = 15;
 
 		private Color boxColor = new Color(0.2f, 0.2f, 0.2f);
 		private Color lineColor = new Color(0.15f, 0.15f, 0.15f);
@@ -19,19 +22,22 @@ namespace Padoru.Core.Editor
 		{
 			KeyValueHeight = highestPropertyHeight;
 			KeyValueHeight += BOX_BORDER * 2;
+			KeyValueHeight += MINUS_BUTTON_HEIGHT;
 		}
 
-		public void Draw(Rect keyValueRect, SerializedProperty key, SerializedProperty value)
+		public void Draw(Rect keyValueRect, SerializedProperty key, SerializedProperty value, Action onRemoveButtonClick)
 		{
-			DrawBoxAndLine(keyValueRect, KeyValueHeight);
+			DrawBoxAndLine(keyValueRect);
 
 			DrawFields(keyValueRect, key, value);
+
+			DrawRemoveButton(keyValueRect, onRemoveButtonClick);
 		}
 
-		private void DrawBoxAndLine(Rect keyValueRect, float boxHeight)
+		private void DrawBoxAndLine(Rect keyValueRect)
 		{
-			var boxRect = GetBoxRect(keyValueRect, boxHeight);
-			var lineRect = GetLineRect(keyValueRect, boxHeight);
+			var boxRect = GetBoxRect(keyValueRect);
+			var lineRect = GetLineRect(keyValueRect);
 
 			EditorGUI.DrawRect(boxRect, boxColor);
 			EditorGUI.DrawRect(lineRect, lineColor);
@@ -46,20 +52,37 @@ namespace Padoru.Core.Editor
 			FieldDrawer.DrawField(value, valueRect);
 		}
 
-		private Rect GetBoxRect(Rect keyValueRect, float boxHeight)
+		private void DrawRemoveButton(Rect keyValueRect, Action onRemoveButtonClick)
+		{
+			var style = GUIStyle.none;
+			var minusIcon = UnityIcons.GetMinusIcon();
+			var size = style.CalcSize(minusIcon);
+
+			var buttonBoxRect = GetMinusButtonBoxRect(keyValueRect);
+			var buttonRect = GetMinusButtonRect(buttonBoxRect, size);
+
+			EditorGUI.DrawRect(buttonBoxRect, boxColor);
+
+			if (GUI.Button(buttonRect, minusIcon, style))
+			{
+				onRemoveButtonClick?.Invoke();
+			}
+		}
+
+		private Rect GetBoxRect(Rect keyValueRect)
 		{
 			return new Rect(keyValueRect.x,
 							keyValueRect.y,
 							keyValueRect.width,
-							boxHeight);
+							KeyValueHeight - MINUS_BUTTON_HEIGHT);
 		}
 
-		private Rect GetLineRect(Rect keyValueRect, float boxHeight)
+		private Rect GetLineRect(Rect keyValueRect)
 		{
 			return new Rect(keyValueRect.x + (keyValueRect.width * KEY_WIDTH_MULTIPLIER) - LINE_WIDTH / 2f + BOX_BORDER, 
 							keyValueRect.y + BOX_BORDER,
 							LINE_WIDTH,
-							boxHeight - BOX_BORDER * 2f);
+							KeyValueHeight - BOX_BORDER * 2f - MINUS_BUTTON_HEIGHT);
 		}
 
 		private Rect GetKeyRect(Rect keyValueRect)
@@ -76,6 +99,22 @@ namespace Padoru.Core.Editor
 							keyValueRect.y + BOX_BORDER, 
 							keyValueRect.width * (1 - KEY_WIDTH_MULTIPLIER) - BOX_BORDER * 2f - KEY_AND_VALUE_SPACING * 2f, // <-- Same here
 							keyValueRect.height - BOX_BORDER * 2f);
+		}
+
+		private Rect GetMinusButtonBoxRect(Rect keyValueRect)
+		{
+			return new Rect(keyValueRect.x + keyValueRect.width - MINUS_BUTTON_WIDTH,
+							keyValueRect.y + KeyValueHeight - MINUS_BUTTON_HEIGHT,
+							MINUS_BUTTON_WIDTH,
+							MINUS_BUTTON_HEIGHT);
+		}
+
+		private Rect GetMinusButtonRect(Rect buttonBoxRect, Vector2 size)
+		{
+			return new Rect(buttonBoxRect.x + buttonBoxRect.width / 2f - size.x / 2f,
+							buttonBoxRect.y,
+							size.x,
+							size.y);
 		}
 	}
 }

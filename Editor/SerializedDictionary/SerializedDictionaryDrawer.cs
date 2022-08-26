@@ -57,7 +57,8 @@ namespace Padoru.Core.Editor
 			position.y += EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
 
 			show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
-			if(GUI.Button(addButtonPosition, "+"))
+
+			if(GUI.Button(addButtonPosition, UnityIcons.GetPlusIcon(), GUIStyle.none))
 			{
 				OnAddButtonClick();
 			}
@@ -107,7 +108,7 @@ namespace Padoru.Core.Editor
 				var key = keysProperty.GetArrayElementAtIndex(i);
 				var value = valuesProperty.GetArrayElementAtIndex(i);
 
-				keyValueDrawer.Draw(keyValueRect, key, value);
+				keyValueDrawer.Draw(keyValueRect, key, value, () => RemoveElement(i));
 
 				keyValueRect.y += yOffset;
 			}
@@ -146,6 +147,18 @@ namespace Padoru.Core.Editor
 										EditorGUI.GetPropertyHeight(firstValue));
 
 			keyValueDrawer = new KeyValueDrawer(highestPropertyHeight);
+		}
+
+		private void RemoveElement(int index)
+		{
+			serializedObject.Update();
+
+			keysProperty.DeleteArrayElementAtIndex(index);
+			valuesProperty.DeleteArrayElementAtIndex(index);
+
+			itemsCount--;
+
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }
