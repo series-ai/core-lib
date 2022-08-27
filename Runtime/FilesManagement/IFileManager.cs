@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Padoru.Core
+namespace Padoru.Core.Files
 {
     public interface IFileManager
     {

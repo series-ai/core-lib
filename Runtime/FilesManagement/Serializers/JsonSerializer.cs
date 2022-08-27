@@ -2,7 +2,7 @@
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Padoru.Core
+namespace Padoru.Core.Files
 {
     public class JsonSerializer : ISerializer
     {

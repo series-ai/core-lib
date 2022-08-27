@@ -1,4 +1,4 @@
-﻿namespace Padoru.Core
+﻿namespace Padoru.Core.Files
 {
     public class File<T>
     {

@@ -1,6 +1,6 @@
 {
   "name": "com.padoru.core-lib",
-  "version": "0.1.4",
+  "version": "0.2.1",
   "displayName": "Padoru Core",
   "description": "A core library to develop games in Unity",
   "unity": "2020.3"
