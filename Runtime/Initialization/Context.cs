@@ -32,7 +32,9 @@ namespace Padoru.Core
                 throw new Exception($"Trying to initialize context more than once {gameObject.name}");
             }
 
-            var initializables = GetComponentsInChildren<IInitializable>();
+            //Only initialize the first depth children
+            var initializables = this.GetComponentsInFirstDepthChildren<IInitializable>();
+            
             foreach (var item in initializables)
             {
                 item.Init();
