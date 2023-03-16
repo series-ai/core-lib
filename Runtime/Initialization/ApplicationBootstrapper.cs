@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Padoru.Diagnostics;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Padoru.Core
     public static class ApplicationBootstrapper
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void StartApplication()
+        public static async void StartApplication()
         {
             var settings = Resources.Load<Settings>(Constants.SETTINGS_OBJECT_NAME);
 
@@ -19,7 +20,7 @@ namespace Padoru.Core
             }
 
             ConfigLog(settings);
-            SetupProjectContext(settings);
+            await SetupProjectContext(settings);
         }
 
         private static void ConfigLog(Settings settings)
@@ -34,7 +35,7 @@ namespace Padoru.Core
             Debug.AddOutput(new UnityConsoleOutput());
         }
 
-        private static void SetupProjectContext(Settings settings)
+        private static async Task SetupProjectContext(Settings settings)
         {
             var projectContextPrefab = Resources.Load<Context>(settings.ProjectContextPrefabName);
 
@@ -52,7 +53,7 @@ namespace Padoru.Core
             Locator.RegisterService(projectContext, settings.ProjectContextPrefabName);
 
             Debug.Log($"Initializing ProjectContext");
-            projectContext.Init();
+            await projectContext.Init();
         }
     }
 }
