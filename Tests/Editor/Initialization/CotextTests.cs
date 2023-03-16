@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -22,30 +23,28 @@ namespace Padoru.Core.Tests
             UnityEngine.Object.DestroyImmediate(go);
         }
 
-        [UnityTest]
-        public IEnumerator InitContext_WhenContextNotInitialized_ShouldBeInitialized()
+        [Test]
+        public async void InitContext_WhenContextNotInitialized_ShouldBeInitialized()
         {
-            yield return null;
-
             var context = go.AddComponent<Context>();
 
-            Assert.DoesNotThrow(context.Init);
+            await Task.Run(context.Init);
+            
             Assert.IsTrue(context.IsInitialized);
         }
 
-        [UnityTest]
-        public IEnumerator InitContext_WhenContextInitialized_ShouldThrowException()
+        [Test]
+        public async void InitContext_WhenContextInitialized_ShouldThrowException()
         {
-            yield return null;
-
             var context = go.AddComponent<Context>();
-            context.Init();
+            
+            await Task.Run(context.Init);
 
-            Assert.Throws<Exception>(context.Init);
+            Assert.Throws<AggregateException>(() => Task.Run(context.Init).Wait());
         }
 
         [UnityTest]
-        public IEnumerator ShudownContext_WhenContextInitialized_ShouldNotBeInitialized()
+        public IEnumerator ShutdownContext_WhenContextInitialized_ShouldNotBeInitialized()
         {
             yield return null;
 
@@ -57,7 +56,7 @@ namespace Padoru.Core.Tests
         }
 
         [UnityTest]
-        public IEnumerator ShudownContext_WhenContextNotInitialized_ShouldThrowException()
+        public IEnumerator ShutdownContext_WhenContextNotInitialized_ShouldThrowException()
         {
             yield return null;
 
