@@ -12,7 +12,7 @@ namespace Padoru.Core.Utils
 
 		public Timer(ModifiableValue<float, FloatCalculator> tickInterval, Action<float> callback)
 		{
-			tickManager = Locator.GetService<ITickManager>();
+			tickManager = Locator.Get<ITickManager>();
 
 			this.tickInterval = tickInterval;
 			this.callback = callback;
@@ -20,7 +20,7 @@ namespace Padoru.Core.Utils
 
 		public Timer(float tickInterval, Action<float> callback)
 		{
-			tickManager = Locator.GetService<ITickManager>();
+			tickManager = Locator.Get<ITickManager>();
 
 			this.tickInterval = new ModifiableValue<float, FloatCalculator>(tickInterval);
 			this.callback = callback;

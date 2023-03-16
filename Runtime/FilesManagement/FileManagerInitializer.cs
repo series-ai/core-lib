@@ -14,12 +14,12 @@ namespace Padoru.Core.Files
 
             fileManager.Register(Protocols.LOCAL_JSON_PPROTOCOL, serializer, fileSystem);
 
-            Locator.RegisterService<IFileManager>(fileManager);
+            Locator.Register<IFileManager>(fileManager);
         }
 
         public void Shutdown()
         {
-            Locator.UnregisterService<IFileManager>();
+            Locator.Unregister<IFileManager>();
         }
     }
 }

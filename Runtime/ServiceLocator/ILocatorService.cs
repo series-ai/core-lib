@@ -4,23 +4,23 @@ namespace Padoru.Core
 {
 	public interface IServiceLocator
 	{
-		void RegisterService<T, S>() where S : T, new();
+		void Register<T, S>() where S : T, new();
 
-		void RegisterService<T>(T service);
+		void Register<T>(T service);
 
-		void RegisterService<T, S>(string tag) where S : T, new();
+		void Register<T, S>(string tag) where S : T, new();
 
-		void RegisterService<T>(T service, string tag);
+		void Register<T>(T service, string tag);
 
-		void UnregisterService<T>();
+		void Unregister<T>();
 
-		void UnregisterService<T>(string tag);
+		void Unregister<T>(string tag);
 
-		T GetService<T>();
+		T Get<T>();
 
-		T GetService<T>(string tag);
+		T Get<T>(string tag);
 
-		List<T> GetAllServices<T>();
+		List<T> GetAll<T>();
 
 		void Clear();
 	}

@@ -17,12 +17,12 @@ namespace Padoru.Core
 
 		public void Init()
 		{
-			Locator.RegisterService<ITickManager>(this);
+			Locator.Register<ITickManager>(this);
 		}
 
 		public void Shutdown()
 		{
-			Locator.UnregisterService<ITickManager>();
+			Locator.Unregister<ITickManager>();
 		}
 
 		public void Register(ITickable tickable)

@@ -14,7 +14,7 @@ namespace Padoru.Core
 
         private void Awake()
         {
-            screenManager = Locator.GetService<IScreenManager>();
+            screenManager = Locator.Get<IScreenManager>();
 
             button = GetComponent<Button>();
             button.onClick.AddListener(OnButtonClick);

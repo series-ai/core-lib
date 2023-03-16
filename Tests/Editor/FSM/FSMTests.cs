@@ -12,13 +12,13 @@ namespace Padoru.Core.Tests
         public void Setup()
         {
             var tickManager = new MockTickManager();
-            Locator.RegisterService<ITickManager>(tickManager);
+            Locator.Register<ITickManager>(tickManager);
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
-            Locator.UnregisterService<ITickManager>();
+            Locator.Unregister<ITickManager>();
         }
 
         [Test]

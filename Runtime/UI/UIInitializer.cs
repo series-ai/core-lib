@@ -13,7 +13,7 @@ namespace Padoru.Core
         public void Init()
         {
             screenManager = new ScreenManager();
-            Locator.RegisterService(screenManager);
+            Locator.Register(screenManager);
 
             if (canvas == null)
             {
@@ -38,7 +38,7 @@ namespace Padoru.Core
 
             screenManager.Clear();
 
-            Locator.UnregisterService<IScreenManager>();
+            Locator.Unregister<IScreenManager>();
         }
     }
 }

@@ -11,49 +11,49 @@ namespace Padoru.Core
 			Locator.serviceLocator = serviceLocator;
 		}
 
-		public static void RegisterService<T, S>() where S : T, new()
+		public static void Register<T, S>() where S : T, new()
 		{
-			serviceLocator.RegisterService<T, S>();
+			serviceLocator.Register<T, S>();
 		}
 
-		public static void RegisterService<T>(T service)
+		public static void Register<T>(T service)
 		{
-			serviceLocator.RegisterService<T>(service);
+			serviceLocator.Register<T>(service);
 		}
 
-		public static void RegisterService<T, S>(string tag) where S : T, new()
+		public static void Register<T, S>(string tag) where S : T, new()
 		{
-			serviceLocator.RegisterService<T, S>(tag);
+			serviceLocator.Register<T, S>(tag);
 		}
 
-		public static void RegisterService<T>(T service, string tag)
+		public static void Register<T>(T service, string tag)
 		{
-			serviceLocator.RegisterService<T>(service, tag);
+			serviceLocator.Register<T>(service, tag);
 		}
 
-		public static void UnregisterService<T>()
+		public static void Unregister<T>()
 		{
-			serviceLocator.UnregisterService<T>();
+			serviceLocator.Unregister<T>();
 		}
 
-		public static void UnregisterService<T>(string tag)
+		public static void Unregister<T>(string tag)
 		{
-			serviceLocator.UnregisterService<T>(tag);
+			serviceLocator.Unregister<T>(tag);
 		}
 
-		public static T GetService<T>()
+		public static T Get<T>()
 		{
-			return serviceLocator.GetService<T>();
+			return serviceLocator.Get<T>();
 		}
 
-		public static T GetService<T>(string tag)
+		public static T Get<T>(string tag)
 		{
-			return serviceLocator.GetService<T>(tag);
+			return serviceLocator.Get<T>(tag);
 		}
 
-		public static List<T> GetAllServices<T>()
+		public static List<T> GetAll<T>()
 		{
-			return serviceLocator.GetAllServices<T>();
+			return serviceLocator.GetAll<T>();
 		}
 
 		public static void Clear()

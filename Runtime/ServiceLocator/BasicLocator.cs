@@ -8,14 +8,14 @@ namespace Padoru.Core
 		private Dictionary<Type, object> services = new Dictionary<Type, object>();
 		private Dictionary<(string, Type), object> taggedServices = new Dictionary<(string, Type), object>();
 
-		public void RegisterService<T, S>() where S : T, new()
+		public void Register<T, S>() where S : T, new()
 		{
 			var service = new S();
 
-			RegisterService<T>(service);
+			Register<T>(service);
 		}
 
-		public void RegisterService<T>(T service)
+		public void Register<T>(T service)
 		{
 			if(service == null)
 			{
@@ -31,14 +31,14 @@ namespace Padoru.Core
 			services.Add(type, service);
 		}
 
-		public void RegisterService<T, S>(string tag) where S : T, new()
+		public void Register<T, S>(string tag) where S : T, new()
 		{
 			var service = new S();
 
-			RegisterService<T>(service, tag);
+			Register<T>(service, tag);
 		}
 
-		public void RegisterService<T>(T service, string tag)
+		public void Register<T>(T service, string tag)
 		{
 			if (service == null)
 			{
@@ -54,7 +54,7 @@ namespace Padoru.Core
 			taggedServices.Add((tag, type), service);
 		}
 
-		public void UnregisterService<T>()
+		public void Unregister<T>()
 		{
 			var type = typeof(T);
 			if (!services.ContainsKey(type))
@@ -65,7 +65,7 @@ namespace Padoru.Core
 			services.Remove(type);
 		}
 
-		public void UnregisterService<T>(string tag)
+		public void Unregister<T>(string tag)
 		{
 			var type = typeof(T);
 			if (!taggedServices.ContainsKey((tag, type)))
@@ -76,7 +76,7 @@ namespace Padoru.Core
 			taggedServices.Remove((tag, type));
 		}
 
-		public T GetService<T>()
+		public T Get<T>()
 		{
 			var type = typeof(T);
 			if (!services.TryGetValue(type, out var service))
@@ -87,7 +87,7 @@ namespace Padoru.Core
 			return (T)service;
 		}
 
-		public T GetService<T>(string tag)
+		public T Get<T>(string tag)
 		{
 			var type = typeof(T);
 			if (!taggedServices.TryGetValue((tag, type), out var service))
@@ -98,7 +98,7 @@ namespace Padoru.Core
 			return (T)service;
 		}
 
-		public List<T> GetAllServices<T>()
+		public List<T> GetAll<T>()
 		{
 			var servicesOfTypeT = new List<T>();
 

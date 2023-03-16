@@ -17,7 +17,7 @@ namespace Padoru.Core.Utils
 		{
 			this.startTime = startTime;
 
-			tickManager = Locator.GetService<ITickManager>();
+			tickManager = Locator.Get<ITickManager>();
 		}
 
 		~Countdown()

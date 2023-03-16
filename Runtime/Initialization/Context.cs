@@ -22,7 +22,7 @@ namespace Padoru.Core
             {
                 Debug.Log($"Context registered with tag '{gameObject.scene.name}'");
                 
-                Locator.RegisterService<Context>(this, gameObject.scene.name);
+                Locator.Register<Context>(this, gameObject.scene.name);
             }
             
             if (initializeOnAwake)
@@ -35,7 +35,7 @@ namespace Padoru.Core
         {
             if (registerOnLocator)
             {
-                Locator.UnregisterService<Context>(gameObject.scene.name);
+                Locator.Unregister<Context>(gameObject.scene.name);
             }
 
             if (IsInitialized)

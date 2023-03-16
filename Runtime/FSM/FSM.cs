@@ -22,7 +22,7 @@ namespace Padoru.Core
 
 			this.initialStateId = initialStateId;
 
-			tickManager = Locator.GetService<ITickManager>();
+			tickManager = Locator.Get<ITickManager>();
 
 			CreateStates();
 		}

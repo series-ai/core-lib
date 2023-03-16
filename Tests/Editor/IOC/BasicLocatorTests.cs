@@ -55,63 +55,63 @@ namespace Padoru.Core.Tests
         [Test]
         public void RegisterServiceWithTag_WhenServiceTypeAlreadyRegistered_ShouldNotThrow()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
 
-            Assert.DoesNotThrow(() => locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag2));
+            Assert.DoesNotThrow(() => locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag2));
         }
 
         [Test]
         public void RegisterServiceWithoutTag_WhenServiceNull_ShouldThrow()
         {
-            Assert.Throws<Exception>(() => locator.RegisterService<IEnumerable<GameObject>>(null));
+            Assert.Throws<Exception>(() => locator.Register<IEnumerable<GameObject>>(null));
         }
 
         [Test]
         public void RegisterServiceWithTag_WhenServiceNull_ShouldThrow()
         {
-            Assert.Throws<Exception>(() => locator.RegisterService<IEnumerable<GameObject>>(null, tag1));
+            Assert.Throws<Exception>(() => locator.Register<IEnumerable<GameObject>>(null, tag1));
         }
 
         [Test]
         public void UnregisterServiceWithoutTag_WhenServiceNotRegistered_ShouldThrow()
         {
-            Assert.Throws<Exception>(locator.UnregisterService<IEnumerable<GameObject>>);
+            Assert.Throws<Exception>(locator.Unregister<IEnumerable<GameObject>>);
         }
 
         [Test]
         public void UnregisterServiceWithoutTag_WhenServiceRegistered_ShouldNotThrow()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>();
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>();
 
-            Assert.DoesNotThrow(locator.UnregisterService<IEnumerable<GameObject>>);
+            Assert.DoesNotThrow(locator.Unregister<IEnumerable<GameObject>>);
         }
 
         [Test]
         public void UnregisterServiceWithTag_WhenServiceNotRegistered_ShouldThrow()
         {
-            Assert.Throws<Exception>(() => locator.UnregisterService<IEnumerable<GameObject>>(tag1));
+            Assert.Throws<Exception>(() => locator.Unregister<IEnumerable<GameObject>>(tag1));
         }
 
         [Test]
         public void UnregisterServiceWithTag_WhenServiceRegistered_ShouldNotThrow()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
 
-            Assert.DoesNotThrow(() => locator.UnregisterService<IEnumerable<GameObject>>(tag1));
+            Assert.DoesNotThrow(() => locator.Unregister<IEnumerable<GameObject>>(tag1));
         }
 
         [Test]
         public void GetServiceWithoutTag_WhenServiceNotRegistered_ShouldThrow()
         {
-            Assert.Throws<Exception>(() => locator.GetService<IEnumerable<GameObject>>());
+            Assert.Throws<Exception>(() => locator.Get<IEnumerable<GameObject>>());
         }
 
         [Test]
         public void GetServiceWithoutTag_WhenServiceRegistered_ShouldNotBeNull()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>();
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>();
 
-            var service = locator.GetService<IEnumerable<GameObject>>();
+            var service = locator.Get<IEnumerable<GameObject>>();
 
             Assert.NotNull(service);
         }
@@ -119,15 +119,15 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetServiceWithTag_WhenServiceNotRegistered_ShouldThrow()
         {
-            Assert.Throws<Exception>(() => locator.GetService<IEnumerable<GameObject>>(tag1));
+            Assert.Throws<Exception>(() => locator.Get<IEnumerable<GameObject>>(tag1));
         }
 
         [Test]
         public void GetServiceWithTag_WhenServiceRegistered_ShouldNotBeNull()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
 
-            var service = locator.GetService<IEnumerable<GameObject>>(tag1);
+            var service = locator.Get<IEnumerable<GameObject>>(tag1);
 
             Assert.NotNull(service);
         }
@@ -135,11 +135,11 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetServicesWithSameTag_WhenServiceRegisteredWithDifferentType_NeitherShouldNotBeNull()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
-            locator.RegisterService<IList<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IList<GameObject>, List<GameObject>>(tag1);
 
-            var service1 = locator.GetService<IEnumerable<GameObject>>(tag1);
-            var service2 = locator.GetService<IList<GameObject>>(tag1);
+            var service1 = locator.Get<IEnumerable<GameObject>>(tag1);
+            var service2 = locator.Get<IList<GameObject>>(tag1);
 
             Assert.NotNull(service1);
             Assert.NotNull(service2);
@@ -148,11 +148,11 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetServicesWithSameType_WhenServiceRegisteredWithDifferentTag_NeitherShouldNotBeNull()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag2);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag2);
 
-            var service1 = locator.GetService<IEnumerable<GameObject>>(tag1);
-            var service2 = locator.GetService<IEnumerable<GameObject>>(tag2);
+            var service1 = locator.Get<IEnumerable<GameObject>>(tag1);
+            var service2 = locator.Get<IEnumerable<GameObject>>(tag2);
 
             Assert.NotNull(service1);
             Assert.NotNull(service2);
@@ -161,10 +161,10 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetAllServices_WhenRegisteredWithAndWithoutTag_ShouldGetBoth()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>();
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>();
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
 
-            var services = locator.GetAllServices<IEnumerable<GameObject>>();
+            var services = locator.GetAll<IEnumerable<GameObject>>();
 
             Assert.AreEqual(2, services.Count);
         }
@@ -172,43 +172,43 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetServices_WhenServicesCleared_ShouldThrow()
         {
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>();
-            locator.RegisterService<IEnumerable<GameObject>, List<GameObject>>(tag1);
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>();
+            locator.Register<IEnumerable<GameObject>, List<GameObject>>(tag1);
 
             locator.Clear();
 
-            Assert.Throws<Exception>(() => locator.GetService<IEnumerable<GameObject>>());
-            Assert.Throws<Exception>(() => locator.GetService<IEnumerable<GameObject>>(tag1));
+            Assert.Throws<Exception>(() => locator.Get<IEnumerable<GameObject>>());
+            Assert.Throws<Exception>(() => locator.Get<IEnumerable<GameObject>>(tag1));
         }
 
         private void GivenAnAlreadyRegisteredServiceWithoutTag<T, S>() where S : T, new()
         {
-            locator.RegisterService<T, S>();
+            locator.Register<T, S>();
         }
 
         private void GivenAnAlreadyRegisteredServiceWithTag<T, S>(string tag) where S : T, new()
         {
-            locator.RegisterService<T, S>(tag);
+            locator.Register<T, S>(tag);
         }
 
         private void ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithoutTag<T, S>() where S : T, new()
         {
-            Assert.Throws<Exception>(locator.RegisterService<T, S>);
+            Assert.Throws<Exception>(locator.Register<T, S>);
         }
 
         private void ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithoutTag<T, S>() where S : T, new()
         {
-            Assert.DoesNotThrow(locator.RegisterService<T, S>);
+            Assert.DoesNotThrow(locator.Register<T, S>);
         }
 
         private void ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithTag<T, S>(string tag) where S : T, new()
         {
-            Assert.DoesNotThrow(() => locator.RegisterService<T, S>(tag));
+            Assert.DoesNotThrow(() => locator.Register<T, S>(tag));
         }
 
         private void ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithTag<T, S>(string tag) where S : T, new()
         {
-            Assert.Throws<Exception>(() => locator.RegisterService<T, S>(tag));
+            Assert.Throws<Exception>(() => locator.Register<T, S>(tag));
         }
     }
 }

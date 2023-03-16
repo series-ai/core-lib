@@ -50,7 +50,7 @@ namespace Padoru.Core
             Object.DontDestroyOnLoad(projectContext);
 
             Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}");
-            Locator.RegisterService(projectContext, settings.ProjectContextPrefabName);
+            Locator.Register(projectContext, settings.ProjectContextPrefabName);
 
             Debug.Log($"Initializing ProjectContext");
             await projectContext.Init();
