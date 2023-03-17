@@ -16,6 +16,8 @@ namespace Padoru.Core
 
         public bool IsInitialized { get; private set; }
 
+        public event Action OnInitializationFinish;
+
         private async void Awake()
         {
             if (registerOnLocator)
@@ -73,6 +75,7 @@ namespace Padoru.Core
             }
 
             IsInitialized = true;
+            OnInitializationFinish?.Invoke();
         }
 
         public void Shutdown()
