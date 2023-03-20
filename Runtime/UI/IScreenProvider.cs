@@ -4,6 +4,6 @@ namespace Padoru.Core
 {
 	public interface IScreenProvider
 	{
-		IPromise<IScreen> GetScreen(Transform parent);
+		IScreen GetScreen(Transform parent);
 	}
 }
