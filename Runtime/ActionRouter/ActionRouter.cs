@@ -51,7 +51,7 @@ namespace Padoru.Core.ActionRouter
         {
             foreach (var actionRouterGroup in actionRouterGroups)
             {
-                if (actionRouterGroup.Id == actionId)
+                if (actionRouterGroup.ActionId == actionId)
                 {
                     return actionRouterGroup;
                 }

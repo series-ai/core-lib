@@ -6,13 +6,13 @@ namespace Padoru.Core.ActionRouter
 {
     public class ActionRouterGroup
     {
-        public string Id { get; }
+        public string ActionId { get; }
 
         private readonly List<Action<object>> subscribers = new();
         
-        public ActionRouterGroup(string id)
+        public ActionRouterGroup(string actionId)
         {
-            Id = id;
+            ActionId = actionId;
         }
 
         public void Invoke(object actionObject)
@@ -28,7 +28,7 @@ namespace Padoru.Core.ActionRouter
         {
             if (subscribers.Contains(subscriber))
             {
-                Debug.LogWarning($"Unable to subscribe to the action '{Id}' because is already subscribed");
+                Debug.LogWarning($"Unable to subscribe to the action '{ActionId}' because is already subscribed");
                 return;
             }
             
@@ -39,7 +39,7 @@ namespace Padoru.Core.ActionRouter
         {
             if (!subscribers.Remove(subscriber))
             {
-                Debug.LogWarning($"Unable to remove subscriber from event '{Id}'");
+                Debug.LogWarning($"Unable to remove subscriber from event '{ActionId}' because it is not subscribed");
             }
         }
     }
