@@ -2,7 +2,7 @@
 {
     public class TestScreen : IScreen
     {
-        public void Dispose()
+        public void Close()
         {
 
         }
@@ -12,7 +12,7 @@
 
         }
 
-        public void Initialize()
+        public void Show()
         {
 
         }
