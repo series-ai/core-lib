@@ -4,9 +4,9 @@ namespace Padoru.Core.Tests
 {
     public class TestScreenProvider : IScreenProvider
     {
-        public IPromise<IScreen> GetScreen(Transform parent = null)
+        public IScreen GetScreen(Transform parent = null)
         {
-            return PromiseFactory.CreateCompleted<IScreen>(new TestScreen());
+            return new TestScreen();
         }
     }
 }
