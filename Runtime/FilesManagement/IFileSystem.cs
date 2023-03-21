@@ -1,15 +1,15 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
     public interface IFileSystem
     {
-        bool Exists(string uri);
+        Task<bool> Exists(string uri);
 
-        void Get(string uri, Action<File<byte[]>> OnFinish);
+        Task<File<byte[]>> Read(string uri);
 
-        void Set(File<byte[]> file, Action<File<byte[]>> OnFinish);
+        Task<File<byte[]>>  Write(File<byte[]> file);
 
-        void Delete(string uri, Action OnFinish);
+        Task Delete(string uri);
     }
 }

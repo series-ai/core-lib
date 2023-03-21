@@ -1,6 +1,5 @@
-using System;
 using System.IO;
-using UnityEngine;
+using System.Threading.Tasks;
 
 using Debug = Padoru.Diagnostics.Debug;
 
@@ -10,87 +9,56 @@ namespace Padoru.Core.Files
     {
         private readonly string basePath;
 
-        public LocalFileSystem(string basePath = null)
+        public LocalFileSystem(string basePath)
         {
-            this.basePath = basePath ?? string.Empty;
+            this.basePath = basePath;
         }
 
-        public bool Exists(string uri)
+        public async Task<bool> Exists(string uri)
         {
-            var path = Path.Combine(basePath, ValidatedFileName(RelativeUri(uri)));
+            var path = GetFullPath(uri);
 
-            return File.Exists(path);
+            return await Task.FromResult(File.Exists(path));
         }
 
-        public void Get(string uri, Action<File<byte[]>> OnFinish)
+        public async Task<File<byte[]>> Read(string uri)
         {
-            var path = Path.Combine(basePath, ValidatedFileName(RelativeUri(uri)));
+            var path = GetFullPath(uri);
 
-            Debug.Log($"Get({path})");
+            var bytes = await File.ReadAllBytesAsync(path);
 
-            var bytes = File.ReadAllBytes(path);
+            Debug.Log($"Read file from path '{path}'");
 
-            OnFinish?.Invoke(new File<byte[]>(uri, bytes));
+            return new File<byte[]>(uri, bytes);
         }
 
-        public void Set(File<byte[]> file, Action<File<byte[]>> OnFinish)
+        public async Task<File<byte[]>> Write(File<byte[]> file)
         {
-            var path = Path.Combine(basePath, ValidatedFileName(RelativeUri(file.Uri)));
-
-            Debug.Log($"Set({path})");
+            var path = GetFullPath(file.Uri);
 
             var directory = Path.GetDirectoryName(path) ?? ".";
+            
             Directory.CreateDirectory(directory);
 
-            File.WriteAllBytes(path, file.Data);
+            await File.WriteAllBytesAsync(path, file.Data);
 
-            OnFinish?.Invoke(file);
+            Debug.Log($"Wrote file to path '{path}'");
+
+            return file;
         }
 
-        public void Delete(string uri, Action OnFinish)
+        public async Task Delete(string uri)
         {
-            var path = Path.Combine(basePath, ValidatedFileName(RelativeUri(uri)));
+            var path = GetFullPath(uri);
 
             File.Delete(path);
-
-            OnFinish?.Invoke();
-        }
-
-        private string RelativeUri(string uri)
-        {
-            var index = uri.IndexOf("://", StringComparison.Ordinal);
-            if (index == -1)
-            {
-                return uri;
-            }
             
-            return uri.Substring(index + 3);
+            await Task.CompletedTask;
         }
-        
-        private string ValidatedFileName(string filePath)
+
+        private string GetFullPath(string uri)
         {
-            filePath = filePath.Replace('\\', '/');
-            var parts = filePath.Split('/');
-            for (var i = 0; i < parts.Length; i++)
-            {
-                var part = parts[i];
-                var invalidChars = Path.GetInvalidFileNameChars();
-                for (var index = 0; index < invalidChars.Length; index++)
-                {
-                    var c = invalidChars[index];
-
-                    if (c == ':')
-                    {
-                        continue;
-                    }
-
-                    part = part.Replace(c, '_');
-                }
-
-                parts[i] = part;
-            }
-
-            return string.Join("/", parts);
+            return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
         }
     }
 }

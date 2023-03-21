@@ -1,40 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
     public class MemoryFileSystem : IFileSystem
     {
-        private readonly Dictionary<string, File<byte[]>> files = new Dictionary<string, File<byte[]>>();
+        private readonly Dictionary<string, File<byte[]>> files = new();
 
-        public bool Exists(string uri)
+        public async Task<bool> Exists(string uri)
         {
-            return files.ContainsKey(uri);
+            return await Task.FromResult(files.ContainsKey(uri));
         }
 
-        public void Get(string uri, Action<File<byte[]>> OnFinish)
+        public async Task<File<byte[]>> Read(string uri)
         {
             File<byte[]> file;
             if (files.TryGetValue(uri, out file))
             {
-                OnFinish?.Invoke(file);
-                return;
+                return await Task.FromResult(file);
             }
 
             throw new Exception("Could not find file.");
         }
 
-        public void Set(File<byte[]> file, Action<File<byte[]>> OnFinish)
+        public async Task<File<byte[]>> Write(File<byte[]> file)
         {
             var newFile = new File<byte[]>(file.Uri, file.Data);
             files[file.Uri] = newFile;
 
-            OnFinish?.Invoke(newFile);
+            return await Task.FromResult(newFile);
         }
 
-        public void Delete(string uri, Action OnFinish)
+        public async Task Delete(string uri)
         {
             files.Remove(uri);
+            
+            await Task.CompletedTask;
         }
     }
 }

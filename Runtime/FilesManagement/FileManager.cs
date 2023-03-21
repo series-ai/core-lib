@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core.Files
@@ -10,9 +11,8 @@ namespace Padoru.Core.Files
         private const string PROTOCOL_HEADER_REGEX = @"^\w+://$";
         private const string DEFAULT_PROTOCOL_HEADER_REGEX = "default://";
 
-        private readonly Dictionary<string, FileSystemProtocol> protocols = new Dictionary<string, FileSystemProtocol>();
+        private readonly Dictionary<string, FileSystemProtocol> protocols = new();
         private readonly Regex protocolRegex;
-        private readonly CommandQueue commandsQueue = new CommandQueue();
         private readonly FileSystemProtocol defaultProtocol;
 
         public FileManager(ISerializer defaultSerializer, IFileSystem defaultFileSystem)
@@ -22,7 +22,7 @@ namespace Padoru.Core.Files
             defaultProtocol = new FileSystemProtocol(DEFAULT_PROTOCOL_HEADER_REGEX, defaultSerializer, defaultFileSystem);
         }
 
-        public void Register(string protocolHeader, ISerializer serializer, IFileSystem fileSystem)
+        public void RegisterProtocol(string protocolHeader, ISerializer serializer, IFileSystem fileSystem)
         {
             if (!protocolRegex.IsMatch(protocolHeader ?? string.Empty))
             {
@@ -49,7 +49,7 @@ namespace Padoru.Core.Files
             protocols.Add(protocolHeader, protocol);
         }
 
-        public bool Unregister(string protocolHeader)
+        public bool UnregisterProtocol(string protocolHeader)
         {
             if (protocols.ContainsKey(protocolHeader))
             {
@@ -60,9 +60,81 @@ namespace Padoru.Core.Files
             return false;
         }
 
-        public bool Exists(string uri)
+        public async Task<bool> Exists(string uri)
         {
-            return GetProtocol(uri).FileSystem.Exists(uri);
+            return await GetProtocol(uri).FileSystem.Exists(uri);
+        }
+
+        public async Task<File<T>> Read<T>(string uri)
+        {
+            try
+            {
+                var protocol = GetProtocol(uri);
+                
+                if (await protocol.FileSystem.Exists(uri))
+                {
+                    var file = await protocol.FileSystem.Read(uri);
+                    
+                    var bytes = file.Data;
+
+                    protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
+
+                    return new File<T>(uri, (T)result);
+                }
+                
+                Debug.LogError($"Cannot read file because it does not exist: {uri}");
+                
+                return new File<T>(uri, default);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                
+                return new File<T>(uri, default);
+            }
+        }
+
+        public async Task<File<T>> Write<T>(string uri, T value)
+        {
+            try
+            {
+                var protocol = GetProtocol(uri);
+                
+                protocol.Serializer.Serialize(value, out var bytes);
+
+                var newFile = new File<byte[]>(uri, bytes);
+
+                await protocol.FileSystem.Write(newFile);
+
+                return new File<T>(uri, value);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                
+                return new File<T>(uri, default);
+            }
+        }
+
+        public async Task Delete(string uri)
+        {
+            try
+            {
+                var protocol = GetProtocol(uri);
+                
+                if (await protocol.FileSystem.Exists(uri))
+                {
+                    await protocol.FileSystem.Delete(uri);
+                }
+                else
+                {
+                    Debug.LogError($"Cannot delete file because it does not exists: {uri}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         private FileSystemProtocol GetProtocol(string uri)
@@ -78,40 +150,6 @@ namespace Padoru.Core.Files
             Debug.LogWarning($"There is not protocol registered for the uri : {uri}. Returning default protocol");
 
             return defaultProtocol;
-        }
-
-        public void Get<T>(string uri, Action<File<T>> OnFinish)
-        {
-            var protocol = GetProtocol(uri);
-
-            var command = new ReadCommand<T>(uri, protocol, OnFinish);
-
-            ExecuteCommand(command);
-        }
-
-        public void Set<T>(string uri, T value, Action<File<T>> OnFinish)
-        {
-            var protocol = GetProtocol(uri);
-
-            var command = new WriteCommand<T>(uri, value, protocol, OnFinish);
-
-            ExecuteCommand(command);
-        }
-
-        public void Delete(string uri, Action OnFinish)
-        {
-            var protocol = GetProtocol(uri);
-
-            var command = new DeleteCommand(uri, protocol, OnFinish);
-
-            ExecuteCommand(command);
-        }
-
-        private void ExecuteCommand(ICommand command)
-        {
-            commandsQueue.QueueCommand(command);
-
-            commandsQueue.Execute();
         }
     }
 }

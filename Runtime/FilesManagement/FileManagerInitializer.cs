@@ -12,7 +12,7 @@ namespace Padoru.Core.Files
             var fileSystem = new LocalFileSystem(basePath);
             var fileManager = new FileManager(serializer, fileSystem);
 
-            fileManager.Register(Protocols.LOCAL_JSON_PPROTOCOL, serializer, fileSystem);
+            fileManager.RegisterProtocol(Protocols.LOCAL_JSON_PPROTOCOL, serializer, fileSystem);
 
             Locator.Register<IFileManager>(fileManager);
         }

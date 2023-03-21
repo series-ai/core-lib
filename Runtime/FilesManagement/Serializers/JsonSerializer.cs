@@ -6,7 +6,7 @@ namespace Padoru.Core.Files
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly JsonSerializerSettings settings = new JsonSerializerSettings
+        private readonly JsonSerializerSettings settings = new()
         {
             TypeNameHandling = TypeNameHandling.All
         };
@@ -19,12 +19,6 @@ namespace Padoru.Core.Files
         public void Deserialize(Type type, ref byte[] bytes, out object value)
         {
             value = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(bytes), type, settings);
-        }
-
-        public void Deserialize<T>(ref byte[] bytes, out T value) where T : class
-        {
-            var str = Encoding.UTF8.GetString(bytes);
-            value = JsonConvert.DeserializeObject<T>(str, settings);
         }
     }
 }

@@ -1,19 +1,19 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
     public interface IFileManager
     {
-        void Register(string protocol, ISerializer serializer, IFileSystem fileSystem);
+        void RegisterProtocol(string protocol, ISerializer serializer, IFileSystem fileSystem);
 
-        bool Unregister(string protocol);
+        bool UnregisterProtocol(string protocol);
 
-        bool Exists(string uri);
+        Task<bool> Exists(string uri);
 
-        void Get<T>(string uri, Action<File<T>> OnFinish);
+        Task<File<T>> Read<T>(string uri);
 
-        void Set<T>(string uri, T value, Action<File<T>> OnFinish);
+        Task<File<T>> Write<T>(string uri, T value);
 
-        void Delete(string uri, Action OnFinish);
+        Task Delete(string uri);
     }
 }
