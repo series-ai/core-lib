@@ -2,16 +2,8 @@
 {
     public interface IScreen
     {
-        void Initialize();
+        void Show();
 
-        void Dispose();
-
-        void Focus();
-
-        void Unfocus();
-
-        IPromise PlayIntroAnimation();
-
-        IPromise PlayOutroAnimation();
+        void Close();
     }
 }

@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
 
 namespace Padoru.Core.Tests
 {
@@ -24,198 +26,134 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNotNull_ShouldNotReturnFailedPromise()
+        public void ShowScreen_WhenProviderNotNullAndScreenNotNull_ShouldNotThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
 
-            screenManager.ShowScreen(provider).OnFail((e) =>
-            {
-                promiseFailed = true;
-            });
-
-            Assert.IsFalse(promiseFailed);
+            Assert.DoesNotThrow(() => screenManager.ShowScreen(provider));
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNull_ShouldReturnFailedPromise()
+        public void ShowScreen_WhenProviderNotNullAndScreenNull_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestNullScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
 
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true);
-
-            Assert.IsTrue(promiseFailed);
+            Assert.Throws<Exception>(() => screenManager.ShowScreen(provider));
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNull_ShouldReturnFailedPromise()
+        public void ShowScreen_WhenProviderNull_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
 
             screenManager.ParentCanvas = parentCanvas;
-
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            screenManager.ShowScreen(null).OnFail((e) => promiseFailed = true);
-
-            Assert.IsTrue(promiseFailed);
+            
+            Assert.Throws<Exception>(() => screenManager.ShowScreen(null));
         }
 
         [Test]
-        public void CloseScreen_WhenShowed_ShouldNotReturnFailedPromise()
+        public void CloseScreen_WhenShowed_ShouldNotThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
 
-            screenManager.ShowScreen(provider).OnComplete((screen) =>
-            {
-                screenManager.CloseScreen(screen).OnFail((e) => promiseFailed = true);
-            });
-
-            Assert.IsFalse(promiseFailed);
+            var screen = screenManager.ShowScreen(provider);
+            
+            Assert.DoesNotThrow(() => screenManager.CloseScreen(screen));
         }
 
         [Test]
-        public void CloseScreen_WhenNotShowed_ShouldReturnFailedPromise()
+        public void CloseScreen_WhenNotShowed_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
 
-            provider.GetScreen().OnComplete((screen) =>
-            {
-                screenManager.CloseScreen(screen).OnFail((e) => promiseFailed = true);
-            });
+            var screen = provider.GetScreen();
 
-            Assert.IsTrue(promiseFailed);
+            Assert.Throws<Exception>(() => screenManager.CloseScreen(screen));
         }
 
         [Test]
-        public void CloseScreen_WhenNull_ShouldReturnFailedPromise()
+        public void CloseScreen_WhenNull_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
 
             screenManager.ParentCanvas = parentCanvas;
-
-            screenManager.CloseScreen(null).OnFail((e) => promiseFailed = true);
-
-            Assert.IsTrue(promiseFailed);
+            
+            Assert.Throws<Exception>(() => screenManager.CloseScreen(null));
         }
 
         [Test]
-        public void CloseScreen_WhenCleared_ShouldReturnFailedPromise()
+        public void CloseScreen_WhenCleared_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
 
-            screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
-            {
-                screenManager.Clear();
-                screenManager.CloseScreen(screen).OnFail((e) => promiseFailed = true);
-            });
+            var screen = screenManager.ShowScreen(provider);
 
-            Assert.IsTrue(promiseFailed);
+            screenManager.Clear();
+            Assert.Throws<Exception>(() => screenManager.CloseScreen(screen));
         }
 
         [Test]
-        public void CloseAndShowScreen_WhenNoScreenOpened_ShouldReturnFailedPromise()
+        public void CloseAndShowScreen_WhenScreenOpened_ShouldNotThrowException()
         {
-            var promiseFailed = false;
-
-            var screenManager = new ScreenManager();
-            var provider = new TestScreenProvider();
-
-            screenManager.ParentCanvas = parentCanvas;
-
-            screenManager.CloseAndShowScreen(provider).OnFail((e) => promiseFailed = true);
-
-            Assert.IsTrue(promiseFailed);
-        }
-
-        [Test]
-        public void CloseAndShowScreen_WhenScreenOpened_ShouldNotReturnFailedPromise()
-        {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider1 = new TestScreenProvider();
             var provider2 = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
-
-            screenManager.ShowScreen(provider1).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
-            {
-                screenManager.CloseAndShowScreen(provider2).OnFail((e) => promiseFailed = true);
-            });
-
-            Assert.IsFalse(promiseFailed);
+            screenManager.ShowScreen(provider1);
+            
+            Assert.DoesNotThrow(() => screenManager.CloseAndShowScreen(provider2));
         }
 
         [Test]
-        public void CloseAndShowScreen_WhenProviderNull_ShouldReturnFailedPromise()
+        public void CloseAndShowScreen_WhenNoScreenOpened_ShouldThrowException()
         {
-            var promiseFailed = false;
-
             var screenManager = new ScreenManager();
             var provider = new TestScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
-
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            screenManager.ShowScreen(provider).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
-            {
-                screenManager.CloseAndShowScreen(null).OnFail((e) => promiseFailed = true);
-            });
-
-            Assert.IsTrue(promiseFailed);
+            
+            Assert.Throws<Exception>(() => screenManager.CloseAndShowScreen(provider));
         }
 
         [Test]
-        public void CloseAndShowScreen_WhenProviderNotNullAndScreenNull_ShouldReturnFailedPromise()
+        public void CloseAndShowScreen_WhenProviderNull_ShouldThrowException()
         {
-            var promiseFailed = false;
+            var screenManager = new ScreenManager();
+            var provider = new TestScreenProvider();
 
+            screenManager.ParentCanvas = parentCanvas;
+            screenManager.ShowScreen(provider);
+
+            Assert.Throws<Exception>(() => screenManager.CloseAndShowScreen(null));
+        }
+
+        [Test]
+        public void CloseAndShowScreen_WhenProviderNotNullAndScreenNull_ShouldThrowException()
+        {
             var screenManager = new ScreenManager();
             var provider1 = new TestScreenProvider();
             var provider2 = new TestNullScreenProvider();
 
             screenManager.ParentCanvas = parentCanvas;
-
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            screenManager.ShowScreen(provider1).OnFail((e) => promiseFailed = true).OnComplete((screen) =>
-            {
-                screenManager.CloseAndShowScreen(provider2).OnFail((e) => promiseFailed = true);
-            });
-
-            Assert.IsTrue(promiseFailed);
+            screenManager.ShowScreen(provider1);
+            
+            Assert.Throws<Exception>(() => screenManager.CloseAndShowScreen(provider2));
         }
         
         [Test]
