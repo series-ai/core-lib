@@ -2,8 +2,8 @@
 
 namespace Padoru.Core
 {
-	public interface IScreenProvider
+	public interface IScreenProvider<TScreenId>
 	{
-		IScreen GetScreen(Transform parent);
+		IScreen GetScreen(TScreenId id, Transform parent);
 	}
 }
