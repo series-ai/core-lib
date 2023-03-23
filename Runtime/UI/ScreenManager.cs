@@ -7,72 +7,79 @@ using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
-    public class ScreenManager : IScreenManager
+    public class ScreenManager<TScreenId> : IScreenManager<TScreenId>
     {
-        private List<IScreen> screens = new List<IScreen>();
+        private readonly Dictionary<TScreenId, IScreen> screensDatabase = new();
+        
+        private IScreenProvider<TScreenId> provider;
+        private Canvas parentCanvas;
 
-        private IScreen currentScreen => screens.LastOrDefault();
-
-        public Canvas ParentCanvas { get; set; }
-
-        public IScreen ShowScreen(IScreenProvider provider)
+        public void Init(IScreenProvider<TScreenId> providerReference, Canvas parentCanvasReference)
         {
-            if(ParentCanvas == null)
+            if (providerReference == null)
+            {
+                throw new Exception("The provider reference is null");
+            }
+            
+            if (parentCanvasReference == null)
+            {
+                throw new Exception("The parent canvas reference is null");
+            }
+            
+            provider = providerReference;
+            parentCanvas = parentCanvasReference;
+        }
+
+        public IScreen ShowScreen(TScreenId id)
+        {
+            if (parentCanvas == null)
             {
                 throw new Exception("ParentCanvas is not set. Cannot show screen");
             }
             
-            if(provider == null)
+            if (provider == null)
             {
                 throw new Exception("ScreenProvider is null. Cannot show screen");
             }
 
-            var screen = provider.GetScreen(ParentCanvas.transform);
+            if (screensDatabase.ContainsKey(id))
+            {
+                throw new Exception("Unable to show screen because is already active");
+            }
+            
+            var screen = provider.GetScreen(id, parentCanvas.transform);
             
             if (screen == null)
             {
                 throw new Exception("Screen is null. Cannot show screen");
             }
             
-            screens.Add(screen);
+            screensDatabase.Add(id, screen);
             screen.Show();
 
             return screen;
         }
 
-        public void CloseScreen(IScreen screen)
+        public void CloseScreen(TScreenId id)
         {
-            if (screen == null)
-            {
-                throw new Exception("Trying to close a null screen");
-            }
-
-            if (!screens.Contains(screen))
+            if (!screensDatabase.ContainsKey(id))
             {
                 throw new Exception("Trying to close a closed screen");
             }
-            
-            screens.Remove(screen);
+
+            var screen = screensDatabase[id];
+            screensDatabase.Remove(id);
             screen.Close();
         }
-
-        public void CloseAndShowScreen(IScreenProvider provider)
-        {
-            CloseScreen(currentScreen);
-            
-            ShowScreen(provider);
-        }
-
+        
         public void Clear()
         {
-            ParentCanvas = null;
+            var screensList = screensDatabase.Keys.ToList();
 
-            var screensClone = new List<IScreen>(screens);
-            foreach (var screen in screensClone)
+            for (var i = screensList.Count - 1; i >= 0; i--)
             {
-                CloseScreen(screen);
+                CloseScreen(screensList[i]);
             }
-            screens.Clear();
         }
     }
 }

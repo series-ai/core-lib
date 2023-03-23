@@ -2,9 +2,9 @@
 
 namespace Padoru.Core.Tests
 {
-    public class TestScreenProvider : IScreenProvider
+    public class TestScreenProvider : IScreenProvider<TestScreenId>
     {
-        public IScreen GetScreen(Transform parent = null)
+        public IScreen GetScreen(TestScreenId id, Transform parent = null)
         {
             return new TestScreen();
         }
