@@ -24,6 +24,32 @@ namespace Padoru.Core.Tests
         {
             Object.DestroyImmediate(parentCanvas.gameObject);
         }
+        
+        [Test]
+        public void Init_WhenProviderNotNullAndCanvasNotNull_ShouldNotThrowException()
+        {
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            Assert.DoesNotThrow(() => screenManager.Init(provider, parentCanvas));
+        }
+        
+        [Test]
+        public void Init_WhenProviderNotNullAndCanvasNull_ShouldThrowException()
+        {
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            Assert.Throws<Exception>(() => screenManager.Init(provider, null));
+        }
+        
+        [Test]
+        public void Init_WhenProviderNullAndCanvasNotNull_ShouldThrowException()
+        {
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            Assert.Throws<Exception>(() => screenManager.Init(null, parentCanvas));
+        }
 
         [Test]
         public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
@@ -50,16 +76,14 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNull_ShouldThrowException()
+        public void ShowScreen_WhenNotInitialized_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
             var screenManager = new ScreenManager<TestScreenId>();
-            
-            screenManager.Init(null, parentCanvas);
-            
+
             Assert.Throws<Exception>(() => screenManager.ShowScreen(screenId));
         }
-        
+
         [Test]
         public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldThrowException()
         {

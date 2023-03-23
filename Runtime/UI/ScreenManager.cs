@@ -16,6 +16,16 @@ namespace Padoru.Core
 
         public void Init(IScreenProvider<TScreenId> providerReference, Canvas parentCanvasReference)
         {
+            if (providerReference == null)
+            {
+                throw new Exception("The provider reference is null");
+            }
+            
+            if (parentCanvasReference == null)
+            {
+                throw new Exception("The parent canvas reference is null");
+            }
+            
             provider = providerReference;
             parentCanvas = parentCanvasReference;
         }
