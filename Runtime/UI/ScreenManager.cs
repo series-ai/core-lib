@@ -9,7 +9,7 @@ namespace Padoru.Core
 {
     public class ScreenManager<TScreenId> : IScreenManager<TScreenId>
     {
-        private readonly Dictionary<TScreenId, IScreen> screensDatabase = new();
+        private readonly Dictionary<TScreenId, IScreen> screens = new();
         
         private IScreenProvider<TScreenId> provider;
         private Canvas parentCanvas;
@@ -42,9 +42,10 @@ namespace Padoru.Core
                 throw new Exception("ScreenProvider is null. Cannot show screen");
             }
 
-            if (screensDatabase.ContainsKey(id))
+            if (screens.ContainsKey(id))
             {
-                throw new Exception("Unable to show screen because is already active");
+                Debug.LogWarning("Unable to show screen because is already active");
+                return screens[id];
             }
             
             var screen = provider.GetScreen(id, parentCanvas.transform);
@@ -54,27 +55,26 @@ namespace Padoru.Core
                 throw new Exception("Screen is null. Cannot show screen");
             }
             
-            screensDatabase.Add(id, screen);
+            screens.Add(id, screen);
             screen.Show();
-
             return screen;
         }
 
         public void CloseScreen(TScreenId id)
         {
-            if (!screensDatabase.ContainsKey(id))
+            if (!screens.ContainsKey(id))
             {
                 throw new Exception("Trying to close a closed screen");
             }
 
-            var screen = screensDatabase[id];
-            screensDatabase.Remove(id);
+            var screen = screens[id];
+            screens.Remove(id);
             screen.Close();
         }
         
         public void Clear()
         {
-            var screensList = screensDatabase.Keys.ToList();
+            var screensList = screens.Keys.ToList();
 
             for (var i = screensList.Count - 1; i >= 0; i--)
             {

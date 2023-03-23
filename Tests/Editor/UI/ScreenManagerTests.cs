@@ -85,7 +85,7 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldThrowException()
+        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldReturnValue()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
@@ -94,7 +94,21 @@ namespace Padoru.Core.Tests
             screenManager.Init(provider, parentCanvas);
             screenManager.ShowScreen(screenId);
             
-            Assert.Throws<Exception>(() => screenManager.ShowScreen(screenId));
+            Assert.NotNull(screenManager.ShowScreen(screenId));
+        }
+        
+        [Test]
+        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldLogWarning()
+        {
+            var screenId = TestScreenId.Test;
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(provider, parentCanvas);
+            screenManager.ShowScreen(screenId);
+            screenManager.ShowScreen(screenId);
+            
+            LogAssert.Expect(LogType.Warning, new Regex(string.Empty));
         }
         
         [Test]
