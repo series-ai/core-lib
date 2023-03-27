@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -13,6 +15,7 @@ namespace Padoru.Core
         [SerializeField] private bool registerOnLocator = true;
         // TODO: Get the modules automatically when detecting changes in the hierarchy and only allow to change order
         [SerializeField] private GameObject[] modules;
+        [SerializeField] private InitializationStage[] initializationStages;
 
         public bool IsInitialized { get; private set; }
 
@@ -53,26 +56,25 @@ namespace Padoru.Core
                 throw new Exception($"Trying to initialize context more than once");
             }
 
-            if (modules != null)
+            var watch = new Stopwatch();
+            watch.Start();
+            
+            var sb = new StringBuilder();
+            sb.Append($"Context {name} initialization finished. Report:");
+            sb.Append(Environment.NewLine);
+
+            for (int i = 0; i < initializationStages.Length; i++)
             {
-                for (int i = 0; i < modules.Length; i++)
-                {
-                    var module = modules[i];
-                    var initializable = module.GetComponent<IInitializable>();
-                    if (initializable != null)
-                    {
-                        initializable.Init();
-                    }
-                    else
-                    {
-                        var initializableAsync = module.GetComponent<IInitializableAsync>();
-                        if (initializableAsync != null)
-                        {
-                            await initializableAsync.Init();
-                        }
-                    }
-                }
+                var stage = initializationStages[i];
+                
+                await stage.Init(sb);
             }
+
+            watch.Stop();
+            sb.Append($"Total initialization time: {watch.ElapsedMilliseconds}. " +
+                      $"Keep in mind some modules might be initialized in parallel");
+            
+            Debug.Log(sb, gameObject);
 
             IsInitialized = true;
             OnInitializationFinish?.Invoke();
