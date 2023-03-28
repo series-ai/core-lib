@@ -52,7 +52,7 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
+        public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
@@ -60,11 +60,11 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
 
-            Assert.DoesNotThrow(() => screenManager.ShowScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId));
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNull_ShouldThrowException()
+        public async void ShowScreen_WhenProviderNotNullAndScreenNull_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestNullScreenProvider();
@@ -72,74 +72,74 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
 
-            Assert.Throws<Exception>(() => screenManager.ShowScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId));
         }
 
         [Test]
-        public void ShowScreen_WhenNotInitialized_ShouldThrowException()
+        public async void ShowScreen_WhenNotInitialized_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
             var screenManager = new ScreenManager<TestScreenId>();
 
-            Assert.Throws<Exception>(() => screenManager.ShowScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId));
         }
 
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldReturnValue()
+        public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldReturnValue()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
             
             Assert.NotNull(screenManager.ShowScreen(screenId));
         }
         
         [Test]
-        public void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldLogWarning()
+        public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldLogWarning()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            screenManager.ShowScreen(screenId);
-            screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
             
             LogAssert.Expect(LogType.Warning, new Regex(string.Empty));
         }
         
         [Test]
-        public void ShowScreen_WhenOpenedAndCleared_ShouldNotThrowException()
+        public async void ShowScreen_WhenOpenedAndCleared_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
             screenManager.Clear();
             
-            Assert.DoesNotThrow(() => screenManager.ShowScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId));
         }
 
         [Test]
-        public void CloseScreen_WhenShowed_ShouldNotThrowException()
+        public async void CloseScreen_WhenShowed_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
             
-            Assert.DoesNotThrow(() => screenManager.CloseScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.CloseScreen(screenId));
         }
 
         [Test]
-        public void CloseScreen_WhenNotShowed_ShouldThrowException()
+        public async void CloseScreen_WhenNotShowed_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
@@ -147,21 +147,90 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
             
-            Assert.Throws<Exception>(() => screenManager.CloseScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId));
         }
 
         [Test]
-        public void CloseScreen_WhenCleared_ShouldThrowException()
+        public async void CloseScreen_WhenCleared_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
             var provider = new TestScreenProvider();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId);
+            
             screenManager.Clear();
             
-            Assert.Throws<Exception>(() => screenManager.CloseScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId));
+        }
+
+        [Test]
+        public async void CloseAndShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenShowed_ShouldNotThrowException()
+        {
+            var screenId = TestScreenId.Test;
+            var screenId2 = TestScreenId.Test2;
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(provider, parentCanvas);
+            await screenManager.ShowScreen(screenId);
+
+            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+        }
+
+        [Test]
+        public async void CloseAndShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
+        {
+            var screenId = TestScreenId.Test;
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(provider, parentCanvas);
+
+            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId)); 
+        }
+        
+        [Test]
+        public async void CloseAndShowScreen_WhenProviderNullAndScreenNotNullAndScreenShowed_ShouldThrowException()
+        {
+            var screenId = TestScreenId.Test;
+            var screenId2 = TestScreenId.Test2;
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(null, parentCanvas);
+            await screenManager.ShowScreen(screenId);
+
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+        }
+        
+        [Test]
+        public async void CloseAndShowScreen_WhenProviderNotNullAndScreenNullAndScreenShowed_ShouldThrowException()
+        {
+            var screenId = TestScreenId.Test;
+            var screenId2 = TestScreenId.Test2;
+            var provider = new TestNullScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(provider, parentCanvas);
+            await screenManager.ShowScreen(screenId);
+
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+        }
+        
+        [Test]
+        public async void CloseAndShowScreen_WhenCleared_ShouldThrowException()
+        {
+            var screenId = TestScreenId.Test;
+            var screenId2 = TestScreenId.Test2;
+            var provider = new TestScreenProvider();
+            var screenManager = new ScreenManager<TestScreenId>();
+            
+            screenManager.Init(provider, parentCanvas);
+            await screenManager.ShowScreen(screenId);
+            screenManager.Clear();
+
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
         }
     }
 }

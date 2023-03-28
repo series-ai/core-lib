@@ -1,15 +1,17 @@
-﻿namespace Padoru.Core.Tests
+﻿using System.Threading.Tasks;
+
+namespace Padoru.Core.Tests
 {
     public class TestScreen : IScreen
     {
-        public void Close()
+        public async Task Close()
         {
-
+            await Task.Delay(10);
         }
 
-        public void Show()
+        public async Task Show()
         {
-
+            await Task.Delay(10);
         }
     }
 }

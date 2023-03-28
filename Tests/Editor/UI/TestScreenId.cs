@@ -2,6 +2,7 @@ namespace Padoru.Core.Tests
 {
     public enum TestScreenId
     {
-        Test
+        Test = 0,
+        Test2 = 1
     }
 }

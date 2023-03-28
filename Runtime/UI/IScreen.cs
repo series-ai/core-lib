@@ -1,9 +1,11 @@
-﻿namespace Padoru.Core
+﻿using System.Threading.Tasks;
+
+namespace Padoru.Core
 {
     public interface IScreen
     {
-        void Show();
+        Task Show();
 
-        void Close();
+        Task Close();
     }
 }
