@@ -13,8 +13,6 @@ namespace Padoru.Core
     {
         [SerializeField] private bool initializeOnAwake = true;
         [SerializeField] private bool registerOnLocator = true;
-        // TODO: Get the modules automatically when detecting changes in the hierarchy and only allow to change order
-        [SerializeField] private GameObject[] modules;
         [SerializeField] private InitializationStage[] initializationStages;
 
         public bool IsInitialized { get; private set; }
