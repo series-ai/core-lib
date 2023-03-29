@@ -60,7 +60,10 @@ namespace Padoru.Core.Editor
         {
             try
             {
-                EditorSceneManager.OpenScene(AssetDatabase.GUIDToAssetPath(scene.GUID));
+                if(EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                {
+                    EditorSceneManager.OpenScene(AssetDatabase.GUIDToAssetPath(scene.GUID));
+                }
             }
             catch (Exception e)
             {
