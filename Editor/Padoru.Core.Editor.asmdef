@@ -2,7 +2,8 @@
     "name": "Padoru.Core.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:0a0471484b079be408cb3a0d7fe94736"
+        "GUID:0a0471484b079be408cb3a0d7fe94736",
+        "GUID:8fd7113a1b80cf14c94fab47b407d67b"
     ],
     "includePlatforms": [
         "Editor"

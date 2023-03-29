@@ -7,8 +7,8 @@ namespace Padoru.Core
     [Serializable]
     public class SerializedDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [SerializeField] private List<TKey> keys = new List<TKey>();
-        [SerializeField] private List<TValue> values = new List<TValue>();
+        [SerializeField] private List<TKey> keys = new();
+        [SerializeField] private List<TValue> values = new();
         [SerializeField, HideInInspector] private bool addedItemThroughEditor;
 
         public void OnBeforeSerialize()

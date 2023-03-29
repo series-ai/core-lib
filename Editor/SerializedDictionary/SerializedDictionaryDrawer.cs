@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Padoru.Core.Editor
 {
-    public abstract class SerializedDictionaryDrawer<T> : PropertyDrawer where T : class, IDictionary
+	[CustomPropertyDrawer(typeof(SerializedDictionary<,>))]
+    public class SerializedDictionaryDrawer : PropertyDrawer
 	{
 		private const int ADD_BUTTON_WIDTH = 20;
 		private const int VERTICAL_SPACING = 5;
