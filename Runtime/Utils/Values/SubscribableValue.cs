@@ -2,6 +2,7 @@ using System;
 
 namespace Padoru.Core
 {
+	[Serializable]
 	public class SubscribableValue<T>
 	{
 		private T value;
@@ -17,7 +18,12 @@ namespace Padoru.Core
 			set
 			{
 				this.value = value;
-				OnValueChanged?.Invoke(this.value);
+
+				// The '?' operator doesn't work with the serialization
+				if (OnValueChanged != null)
+				{
+					OnValueChanged.Invoke(this.value);
+				}
 			}
 		}
 
