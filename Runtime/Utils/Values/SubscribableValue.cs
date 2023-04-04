@@ -22,11 +22,7 @@ namespace Padoru.Core
 				
 				this.value = value;
 
-				// The '?' operator doesn't work with the serialization
-				if (OnValueChanged != null)
-				{
-					OnValueChanged.Invoke(this.value);
-				}
+				OnValueChanged?.Invoke(this.value);
 			}
 		}
 
