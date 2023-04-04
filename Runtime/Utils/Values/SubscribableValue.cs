@@ -12,12 +12,14 @@ namespace Padoru.Core
 
 		public T Value
 		{
-			get
-			{
-				return value;
-			}
+			get => value;
 			set
 			{
+				if (Equals(this.value, value))
+				{
+					return;
+				}
+				
 				this.value = value;
 
 				// The '?' operator doesn't work with the serialization
@@ -31,6 +33,30 @@ namespace Padoru.Core
 		public SubscribableValue(T initialValue)
 		{
 			value = initialValue;
+		}
+		
+		public Action SubscribeAndInvoke(Action<T> subscriber)
+		{
+			OnValueChanged += subscriber;
+			subscriber.Invoke(value);
+
+			return () => OnValueChanged -= subscriber;
+		}
+		
+		public Action Subscribe(Action<T> subscriber)
+		{
+			OnValueChanged += subscriber;
+            
+			return () => OnValueChanged -= subscriber;
+		}
+		
+		/// <summary>
+		/// Set value and invoke OnValueChanged without checking for changes.
+		/// </summary>
+		public void ForceValueChange(T newValue)
+		{
+			value = newValue;
+			OnValueChanged?.Invoke(newValue);
 		}
 	}
 }
