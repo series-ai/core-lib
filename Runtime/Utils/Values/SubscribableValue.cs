@@ -67,6 +67,11 @@ namespace Padoru.Core
 			SetValueAndInvoke(newValue);
 		}
 
+		public void Unsubscribe(Action<T> subscriber)
+		{
+			OnValueChanged -= subscriber;
+		}
+
 		private void SetValueAndInvoke(T newValue)
 		{
 			value = newValue;
