@@ -7,6 +7,7 @@ namespace Padoru.Core
 	{
 		private T value;
 
+		[field: NonSerialized]
 		public event Action<T> OnValueChanged;
 
 		public T Value
