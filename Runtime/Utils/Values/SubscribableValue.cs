@@ -8,7 +8,7 @@ namespace Padoru.Core
 		private T value;
 
 		[field: NonSerialized]
-		public event Action<T> OnValueChanged;
+		private event Action<T> OnValueChanged;
 
 		/// <summary>
 		/// Value property that invoke the OnValueChanged event when the value is set.
