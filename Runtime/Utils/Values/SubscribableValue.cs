@@ -10,19 +10,24 @@ namespace Padoru.Core
 		[field: NonSerialized]
 		public event Action<T> OnValueChanged;
 
+		/// <summary>
+		/// Value property that invoke the OnValueChanged event when the value is set.
+		/// If you set the same value the OnValueChanged event is not invoked.
+		/// </summary>
 		public T Value
 		{
-			get => value;
+			get
+			{
+				return value;
+			}
 			set
 			{
 				if (Equals(this.value, value))
 				{
 					return;
 				}
-				
-				this.value = value;
 
-				OnValueChanged?.Invoke(this.value);
+				SetValueAndInvoke(value);
 			}
 		}
 
@@ -31,6 +36,9 @@ namespace Padoru.Core
 			value = initialValue;
 		}
 		
+		/// <summary>
+		/// Subscribe to value changes and invoke the given subscriber immediately. Return the unsubscribe action.
+		/// </summary>
 		public Action SubscribeAndInvoke(Action<T> subscriber)
 		{
 			OnValueChanged += subscriber;
@@ -39,6 +47,11 @@ namespace Padoru.Core
 			return () => OnValueChanged -= subscriber;
 		}
 		
+		/// <summary>
+		/// Subscribe to value changes and return the unsubscribe action.
+		/// </summary>
+		/// <param name="subscriber"></param>
+		/// <returns></returns>
 		public Action Subscribe(Action<T> subscriber)
 		{
 			OnValueChanged += subscriber;
@@ -51,8 +64,13 @@ namespace Padoru.Core
 		/// </summary>
 		public void ForceValueChange(T newValue)
 		{
+			SetValueAndInvoke(newValue);
+		}
+
+		private void SetValueAndInvoke(T newValue)
+		{
 			value = newValue;
-			OnValueChanged?.Invoke(newValue);
+			OnValueChanged?.Invoke(value);
 		}
 	}
 }
