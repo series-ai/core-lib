@@ -1,127 +1,226 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Padoru.Core
 {
-    [Serializable]
-    public class SubscribableListValue<T>
+    public enum ListEvent
     {
-        private readonly List<T> value = new();
-        public IReadOnlyList<T> Value => value;
+        CollectionChanged = 0,
+        ElementAdded = 1,
+        ElementRemoved = 2,
+        ElementChanged = 3,
+    }
+    
+    [Serializable]
+    public class SubscribableListValue<T> : IList<T>
+    {
+        private readonly List<T> innerList = new();
         
-        public int Count => value.Count;
+        public int Count => innerList.Count;
+        public bool IsReadOnly => false;
+
+        private event Action<ListEvent, T> OnListChanged;
         
-        private event Action<IReadOnlyList<T>> OnValueChanged;
-        
-        /// <summary>
-        /// Add an element to the list.
-        /// </summary>
-         public void Add(T element)
+        public T this[int index]
         {
-            value.Add(element);
-            OnValueChanged?.Invoke(Value);
+            get
+            {
+                return innerList[index];
+            }
+            set
+            {
+                innerList[index] = value;
+                OnListChanged?.Invoke(ListEvent.ElementChanged, value);
+            }
         }
 
         /// <summary>
-        /// Return true if the element is contained in the list.
+        /// Subscribe to list changes and return the unsubscribe action.
         /// </summary>
-        /// <param name="element"></param>
+        /// <param name="subscriber"></param>
         /// <returns></returns>
-        public bool Contains(T element)
+        public Action Subscribe(Action<ListEvent, T> subscriber)
         {
-            return value.Contains(element);
+            OnListChanged += subscriber;
+            return () => OnListChanged -= subscriber;
         }
         
         /// <summary>
-        /// Add a list of elements to the list.
+        /// Unsubscribe from list changes
         /// </summary>
-        public void AddRange(IEnumerable<T> element)
+        /// <param name="subscriber"></param>
+        public void Unsubscribe(Action<ListEvent, T> subscriber)
         {
-            value.AddRange(element);
-            OnValueChanged?.Invoke(Value);
+            OnListChanged -= subscriber;
+        }
+        
+        public void Add(T item)
+        {
+            innerList.Add(item);
+            OnListChanged?.Invoke(ListEvent.ElementAdded, item);
         }
 
-        /// <summary>
-        /// Remove an element from the list.
-        /// </summary>
-        public void Remove(T element)
+        public void AddRange(IEnumerable<T> collection)
         {
-            value.Remove(element);
-            OnValueChanged?.Invoke(Value);
+            innerList.AddRange(collection);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
         }
 
-        /// <summary>
-        /// Remove a count of elements starting at the target index
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        public void RemoveRange(int index, int count)
-        {
-            value.RemoveRange(index, count);
-        }
-
-        /// <summary>
-        /// Remove an element from the list at the given index.
-        /// </summary>
-        public void RemoveAt(int index)
-        {
-            value.RemoveAt(index);
-            OnValueChanged?.Invoke(Value);
-        }
-
-        /// <summary>
-        /// Remove all elements from the list.
-        /// </summary>
         public void Clear()
         {
-            value.Clear();
-            OnValueChanged?.Invoke(Value);
+            innerList.Clear();
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
         }
 
-        /// <summary>
-        /// Remove all elements from the list and add the given element.
-        /// </summary>
-        public void Overwrite(T element)
+        public bool Contains(T item)
         {
-            value.Clear();
-            value.Add(element);
-            OnValueChanged?.Invoke(Value);
+            return innerList.Contains(item);
         }
 
-        /// <summary>
-        /// Remove all elements from the list and add the given list.
-        /// </summary>
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            innerList.CopyTo(array, arrayIndex);
+        }
+
         public void Overwrite(IEnumerable<T> elements)
         {
-            value.Clear();
-            value.AddRange(elements);
-            OnValueChanged?.Invoke(Value);
-        }
-        
-        /// <summary>
-        /// Subscribe to value changes and invoke the given subscriber immediately. Return the unsubscribe action.
-        /// </summary>
-        public Action SubscribeAndInvoke(Action<IReadOnlyList<T>> subscriber)
-        {
-            OnValueChanged += subscriber;
-            subscriber.Invoke(value);
-            
-            return () => OnValueChanged -= subscriber;
-        }
-        
-        /// <summary>
-        /// Subscribe to value changes and return the unsubscribe action.
-        /// </summary>
-        public Action Subscribe(Action<IReadOnlyList<T>> subscriber)
-        {
-            OnValueChanged += subscriber;
-            
-            return () => OnValueChanged -= subscriber;
+            innerList.Clear();
+            innerList.AddRange(elements);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
         }
 
-        public void Unsubscribe(Action<IReadOnlyList<T>> subscriber)
+        public bool Exists(Predicate<T> match)
         {
-            OnValueChanged -= subscriber;
+            return innerList.Exists(match);
+        }
+        
+        public bool Remove(T item)
+        {
+            var wasRemoved = innerList.Remove(item);
+
+            if (wasRemoved)
+            {
+                OnListChanged?.Invoke(ListEvent.ElementRemoved, item);
+            }
+
+            return wasRemoved;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return innerList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int IndexOf(T item)
+        {
+            return innerList.IndexOf(item);
+        }
+
+        public int IndexOf(T item, int index)
+        {
+            return innerList.IndexOf(item, index);
+        }
+
+        public int IndexOf(T item, int index, int count)
+        {
+            return innerList.IndexOf(item, index, count);
+        }
+
+        public T FindLast(Predicate<T> match)
+        {
+            return innerList.FindLast(match);
+        }
+
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return innerList.FindLastIndex(startIndex, count, match);
+        }
+
+        public int FindLastIndex(int startIndex, Predicate<T> match)
+        {
+            return innerList.FindLastIndex(startIndex, match);
+        }
+
+        public int FindLastIndex(Predicate<T> match)
+        {
+            return innerList.FindLastIndex(match);
+        }
+
+        public void ForEach(Action<T> action)
+        {
+            innerList.ForEach(action);
+        }
+
+        public bool TrueForAll(Predicate<T> match)
+        {
+            return innerList.TrueForAll(match);
+        }
+
+        public void Reverse()
+        {
+            innerList.Reverse();
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);        
+        }
+
+        public void Reverse(int index, int count)
+        {
+            innerList.Reverse(index, count);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+
+        public void Sort()
+        {
+            innerList.Sort();
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+
+        public void Sort(IComparer<T> comparer)
+        {
+            innerList.Sort(comparer);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+
+        public void Sort(Comparison<T> comparison)
+        {
+            innerList.Sort(comparison);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            innerList.Sort(index, count, comparer);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+        
+        public void Insert(int index, T item)
+        {
+            innerList.Insert(index, item);
+            OnListChanged?.Invoke(ListEvent.ElementAdded, item);
+        }
+
+        public void InsertRange(int index, IEnumerable<T> collection)
+        {
+            innerList.InsertRange(index, collection);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+        }
+
+        public void RemoveAt(int index)
+        {
+            var item = innerList[index];
+            innerList.RemoveAt(index);
+            OnListChanged?.Invoke(ListEvent.ElementRemoved, item);
+        }
+        
+        public void RemoveRange(int index, int count)
+        {
+            innerList.RemoveRange(index, count);
+            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
         }
     }
 }
