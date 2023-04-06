@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Padoru.Core.Files
@@ -8,7 +9,12 @@ namespace Padoru.Core.Files
         public void Init()
         {
             var basePath = Path.Combine(Application.persistentDataPath, "Files");
-            var serializer = new JsonSerializer();
+            
+            var serializer = new JsonSerializer(new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            });
+            
             var fileSystem = new LocalFileSystem(basePath);
             var fileManager = new FileManager(serializer, fileSystem);
 
