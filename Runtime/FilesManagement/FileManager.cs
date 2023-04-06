@@ -62,7 +62,15 @@ namespace Padoru.Core.Files
 
         public async Task<bool> Exists(string uri)
         {
-            return await GetProtocol(uri).FileSystem.Exists(uri);
+            try
+            {
+                return await GetProtocol(uri).FileSystem.Exists(uri);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return false;
+            }
         }
 
         public async Task<File<T>> Read<T>(string uri)
