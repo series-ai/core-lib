@@ -6,10 +6,17 @@ namespace Padoru.Core.Files
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly JsonSerializerSettings settings = new()
+        private readonly JsonSerializerSettings settings;
+
+        public JsonSerializer()
         {
-            TypeNameHandling = TypeNameHandling.All
-        };
+            settings = new JsonSerializerSettings();
+        }
+        
+        public JsonSerializer(JsonSerializerSettings settings)
+        {
+            this.settings = settings;
+        }
 
         public void Serialize(object value, out byte[] bytes)
         {
