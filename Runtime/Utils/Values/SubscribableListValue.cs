@@ -223,5 +223,10 @@ namespace Padoru.Core
             innerList.RemoveRange(index, count);
             OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
         }
+
+        public List<T> ToList()
+        {
+            return new List<T>(innerList);
+        }
     }
 }
