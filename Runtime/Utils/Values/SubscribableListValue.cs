@@ -15,11 +15,12 @@ namespace Padoru.Core
     [Serializable]
     public class SubscribableListValue<T> : IList<T>
     {
-        private readonly List<T> innerList = new();
+        private List<T> innerList = new();
         
         public int Count => innerList.Count;
         public bool IsReadOnly => false;
 
+        [field: NonSerialized]
         private event Action<ListEvent, T> OnListChanged;
         
         public T this[int index]
