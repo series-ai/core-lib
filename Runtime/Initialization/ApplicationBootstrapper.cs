@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Padoru.Diagnostics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Debug = Padoru.Diagnostics.Debug;
 
@@ -20,7 +21,11 @@ namespace Padoru.Core
             }
 
             ConfigLog(settings);
-            await SetupProjectContext(settings);
+
+            if (ShouldInitializeFramework(settings))
+            {
+                await SetupProjectContext(settings);
+            }
         }
 
         private static void ConfigLog(Settings settings)
@@ -54,6 +59,13 @@ namespace Padoru.Core
 
             Debug.Log($"Initializing ProjectContext");
             await projectContext.Init();
+        }
+
+        private static bool ShouldInitializeFramework(Settings settings)
+        {
+            var activeSceneName = SceneManager.GetActiveScene().name;
+
+            return settings.scenes.Contains(activeSceneName);
         }
     }
 }
