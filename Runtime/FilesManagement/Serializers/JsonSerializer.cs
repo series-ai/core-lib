@@ -9,7 +9,10 @@ namespace Padoru.Core.Files
 
         public JsonSerializer()
         {
-            settings = new JsonSerializerSettings();
+            settings = new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+            };
         }
         
         public JsonSerializer(JsonSerializerSettings settings)
