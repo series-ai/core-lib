@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace Padoru.Core.Files
@@ -18,14 +17,14 @@ namespace Padoru.Core.Files
             this.settings = settings;
         }
 
-        public void Serialize(object value, out byte[] bytes)
+        public void Serialize(object value, out string text)
         {
-            bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, settings));
+            text = JsonConvert.SerializeObject(value, settings);
         }
 
-        public void Deserialize(Type type, ref byte[] bytes, out object value)
+        public void Deserialize(Type type, ref string text, out object value)
         {
-            value = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(bytes), type, settings);
+            value = JsonConvert.DeserializeObject(text, type, settings);
         }
     }
 }

@@ -108,9 +108,9 @@ namespace Padoru.Core.Files
             {
                 var protocol = GetProtocol(uri);
                 
-                protocol.Serializer.Serialize(value, out var bytes);
+                protocol.Serializer.Serialize(value, out var text);
 
-                var newFile = new File<byte[]>(uri, bytes);
+                var newFile = new File<string>(uri, text);
 
                 await protocol.FileSystem.Write(newFile);
 

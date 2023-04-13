@@ -21,18 +21,18 @@ namespace Padoru.Core.Files
             return await Task.FromResult(File.Exists(path));
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<string>> Read(string uri)
         {
             var path = GetFullPath(uri);
 
-            var bytes = await File.ReadAllBytesAsync(path);
+            var text = await File.ReadAllTextAsync(path);
 
             Debug.Log($"Read file from path '{path}'");
 
-            return new File<byte[]>(uri, bytes);
+            return new File<string>(uri, text);
         }
 
-        public async Task<File<byte[]>> Write(File<byte[]> file)
+        public async Task Write(File<string> file)
         {
             var path = GetFullPath(file.Uri);
 
@@ -40,11 +40,9 @@ namespace Padoru.Core.Files
             
             Directory.CreateDirectory(directory);
 
-            await File.WriteAllBytesAsync(path, file.Data);
+            await File.WriteAllTextAsync(path, file.Data);
 
             Debug.Log($"Wrote file to path '{path}'");
-
-            return file;
         }
 
         public async Task Delete(string uri)

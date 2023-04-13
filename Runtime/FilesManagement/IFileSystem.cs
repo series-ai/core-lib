@@ -6,9 +6,9 @@ namespace Padoru.Core.Files
     {
         Task<bool> Exists(string uri);
 
-        Task<File<byte[]>> Read(string uri);
+        Task<File<string>> Read(string uri);
 
-        Task<File<byte[]>>  Write(File<byte[]> file);
+        Task Write(File<string> file);
 
         Task Delete(string uri);
     }

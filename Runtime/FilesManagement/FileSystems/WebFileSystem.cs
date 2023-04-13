@@ -18,79 +18,82 @@ namespace Padoru.Core.Files
         {
             var path = GetFullPath(uri);
             
-            var www = UnityWebRequest.Get(path);
-            var request = www.SendWebRequest();
+            var uwr = UnityWebRequest.Get(path);
+            var request = uwr.SendWebRequest();
 
             while (!request.isDone)
             {
                 await Task.Yield();
             }
 
-            return www.result == UnityWebRequest.Result.Success;
+            return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<string>> Read(string uri)
         {
             var path = GetFullPath(uri);
             
-            var www = UnityWebRequest.Get(path);
-            var request = www.SendWebRequest();
+            var uwr = UnityWebRequest.Get(path);
+            var request = uwr.SendWebRequest();
 
             while (!request.isDone)
             {
                 await Task.Yield();
             }
             
-            if (www.result == UnityWebRequest.Result.Success) 
+            if (uwr.result == UnityWebRequest.Result.Success) 
             {
-                var manifestData = www.downloadHandler.data;
-                return new File<byte[]>(uri, manifestData);
+                Debug.Log($"Read file at path '{path}'.");
+                
+                var manifestData = uwr.downloadHandler.text;
+                return new File<string>(uri, manifestData);
             }
             
-            Debug.LogError($"Could not read file at path '{path}'. Error: {www.error}");
-            return new File<byte[]>(uri, default);
+            Debug.LogError($"Could not read file at path '{path}'. Error: {uwr.error}");
+            return new File<string>(uri, string.Empty);
         }
 
-        public async Task<File<byte[]>> Write(File<byte[]> file)
+        public async Task Write(File<string> file)
         {
             var path = GetFullPath(file.Uri);
             
-            var www = UnityWebRequest.Post(path, file.Data.ToString());
-            var request = www.SendWebRequest();
+            var uwr = UnityWebRequest.Post(path, file.Data);
+            var request = uwr.SendWebRequest();
 
             while (!request.isDone)
             {
                 await Task.Yield();
             }
             
-            if (www.result == UnityWebRequest.Result.Success) 
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
-                return file;
+                Debug.Log($"Written file at path '{path}'.");
             }
-            
-            Debug.LogError($"Could not write file at path '{path}'. Error: {www.error}");
-            return file;
+            else
+            {
+                Debug.LogError($"Could not write file at path '{path}'. Error: {uwr.error}");
+            }
         }
 
         public async Task Delete(string uri)
         {
             var path = GetFullPath(uri);
             
-            var www = UnityWebRequest.Delete(path);
-            var request = www.SendWebRequest();
+            var uwr = UnityWebRequest.Delete(path);
+            var request = uwr.SendWebRequest();
 
             while (!request.isDone)
             {
                 await Task.Yield();
             }
             
-            if (www.result != UnityWebRequest.Result.Success) 
+            if (uwr.result == UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Deleted file at path '{path}'.");
+                Debug.Log($"Deleted file at path '{path}'.");
             }
             else
             {
-                Debug.LogError($"Could not delete file at path '{path}'. Error: {www.error}");
+                Debug.LogError($"Could not delete file at path '{path}'. Error: {uwr.error}");
             }
         }
         
