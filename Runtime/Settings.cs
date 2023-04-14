@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Padoru.Diagnostics;
 using UnityEngine;
 
 using LogType = Padoru.Diagnostics.LogType;
@@ -13,8 +14,7 @@ namespace Padoru.Core
 		[Tooltip("Only the scenes specified in the list will trigger the initialization of the framework")]
 		public List<string> scenes;
 
-		[Header("Logging")]
-		public LogType LogType = LogType.Info;
-		public LogType StacktraceLogType = LogType.Info;
+		[Header("Logging")] 
+		public LogSettings logSettings;
 	}
 }

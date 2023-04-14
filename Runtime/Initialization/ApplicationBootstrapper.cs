@@ -30,13 +30,7 @@ namespace Padoru.Core
 
         private static void ConfigLog(Settings settings)
         {
-            var logSettings = new LogSettings()
-            {
-                LogType = settings.LogType,
-                StacktraceLogType = settings.StacktraceLogType,
-            };
-
-            Debug.Configure(logSettings, new UnityDefaultLogFormatter(), new UnityDefaultStackTraceFormatter());
+            Debug.Configure(settings.logSettings, new UnityDefaultLogFormatter(), new UnityDefaultStackTraceFormatter());
             Debug.AddOutput(new UnityConsoleOutput());
         }
 
