@@ -190,15 +190,15 @@ namespace Padoru.Core.Files.Tests
         }
 
         [Test]
-        public async void Read_WhenFileDoesNotExist_ShouldReturnValueAndLog()
+        public async void Read_WhenFileDoesNotExist_ShouldLogAndReturnNull()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             LogAssert.Expect(LogType.Error, new Regex(""));
 
             var file = await fileManager.Read<TestClass>(testUri);
-
-            Assert.IsNotNull(file);
+            
+            Assert.IsNull(file);
         }
 
         [Test]

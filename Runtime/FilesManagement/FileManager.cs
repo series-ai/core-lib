@@ -79,26 +79,19 @@ namespace Padoru.Core.Files
             {
                 var protocol = GetProtocol(uri);
                 
-                if (await protocol.FileSystem.Exists(uri))
-                {
-                    var file = await protocol.FileSystem.Read(uri);
+                var file = await protocol.FileSystem.Read(uri);
                     
-                    var bytes = file.Data;
+                var bytes = file.Data;
 
-                    protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
+                protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
 
-                    return new File<T>(uri, (T)result);
-                }
-                
-                Debug.LogError($"Cannot read file because it does not exist: {uri}");
-                
-                return new File<T>(uri, default);
+                return new File<T>(uri, (T)result);
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
                 
-                return new File<T>(uri, default);
+                return null;
             }
         }
 
@@ -120,7 +113,7 @@ namespace Padoru.Core.Files
             {
                 Debug.LogException(e);
                 
-                return new File<T>(uri, default);
+                return new File<T>(uri, value);
             }
         }
 
