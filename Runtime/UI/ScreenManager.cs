@@ -11,29 +11,29 @@ namespace Padoru.Core
     public class ScreenManager<TScreenId> : IScreenManager<TScreenId>
     {
         private readonly Dictionary<TScreenId, IScreen> screens = new();
-        private readonly List<TScreenId> activeScreens = new List<TScreenId>();
+        private readonly List<TScreenId> activeScreens = new();
         private IScreenProvider<TScreenId> provider;
         private Canvas parentCanvas;
 
         private TScreenId CurrentActiveScreen => activeScreens.LastOrDefault();
 
-        public void Init(IScreenProvider<TScreenId> providerReference, Canvas parentCanvasReference)
+        public void Init(IScreenProvider<TScreenId> provider, Canvas parentCanvas)
         {
-            if (providerReference == null)
+            if (provider == null)
             {
                 throw new Exception("The provider reference is null");
             }
             
-            if (parentCanvasReference == null)
+            if (parentCanvas == null)
             {
                 throw new Exception("The parent canvas reference is null");
             }
             
-            provider = providerReference;
-            parentCanvas = parentCanvasReference;
+            this.provider = provider;
+            this.parentCanvas = parentCanvas;
         }
 
-        public async Task<IScreen> ShowScreen(TScreenId id)
+        public async Task ShowScreen(TScreenId id)
         {
             if (id == null)
             {
@@ -53,7 +53,7 @@ namespace Padoru.Core
             if (screens.ContainsKey(id))
             {
                 Debug.LogWarning($"Unable to show screen {id} because is already active");
-                return screens[id];
+                return;
             }
             
             var screen = provider.GetScreen(id, parentCanvas.transform);
@@ -67,8 +67,6 @@ namespace Padoru.Core
             screens.Add(id, screen);
             
             await screen.Show();
-            
-            return screen;
         }
 
         public async Task CloseScreen(TScreenId id)
@@ -94,16 +92,21 @@ namespace Padoru.Core
         /// </summary>
         /// <param name="id">The id of the screen to show</param>
         /// <returns></returns>
-        public async Task<IScreen> CloseAndShowScreen(TScreenId id)
+        public async Task CloseAndShowScreen(TScreenId id)
         {
             if (CurrentActiveScreen != null)
             {
                 await CloseScreen(CurrentActiveScreen);
             }
             
-            return await ShowScreen(id);
+            await ShowScreen(id);
         }
-        
+
+        public bool IsScreenOpened(TScreenId id)
+        {
+            return activeScreens.Contains(id);
+        }
+
         public async void Clear()
         {
             var screensList = screens.Keys.ToList();

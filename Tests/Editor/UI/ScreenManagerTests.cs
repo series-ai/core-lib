@@ -83,19 +83,6 @@ namespace Padoru.Core.Tests
 
             Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId));
         }
-
-        [Test]
-        public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldReturnValue()
-        {
-            var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
-            var screenManager = new ScreenManager<TestScreenId>();
-            
-            screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
-            
-            Assert.NotNull(screenManager.ShowScreen(screenId));
-        }
         
         [Test]
         public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldLogWarning()
