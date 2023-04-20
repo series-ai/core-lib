@@ -50,7 +50,7 @@ namespace Padoru.Core.Files
             }
             
             Debug.LogError($"Could not read file at path '{path}'. Error: {uwr.error}");
-            return new File<string>(uri, string.Empty);
+            return null;
         }
 
         public async Task Write(File<string> file)
