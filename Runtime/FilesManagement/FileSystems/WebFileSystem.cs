@@ -49,7 +49,7 @@ namespace Padoru.Core.Files
                 return new File<string>(uri, manifestData);
             }
             
-            throw new Exception($"Could not read file at path '{path}'. Error: {uwr.error}");
+            throw new FileNotFoundException($"Could not read file at path '{path}'. Error: {uwr.error}");
         }
 
         public async Task Write(File<string> file)
