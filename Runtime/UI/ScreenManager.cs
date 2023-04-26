@@ -35,14 +35,19 @@ namespace Padoru.Core
 
         public async Task ShowScreen(TScreenId id)
         {
+            await ShowScreen(id, parentCanvas.transform);
+        }
+
+        public async Task ShowScreen(TScreenId id, Transform parent)
+        {
             if (id == null)
             {
                 throw new Exception("Cannot Show screen. Provided screen id is null");
             }
             
-            if (parentCanvas == null)
+            if (parent == null)
             {
-                throw new Exception("ParentCanvas is not set. Cannot show screen");
+                throw new Exception("Parent is null. Cannot show screen");
             }
             
             if (provider == null)
@@ -56,7 +61,7 @@ namespace Padoru.Core
                 return;
             }
             
-            var screen = provider.GetScreen(id, parentCanvas.transform);
+            var screen = provider.GetScreen(id, parent);
             
             if (screen == null)
             {
