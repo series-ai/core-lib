@@ -4,16 +4,8 @@ using System.Collections.Generic;
 
 namespace Padoru.Core
 {
-    public enum ListEvent
-    {
-        CollectionChanged = 0,
-        ElementAdded = 1,
-        ElementRemoved = 2,
-        ElementChanged = 3,
-    }
-    
     [Serializable]
-    public class SubscribableListValue<T> : IList<T>
+    public class SubscribableList<T> : IList<T>
     {
         private List<T> innerList = new();
         
@@ -21,7 +13,7 @@ namespace Padoru.Core
         public bool IsReadOnly => false;
 
         [field: NonSerialized]
-        private event Action<ListEvent, T> OnListChanged;
+        private event Action<CollectionEvent, T> OnListChanged;
         
         public T this[int index]
         {
@@ -32,7 +24,7 @@ namespace Padoru.Core
             set
             {
                 innerList[index] = value;
-                OnListChanged?.Invoke(ListEvent.ElementChanged, value);
+                OnListChanged?.Invoke(CollectionEvent.ElementChanged, value);
             }
         }
 
@@ -41,7 +33,7 @@ namespace Padoru.Core
         /// </summary>
         /// <param name="subscriber"></param>
         /// <returns></returns>
-        public Action Subscribe(Action<ListEvent, T> subscriber)
+        public Action Subscribe(Action<CollectionEvent, T> subscriber)
         {
             OnListChanged += subscriber;
             return () => OnListChanged -= subscriber;
@@ -51,7 +43,7 @@ namespace Padoru.Core
         /// Unsubscribe from list changes
         /// </summary>
         /// <param name="subscriber"></param>
-        public void Unsubscribe(Action<ListEvent, T> subscriber)
+        public void Unsubscribe(Action<CollectionEvent, T> subscriber)
         {
             OnListChanged -= subscriber;
         }
@@ -59,19 +51,19 @@ namespace Padoru.Core
         public void Add(T item)
         {
             innerList.Add(item);
-            OnListChanged?.Invoke(ListEvent.ElementAdded, item);
+            OnListChanged?.Invoke(CollectionEvent.ElementAdded, item);
         }
 
         public void AddRange(IEnumerable<T> collection)
         {
             innerList.AddRange(collection);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void Clear()
         {
             innerList.Clear();
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public bool Contains(T item)
@@ -88,7 +80,7 @@ namespace Padoru.Core
         {
             innerList.Clear();
             innerList.AddRange(elements);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public bool Exists(Predicate<T> match)
@@ -102,7 +94,7 @@ namespace Padoru.Core
 
             if (wasRemoved)
             {
-                OnListChanged?.Invoke(ListEvent.ElementRemoved, item);
+                OnListChanged?.Invoke(CollectionEvent.ElementRemoved, item);
             }
 
             return wasRemoved;
@@ -166,62 +158,62 @@ namespace Padoru.Core
         public void Reverse()
         {
             innerList.Reverse();
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);        
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);        
         }
 
         public void Reverse(int index, int count)
         {
             innerList.Reverse(index, count);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void Sort()
         {
             innerList.Sort();
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void Sort(IComparer<T> comparer)
         {
             innerList.Sort(comparer);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void Sort(Comparison<T> comparison)
         {
             innerList.Sort(comparison);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void Sort(int index, int count, IComparer<T> comparer)
         {
             innerList.Sort(index, count, comparer);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
         
         public void Insert(int index, T item)
         {
             innerList.Insert(index, item);
-            OnListChanged?.Invoke(ListEvent.ElementAdded, item);
+            OnListChanged?.Invoke(CollectionEvent.ElementAdded, item);
         }
 
         public void InsertRange(int index, IEnumerable<T> collection)
         {
             innerList.InsertRange(index, collection);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public void RemoveAt(int index)
         {
             var item = innerList[index];
             innerList.RemoveAt(index);
-            OnListChanged?.Invoke(ListEvent.ElementRemoved, item);
+            OnListChanged?.Invoke(CollectionEvent.ElementRemoved, item);
         }
         
         public void RemoveRange(int index, int count)
         {
             innerList.RemoveRange(index, count);
-            OnListChanged?.Invoke(ListEvent.CollectionChanged, default);
+            OnListChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
 
         public List<T> ToList()
