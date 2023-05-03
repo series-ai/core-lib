@@ -5,21 +5,13 @@ using System.Linq;
 
 namespace Padoru.Core
 {
-    public enum DictionaryEvent
-    {
-        DictionaryChanged = 0,
-        KeyAdded = 1,
-        KeyRemoved = 2,
-        KeyValueChanged = 3,
-    }
-    
     [Serializable]
-    public class SubscribableDictionaryValue<TKey, TValue> : IDictionary<TKey, TValue>
+    public class SubscribableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private Dictionary<TKey, TValue> innerDictionary = new();
 
         [field: NonSerialized]
-        private event Action<DictionaryEvent, KeyValuePair<TKey, TValue>> OnDictionaryChanged;
+        private event Action<CollectionEvent, KeyValuePair<TKey, TValue>> OnDictionaryChanged;
         
         public int Count => innerDictionary.Count;
 
@@ -39,7 +31,7 @@ namespace Padoru.Core
             {
                 innerDictionary[key] = value;
                 
-                OnDictionaryChanged?.Invoke(DictionaryEvent.KeyValueChanged, 
+                OnDictionaryChanged?.Invoke(CollectionEvent.CollectionChanged, 
                     new KeyValuePair<TKey, TValue>(key, value));
             }
         }
@@ -49,7 +41,7 @@ namespace Padoru.Core
         /// </summary>
         /// <param name="subscriber"></param>
         /// <returns></returns>
-        public Action Subscribe(Action<DictionaryEvent, KeyValuePair<TKey, TValue>> subscriber)
+        public Action Subscribe(Action<CollectionEvent, KeyValuePair<TKey, TValue>> subscriber)
         {
             OnDictionaryChanged += subscriber;
             return () => OnDictionaryChanged -= subscriber;
@@ -59,7 +51,7 @@ namespace Padoru.Core
         /// Unsubscribe from list changes
         /// </summary>
         /// <param name="subscriber"></param>
-        public void Unsubscribe(Action<DictionaryEvent, KeyValuePair<TKey, TValue>> subscriber)
+        public void Unsubscribe(Action<CollectionEvent, KeyValuePair<TKey, TValue>> subscriber)
         {
             OnDictionaryChanged -= subscriber;
         }
@@ -70,7 +62,7 @@ namespace Padoru.Core
 
             if (wasAdded)
             {
-                OnDictionaryChanged?.Invoke(DictionaryEvent.KeyAdded, 
+                OnDictionaryChanged?.Invoke(CollectionEvent.ElementAdded, 
                     new KeyValuePair<TKey, TValue>(key, value));
             }
 
@@ -86,14 +78,14 @@ namespace Padoru.Core
         {
             innerDictionary.Add(key, value);
             
-            OnDictionaryChanged?.Invoke(DictionaryEvent.KeyAdded, 
+            OnDictionaryChanged?.Invoke(CollectionEvent.ElementAdded, 
                 new KeyValuePair<TKey, TValue>(key, value));
         }
 
         public void Clear()
         {
             innerDictionary.Clear();
-            OnDictionaryChanged?.Invoke(DictionaryEvent.DictionaryChanged, default);
+            OnDictionaryChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
         
         public bool Contains(KeyValuePair<TKey, TValue> item)
@@ -136,7 +128,7 @@ namespace Padoru.Core
                 innerDictionary.Add(key, elements[key]);
             }
             
-            OnDictionaryChanged?.Invoke(DictionaryEvent.DictionaryChanged, default);
+            OnDictionaryChanged?.Invoke(CollectionEvent.CollectionChanged, default);
         }
         
         public bool Remove(KeyValuePair<TKey, TValue> item)
@@ -154,7 +146,7 @@ namespace Padoru.Core
 
                 if (wasRemoved)
                 {
-                    OnDictionaryChanged?.Invoke(DictionaryEvent.KeyRemoved, 
+                    OnDictionaryChanged?.Invoke(CollectionEvent.ElementRemoved, 
                         new KeyValuePair<TKey, TValue>(key, value));
                 }
 
