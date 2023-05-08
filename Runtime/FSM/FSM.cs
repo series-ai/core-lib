@@ -7,12 +7,15 @@ namespace Padoru.Core
 {
 	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
 	{
-		private Dictionary<TState, State> states;
-		private List<Transition<TState, TTrigger>> transitions;
-		private TState initialStateId;
-		private ITickManager tickManager;
+		private readonly Dictionary<TState, State> states;
+		private readonly List<Transition<TState, TTrigger>> transitions;
+		private readonly TState initialStateId;
+		private readonly ITickManager tickManager;
 
 		public State CurrentState { get; private set; }
+		
+		public State PreviousState { get; private set; }
+		
 		public bool IsActive { get; private set; }
 
 		public FSM(TState initialStateId)
@@ -34,6 +37,7 @@ namespace Padoru.Core
 				throw new Exception("Could not start FSM, it is already active");
 			}
 
+			PreviousState = null;
 			ChangeState(initialStateId);
 			IsActive = true;
 			tickManager.Register(this);
@@ -134,14 +138,15 @@ namespace Padoru.Core
 
 		private void ChangeState(State state)
 		{
-			if(CurrentState != null)
+			if (CurrentState != null)
 			{
+				PreviousState = CurrentState;
 				CurrentState.OnStateExit();
 			}
 
 			CurrentState = state;
 
-			if(CurrentState != null)
+			if (CurrentState != null)
 			{
 				CurrentState.OnStateEnter();
 			}
