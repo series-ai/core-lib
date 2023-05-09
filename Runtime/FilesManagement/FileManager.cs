@@ -62,80 +62,45 @@ namespace Padoru.Core.Files
 
         public async Task<bool> Exists(string uri)
         {
-            try
-            {
-                return await GetProtocol(uri).FileSystem.Exists(uri);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                return false;
-            }
+            return await GetProtocol(uri).FileSystem.Exists(uri);
         }
 
         public async Task<File<T>> Read<T>(string uri)
         {
-            try
-            {
-                var protocol = GetProtocol(uri);
+            var protocol = GetProtocol(uri);
                 
-                var file = await protocol.FileSystem.Read(uri);
+            var file = await protocol.FileSystem.Read(uri);
                     
-                var bytes = file.Data;
+            var bytes = file.Data;
 
-                protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
+            protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
 
-                return new File<T>(uri, (T)result);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                
-                return null;
-            }
+            return new File<T>(uri, (T)result);
         }
 
         public async Task<File<T>> Write<T>(string uri, T value)
         {
-            try
-            {
-                var protocol = GetProtocol(uri);
+            var protocol = GetProtocol(uri);
                 
-                protocol.Serializer.Serialize(value, out var text);
+            protocol.Serializer.Serialize(value, out var text);
 
-                var newFile = new File<string>(uri, text);
+            var newFile = new File<string>(uri, text);
 
-                await protocol.FileSystem.Write(newFile);
+            await protocol.FileSystem.Write(newFile);
 
-                return new File<T>(uri, value);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                
-                return new File<T>(uri, value);
-            }
+            return new File<T>(uri, value);
         }
 
         public async Task Delete(string uri)
         {
-            try
-            {
-                var protocol = GetProtocol(uri);
+            var protocol = GetProtocol(uri);
                 
-                if (await protocol.FileSystem.Exists(uri))
-                {
-                    await protocol.FileSystem.Delete(uri);
-                }
-                else
-                {
-                    Debug.LogError($"Cannot delete file because it does not exists: {uri}");
-                }
-            }
-            catch (Exception e)
+            if (!await protocol.FileSystem.Exists(uri))
             {
-                Debug.LogException(e);
+                throw new Exception($"Cannot delete file because it does not exists: {uri}");
             }
+            
+            await protocol.FileSystem.Delete(uri);
         }
 
         private FileSystemProtocol GetProtocol(string uri)
