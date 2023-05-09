@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
@@ -20,7 +21,7 @@ namespace Padoru.Core.Files
                 return await Task.FromResult(file);
             }
 
-            throw new Exception($"Could not find file. Uri {uri}");
+            throw new FileNotFoundException($"Could not find file. Uri {uri}");
         }
 
         public async Task Write(File<string> file)

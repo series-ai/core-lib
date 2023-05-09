@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -129,88 +130,75 @@ namespace Padoru.Core.Files.Tests
         }
         
         [Test]
-        public async void DeleteFile_WhenFileDoesExist_ShouldNotLog()
+        public async void DeleteFile_WhenFileDoesExist_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value);
 
-            await fileManager.Delete(testUri);
+            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri));
         }
 
         [Test]
-        public async void DeleteFile_WhenFileDoesNotExist_ShouldLogError()
+        public async void DeleteFile_WhenFileDoesNotExist_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            await fileManager.Delete(testUri);
+            Assert.Throws<Exception>(async () => await fileManager.Delete(testUri));
         }
 
         [Test]
-        public async void DeleteFile_WhenProtocolNotRegistered_ShouldLogErrorAndWarning()
+        public async void DeleteFile_WhenProtocolNotRegistered_ShouldLogWarningAndNotThrow()
         {
             LogAssert.Expect(LogType.Warning, new Regex(""));
-            LogAssert.Expect(LogType.Error, new Regex(""));
 
-            await fileManager.Delete(testUri);
+            await fileManager.Write(testUri, value);
+
+            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri));
         }
 
         [Test]
-        public async void Write_WhenValueNull_ShouldReturnValue()
+        public async void Write_WhenValueNull_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            var file = await fileManager.Write<TestClass>(testUri, null);
-
-            Assert.IsNotNull(file);
+            Assert.DoesNotThrow(async () => await fileManager.Write<TestClass>(testUri, null));
         }
 
         [Test]
-        public async void Write_WhenValueNotNull_ShouldReturnValue()
+        public async void Write_WhenValueNotNull_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            var file = await fileManager.Write(testUri, value);
-
-            Assert.IsNotNull(file);
+            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value));
         }
 
         [Test]
-        public async void Write_WhenFileAlreadyExist_ShouldReturnValue()
+        public async void Write_WhenFileAlreadyExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            var file = await fileManager.Write(testUri, value);
-
-            file = await fileManager.Write(testUri, value);
-
-            Assert.IsNotNull(file);
-        }
-
-        [Test]
-        public async void Read_WhenFileDoesNotExist_ShouldLogAndReturnNull()
-        {
-            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
-
-            LogAssert.Expect(LogType.Error, new Regex(""));
-
-            var file = await fileManager.Read<TestClass>(testUri);
+            await fileManager.Write(testUri, value);
             
-            Assert.IsNull(file);
+            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value));
         }
 
         [Test]
-        public async void Read_WhenFileDoesExist_ShouldReturnValue()
+        public async void Read_WhenFileDoesNotExist_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<FileNotFoundException>(async () => await fileManager.Read<TestClass>(testUri));
+        }
+
+        [Test]
+        public async void Read_WhenFileDoesExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value);
 
-            var file = await fileManager.Read<TestClass>(testUri);
-
-            Assert.IsNotNull(file);
+            Assert.DoesNotThrow(async () => await fileManager.Read<TestClass>(testUri));
         }
     }
 }
