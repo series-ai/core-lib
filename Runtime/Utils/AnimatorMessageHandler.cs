@@ -2,29 +2,32 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class AnimatorMessageHandler : MonoBehaviour
+namespace Padoru.Core
 {
-    private Dictionary<string, UnityEvent> events = new ();
-
-    public UnityEvent GetEvent(string eventName)
+    public class AnimatorMessageHandler : MonoBehaviour
     {
-        eventName = eventName.ToLower();
+        private Dictionary<string, UnityEvent> events = new ();
 
-        if (!events.ContainsKey(eventName))
+        public UnityEvent GetEvent(string eventName)
         {
-            events.Add(eventName, new UnityEvent());
-        }
+            eventName = eventName.ToLower();
+
+            if (!events.ContainsKey(eventName))
+            {
+                events.Add(eventName, new UnityEvent());
+            }
         
-        return events[eventName];
-    }
+            return events[eventName];
+        }
 
-    public void ClearEvents()
-    {
-        events.Clear();
-    }
+        public void ClearEvents()
+        {
+            events.Clear();
+        }
 
-    public void TriggerEvent(string eventName)
-    {
-        GetEvent(eventName).Invoke();
+        public void TriggerEvent(string eventName)
+        {
+            GetEvent(eventName).Invoke();
+        }
     }
 }
