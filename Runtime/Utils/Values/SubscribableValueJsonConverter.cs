@@ -14,7 +14,13 @@ namespace Padoru.Core
             JsonSerializer serializer)
         {
             var s = (T)reader.Value;
-            return new SubscribableValue<T>(s);
+
+            if (existingValue != null)
+            {
+                existingValue.Value = s;
+            }
+            
+            return existingValue ?? new SubscribableValue<T>(s);
         }
     }
 }
