@@ -27,7 +27,7 @@ namespace Padoru.Core.Tests
             fsm = new FSM<TestStates, TestTriggers>(startState);
             fsm.Start();
 
-            Assert.AreEqual(fsm.CurrentState, fsm.GetState(startState));
+            Assert.AreEqual(fsm.CurrentStateId, startState);
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace Padoru.Core.Tests
             fsm.Start();
 
             Assert.DoesNotThrow(() => fsm.SetTrigger(TestTriggers.Trigger1));
-            Assert.AreEqual(fsm.GetState(targetState), fsm.CurrentState);
+            Assert.AreEqual(targetState, fsm.CurrentStateId);
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace Padoru.Core.Tests
             fsm.Start();
 
             Assert.DoesNotThrow(() => fsm.SetTrigger(TestTriggers.Trigger1));
-            Assert.AreEqual(fsm.GetState(startState), fsm.CurrentState);
+            Assert.AreEqual(startState, fsm.CurrentStateId);
         }
     }
 }

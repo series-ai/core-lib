@@ -12,10 +12,10 @@ namespace Padoru.Core
 		private readonly TState initialStateId;
 		private readonly ITickManager tickManager;
 
-		public State CurrentState { get; private set; }
-		
-		public State PreviousState { get; private set; }
-		
+		private State currentState;
+
+		public TState CurrentStateId { get; private set; }
+		public TState PreviousStateId { get; private set; }
 		public bool IsActive { get; private set; }
 
 		public FSM(TState initialStateId)
@@ -37,7 +37,7 @@ namespace Padoru.Core
 				throw new Exception("Could not start FSM, it is already active");
 			}
 
-			PreviousState = null;
+			PreviousStateId = initialStateId;
 			ChangeState(initialStateId);
 			IsActive = true;
 			tickManager.Register(this);
@@ -50,14 +50,15 @@ namespace Padoru.Core
 				throw new Exception("Could not stop FSM, it is not active");
 			}
 
-			ChangeState(null);
+			currentState?.OnStateExit();
+			currentState = null;
 			IsActive = false;
 			tickManager.Unregister(this);
 		}
 
 		public void Tick(float deltaTime)
 		{
-			CurrentState?.OnStateUpdate();
+			currentState?.OnStateUpdate();
 		}
 
 		public void AddTransition(TState initialState, TState targetState, TTrigger trigger)
@@ -97,8 +98,7 @@ namespace Padoru.Core
 
 		private bool ShouldTransition(Transition<TState, TTrigger> transition, TTrigger trigger)
 		{
-			return states[transition.initialState].Equals(CurrentState) &&
-				   transition.trigger.Equals(trigger);
+			return transition.initialState.Equals(CurrentStateId) && transition.trigger.Equals(trigger);
 		}
 
 		private bool IsTransitionAlreadyRegistered(Transition<TState, TTrigger> transition)
@@ -125,7 +125,7 @@ namespace Padoru.Core
 				var state = new State(stateId.ToString());
 				states.Add((TState)stateId, state);
 				sb.Append(Environment.NewLine);
-				sb.Append($" {stateId.ToString()}");
+				sb.Append($" {stateId}");
 			}
 
 			Debug.Log(sb);
@@ -133,22 +133,18 @@ namespace Padoru.Core
 
 		private void ChangeState(TState stateId)
 		{
-			ChangeState(GetState(stateId));
-		}
-
-		private void ChangeState(State state)
-		{
-			if (CurrentState != null)
+			if (currentState != null)
 			{
-				PreviousState = CurrentState;
-				CurrentState.OnStateExit();
+				PreviousStateId = CurrentStateId;
+				currentState.OnStateExit();
 			}
 
-			CurrentState = state;
+			currentState = GetState(stateId);
+			CurrentStateId = stateId;
 
-			if (CurrentState != null)
+			if (currentState != null)
 			{
-				CurrentState.OnStateEnter();
+				currentState.OnStateEnter();
 			}
 		}
 	}

@@ -4,9 +4,9 @@ namespace Padoru.Core
 {
 	public interface IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
 	{
-		State CurrentState { get; }
+		TState CurrentStateId { get; }
 		
-		State PreviousState { get; }
+		TState PreviousStateId { get; }
 		
 		bool IsActive { get; }
 		
