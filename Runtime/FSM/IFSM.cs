@@ -9,8 +9,14 @@ namespace Padoru.Core
 		TState PreviousStateId { get; }
 		
 		bool IsActive { get; }
+
+		void Start();
+		
+		void Stop();
 		
 		void AddTransition(TState initialState, TState targetState, TTrigger trigger);
+		
+		void AddStateCallbackReceiver(TState stateId, StateCallbacksReceiver stateCallbacksReceiver);
 
 		void SetTrigger(TTrigger trigger);
 

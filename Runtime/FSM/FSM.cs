@@ -9,6 +9,7 @@ namespace Padoru.Core
 	{
 		private readonly Dictionary<TState, State> states;
 		private readonly List<Transition<TState, TTrigger>> transitions;
+		private readonly Dictionary<TState, StateCallbacksReceiver> stateCallbacksReceivers;
 		private readonly TState initialStateId;
 		private readonly ITickManager tickManager;
 
@@ -20,8 +21,9 @@ namespace Padoru.Core
 
 		public FSM(TState initialStateId)
 		{
-			states = new Dictionary<TState, State>();
-			transitions = new List<Transition<TState, TTrigger>>();
+			states = new();
+			transitions = new();
+			stateCallbacksReceivers = new();
 
 			this.initialStateId = initialStateId;
 
@@ -36,6 +38,8 @@ namespace Padoru.Core
 			{
 				throw new Exception("Could not start FSM, it is already active");
 			}
+
+			SetupCallbackReceivers();
 
 			PreviousStateId = initialStateId;
 			ChangeState(initialStateId);
@@ -54,6 +58,8 @@ namespace Padoru.Core
 			currentState = null;
 			IsActive = false;
 			tickManager.Unregister(this);
+			
+			ShutdownCallbackReceivers();
 		}
 
 		public void Tick(float deltaTime)
@@ -80,6 +86,11 @@ namespace Padoru.Core
 			transitions.Add(transition);
 		}
 
+		public void AddStateCallbackReceiver(TState stateId, StateCallbacksReceiver stateCallbacksReceiver)
+		{
+			stateCallbacksReceivers.Add(stateId, stateCallbacksReceiver);
+		}
+
 		public void SetTrigger(TTrigger trigger)
 		{
 			Debug.Log($"Trigger set {trigger}");
@@ -94,6 +105,23 @@ namespace Padoru.Core
 		public State GetState(TState stateId)
 		{
 			return states[stateId];
+		}
+
+		private void SetupCallbackReceivers()
+		{
+			foreach (var receiver in stateCallbacksReceivers)
+			{
+				var state = GetState(receiver.Key);
+				receiver.Value.Setup(state);
+			}
+		}
+
+		private void ShutdownCallbackReceivers()
+		{
+			foreach (var receiver in stateCallbacksReceivers)
+			{
+				receiver.Value.Shutdown();
+			}
 		}
 
 		private bool ShouldTransition(Transition<TState, TTrigger> transition, TTrigger trigger)
