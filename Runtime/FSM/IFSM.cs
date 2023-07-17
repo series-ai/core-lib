@@ -9,6 +9,8 @@ namespace Padoru.Core
 		TState PreviousStateId { get; }
 		
 		bool IsActive { get; }
+		
+		IFSMProxy<TState, TTrigger> Proxy { get; }
 
 		void Start();
 		

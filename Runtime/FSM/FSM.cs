@@ -18,14 +18,17 @@ namespace Padoru.Core
 		public TState CurrentStateId { get; private set; }
 		public TState PreviousStateId { get; private set; }
 		public bool IsActive { get; private set; }
+		public IFSMProxy<TState, TTrigger> Proxy { get; }
 
-		public FSM(TState initialStateId)
+		public FSM(TState initialStateId, IFSMProxy<TState, TTrigger> proxy = null)
 		{
 			states = new();
 			transitions = new();
 			stateCallbacksReceivers = new();
 
 			this.initialStateId = initialStateId;
+
+			Proxy = proxy ?? new FSMProxy<TState, TTrigger>(this);
 
 			tickManager = Locator.Get<ITickManager>();
 
