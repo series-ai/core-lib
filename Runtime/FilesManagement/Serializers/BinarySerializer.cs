@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Padoru.Core.Files
 {
@@ -9,28 +8,24 @@ namespace Padoru.Core.Files
     {
         private readonly BinaryFormatter binaryFormatter = new();
         
-        public void Serialize(object value, out string text)
+        public void Serialize(object value, out byte[] bytes)
         {
             var ms = new MemoryStream();
             
             binaryFormatter.Serialize(ms, value);
             
-            text = Encoding.UTF8.GetString(ms.ToArray());
+            bytes = ms.ToArray();
         }
 
-        public void Deserialize(Type type, ref string text, out object value)
+        public void Deserialize(Type type, ref byte[] bytes, out object value)
         {
             var ms = new MemoryStream();
-            
-            var bytes = Encoding.UTF8.GetBytes(text);
-            
+
             ms.Write(bytes, 0, bytes.Length);
             
             ms.Seek(0, SeekOrigin.Begin);
             
-            var obj = binaryFormatter.Deserialize(ms);
-            
-            value = obj;
+            value = binaryFormatter.Deserialize(ms);
         }
     }
 }

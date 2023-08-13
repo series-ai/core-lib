@@ -29,7 +29,7 @@ namespace Padoru.Core.Files
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<string>> Read(string uri)
+        public async Task<File<byte[]>> Read(string uri)
         {
             var path = GetFullPath(uri);
             
@@ -45,18 +45,22 @@ namespace Padoru.Core.Files
             {
                 Debug.Log($"Read file at path '{path}'.");
                 
-                var manifestData = uwr.downloadHandler.text;
-                return new File<string>(uri, manifestData);
+                var manifestData = uwr.downloadHandler.data;
+                return new File<byte[]>(uri, manifestData);
             }
             
             throw new FileNotFoundException($"Could not read file at path '{path}'. Error: {uwr.error}");
         }
 
-        public async Task Write(File<string> file)
+        public async Task Write(File<byte[]> file)
         {
             var path = GetFullPath(file.Uri);
             
-            var uwr = UnityWebRequest.Post(path, file.Data);
+            var uwr = new UnityWebRequest(path, UnityWebRequest.kHttpVerbPOST);
+            var myUploadHandler = new UploadHandlerRaw(file.Data);
+            myUploadHandler.contentType= "application/x-www-form-urlencoded"; // might work with 'multipart/form-data'
+            uwr.uploadHandler= myUploadHandler;
+            
             var request = uwr.SendWebRequest();
 
             while (!request.isDone)
