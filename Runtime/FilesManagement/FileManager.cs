@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -73,7 +73,7 @@ namespace Padoru.Core.Files
                     
             var bytes = file.Data;
 
-            protocol.Serializer.Deserialize(typeof(T), ref bytes, out var result);
+            protocol.Serializer.Deserialize(typeof(T), ref bytes, uri, out var result);
 
             return new File<T>(uri, (T)result);
         }

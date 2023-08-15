@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Padoru.Core.Files
 {
@@ -6,6 +6,6 @@ namespace Padoru.Core.Files
     {
         void Serialize(object value, out byte[] bytes);
 
-        void Deserialize(Type type, ref byte[] bytes, out object value);
+        void Deserialize(Type type, ref byte[] bytes, string uri, out object value);
     }
 }

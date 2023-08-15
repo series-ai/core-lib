@@ -17,7 +17,7 @@ namespace Padoru.Core.Files
             bytes = ms.ToArray();
         }
 
-        public void Deserialize(Type type, ref byte[] bytes, out object value)
+        public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
         {
             var ms = new MemoryStream();
 
