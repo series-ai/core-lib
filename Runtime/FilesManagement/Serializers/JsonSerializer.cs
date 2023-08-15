@@ -28,7 +28,7 @@ namespace Padoru.Core.Files
             bytes = Encoding.UTF8.GetBytes(text);
         }
 
-        public void Deserialize(Type type, ref byte[] bytes, out object value)
+        public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
         {
             var text = Encoding.UTF8.GetString(bytes);
             

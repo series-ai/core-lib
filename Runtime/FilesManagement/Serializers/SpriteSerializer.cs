@@ -13,10 +13,12 @@ namespace Padoru.Core.Files
 			bytes = texture.EncodeToPNG();
 		}
 
-		public void Deserialize(Type type, ref byte[] bytes, out object value)
+		public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
 		{
 			var tex = new Texture2D(2, 2);
 			tex.LoadImage(bytes);
+			tex.name = FileUtils.PathFromUri(uri);
+			tex.Compress(true);
             
 			var pivot = new Vector2(0.5f, 0.5f);
 			var rect = new Rect(0.0f, 0.0f, tex.width, tex.height);

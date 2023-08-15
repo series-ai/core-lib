@@ -12,12 +12,17 @@ namespace Padoru.Core.Files
 			bytes = texture.EncodeToPNG();
 		}
 
-		public void Deserialize(Type type, ref byte[] bytes, out object value)
+		public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
 		{
-			var tex = new Texture2D(2, 2);
-			tex.LoadImage(bytes);
-            
-			value = tex;
+			var texture = new Texture2D(2, 2);
+			texture.LoadImage(bytes);
+			texture.name = FileUtils.PathFromUri(uri);
+			texture.wrapMode = TextureWrapMode.Clamp;
+			texture.filterMode = FilterMode.Bilinear;
+			texture.Compress(true);
+			
+			//Debug.LogWarning($"Size {texture.width}, {texture.height}");
+			value = texture;
 		}
 	}
 }
