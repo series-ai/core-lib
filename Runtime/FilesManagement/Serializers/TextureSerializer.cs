@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+using Debug = Padoru.Diagnostics.Debug;
+
 namespace Padoru.Core.Files
 {
 	public class TextureSerializer : ISerializer
@@ -19,9 +21,16 @@ namespace Padoru.Core.Files
 			texture.name = FileUtils.PathFromUri(uri);
 			texture.wrapMode = TextureWrapMode.Clamp;
 			texture.filterMode = FilterMode.Bilinear;
-			texture.Compress(true);
 			
-			//Debug.LogWarning($"Size {texture.width}, {texture.height}");
+			if (texture.width % 4 == 0 && texture.height % 4 == 0)
+			{
+				texture.Compress(true);
+			}
+			else
+			{
+				Debug.LogWarning($"Could not compress texture `{texture.name}` because it is not divisible by 4");
+			}
+			
 			value = texture;
 		}
 	}
