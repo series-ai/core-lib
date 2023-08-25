@@ -27,7 +27,7 @@ namespace Padoru.Core.Files
 			}
 			else
 			{
-				Debug.LogWarning($"Could not compress texture `{texture.name}` because it is not divisible by 4");
+				Debug.LogWarning($"Could not compress texture `{tex.name}` because it is not divisible by 4");
 			}
             
 			var pivot = new Vector2(0.5f, 0.5f);
