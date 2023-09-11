@@ -62,11 +62,21 @@ namespace Padoru.Core.Files
 
         public async Task<bool> Exists(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("The provided uri is null or empty");
+            }
+
             return await GetProtocol(uri).FileSystem.Exists(uri);
         }
 
         public async Task<File<T>> Read<T>(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("The provided uri is null or empty");
+            }
+            
             var protocol = GetProtocol(uri);
                 
             var file = await protocol.FileSystem.Read(uri);
@@ -80,6 +90,11 @@ namespace Padoru.Core.Files
 
         public async Task<File<T>> Write<T>(string uri, T value)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("The provided uri is null or empty");
+            }
+            
             var protocol = GetProtocol(uri);
                 
             protocol.Serializer.Serialize(value, out var bytes);
@@ -93,6 +108,11 @@ namespace Padoru.Core.Files
 
         public async Task Delete(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("The provided uri is null or empty");
+            }
+            
             var protocol = GetProtocol(uri);
                 
             if (!await protocol.FileSystem.Exists(uri))
