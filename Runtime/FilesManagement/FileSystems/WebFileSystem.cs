@@ -93,11 +93,10 @@ namespace Padoru.Core.Files
             if (uwr.result == UnityWebRequest.Result.Success)
             {
                 Debug.Log($"Deleted file at path '{path}'.");
+                return;
             }
-            else
-            {
-                Debug.LogError($"Could not delete file at path '{path}'. Error: {uwr.error}");
-            }
+
+            throw new FileNotFoundException($"Could not find file. Uri {uri}. Error: {uwr.error}");
         }
         
         private string GetFullPath(string uri)

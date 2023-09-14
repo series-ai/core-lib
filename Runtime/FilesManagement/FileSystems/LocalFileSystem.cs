@@ -49,6 +49,11 @@ namespace Padoru.Core.Files
         {
             var path = GetFullPath(uri);
 
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException($"Could not find file. Uri {uri}");
+            }
+            
             File.Delete(path);
             
             await Task.CompletedTask;

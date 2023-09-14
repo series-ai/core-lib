@@ -130,7 +130,23 @@ namespace Padoru.Core.Files.Tests
         }
         
         [Test]
-        public async void DeleteFile_WhenFileDoesExist_ShouldThrow()
+        public async void CheckFileIfExists_WhenUriIsNull_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null));
+        }
+    
+        [Test]
+        public async void CheckFileIfExists_WhenUriIsEmpty_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null));
+        }
+        
+        [Test]
+        public async void DeleteFile_WhenFileDoesExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
@@ -144,9 +160,25 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<Exception>(async () => await fileManager.Delete(testUri));
+            Assert.Throws<FileNotFoundException>(async () => await fileManager.Delete(testUri));
         }
 
+        [Test]
+        public async void DeleteFile_WhenUriIsNull_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(null));
+        }
+        
+        [Test]
+        public async void DeleteFile_WhenUriIsEmpty_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(string.Empty));
+        }
+        
         [Test]
         public async void DeleteFile_WhenProtocolNotRegistered_ShouldLogWarningAndNotThrow()
         {
@@ -179,8 +211,24 @@ namespace Padoru.Core.Files.Tests
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value);
-            
+
             Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value));
+        }
+
+        [Test]
+        public async void Write_WhenUriIsNull_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Write(null, value));
+        }
+    
+        [Test]
+        public async void Write_WhenUriIsEmpty_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Write(string.Empty, value));
         }
 
         [Test]
@@ -199,6 +247,22 @@ namespace Padoru.Core.Files.Tests
             await fileManager.Write(testUri, value);
 
             Assert.DoesNotThrow(async () => await fileManager.Read<TestClass>(testUri));
+        }
+        
+        [Test]
+        public async void Read_WhenUriIsNull_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(null));
+        }
+    
+        [Test]
+        public async void Read_WhenUriIsEmpty_ShouldThrow()
+        {
+            fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
+
+            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(string.Empty));
         }
     }
 }

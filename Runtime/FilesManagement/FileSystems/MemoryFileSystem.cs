@@ -32,6 +32,11 @@ namespace Padoru.Core.Files
 
         public async Task Delete(string uri)
         {
+            if (!files.ContainsKey(uri))
+            {
+                throw new FileNotFoundException($"Could not find file. Uri {uri}");
+            }
+            
             files.Remove(uri);
             
             await Task.CompletedTask;
