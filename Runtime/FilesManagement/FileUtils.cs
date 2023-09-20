@@ -16,6 +16,18 @@ namespace Padoru.Core.Files
 
             return uri.Substring(index + uriSeparator.Length);
         }
+        
+        public static string PathFileNameUri(string uri, bool includeExtension = true)
+        {
+            var path = PathFromUri(uri);
+
+            if (includeExtension)
+            {
+                return Path.GetFileName(path);
+            }
+
+            return Path.GetFileNameWithoutExtension(path);
+        }
 
         public static string ValidatedFileName(string filePath)
         {
