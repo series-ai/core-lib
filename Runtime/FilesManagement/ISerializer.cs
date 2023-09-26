@@ -1,11 +1,12 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
     public interface ISerializer
     {
-        void Serialize(object value, out byte[] bytes);
+        Task<byte[]> Serialize(object value);
 
-        void Deserialize(Type type, ref byte[] bytes, string uri, out object value);
+        Task<object> Deserialize(Type type, byte[] bytes, string uri);
     }
 }

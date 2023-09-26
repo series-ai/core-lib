@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Padoru.Core.Files
@@ -21,18 +22,22 @@ namespace Padoru.Core.Files
             this.settings = settings;
         }
 
-        public void Serialize(object value, out byte[] bytes)
+        public Task<byte[]> Serialize(object value)
         {
             var text = JsonConvert.SerializeObject(value, settings);
             
-            bytes = Encoding.UTF8.GetBytes(text);
+            var bytes = Encoding.UTF8.GetBytes(text);
+            
+            return Task.FromResult(bytes);
         }
 
-        public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
+        public Task<object> Deserialize(Type type, byte[] bytes, string uri)
         {
             var text = Encoding.UTF8.GetString(bytes);
             
-            value = JsonConvert.DeserializeObject(text, type, settings);
+            var value = JsonConvert.DeserializeObject(text, type, settings);
+            
+            return Task.FromResult(value);
         }
     }
 }
