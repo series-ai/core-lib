@@ -1,18 +1,23 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
     public class StringSerializer : ISerializer
     {
-        public void Serialize(object value, out byte[] bytes)
+        public Task<byte[]> Serialize(object value)
         {
-            bytes = Encoding.UTF8.GetBytes(value.ToString());
+            var bytes = Encoding.UTF8.GetBytes(value.ToString());
+            
+            return Task.FromResult(bytes);
         }
 
-        public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
+        public Task<object> Deserialize(Type type, byte[] bytes, string uri)
         {
-            value = Encoding.UTF8.GetString(bytes);
+            object value = Encoding.UTF8.GetString(bytes);
+            
+            return Task.FromResult(value);
         }
     }
 }

@@ -1,23 +1,28 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Padoru.Core.Files
 {
 	public class TextAssetSerializer : ISerializer
 	{
-		public void Serialize(object value, out byte[] bytes)
+		public Task<byte[]> Serialize(object value)
 		{
 			var textAsset = (TextAsset)value;
 			
-			bytes = Encoding.UTF8.GetBytes(textAsset.text);
+			var bytes = Encoding.UTF8.GetBytes(textAsset.text);
+			
+			return Task.FromResult(bytes);
 		}
 
-		public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
+		public Task<object> Deserialize(Type type, byte[] bytes, string uri)
 		{
 			var text = Encoding.UTF8.GetString(bytes);
 
-			value = new TextAsset(text);
+			object value = new TextAsset(text);
+			
+			return Task.FromResult(value);
 		}
 	}
 }

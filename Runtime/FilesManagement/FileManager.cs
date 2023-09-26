@@ -83,7 +83,7 @@ namespace Padoru.Core.Files
                     
             var bytes = file.Data;
 
-            protocol.Serializer.Deserialize(typeof(T), ref bytes, uri, out var result);
+            var result = await protocol.Serializer.Deserialize(typeof(T), bytes, uri);
 
             return new File<T>(uri, (T)result);
         }
@@ -97,7 +97,7 @@ namespace Padoru.Core.Files
             
             var protocol = GetProtocol(uri);
                 
-            protocol.Serializer.Serialize(value, out var bytes);
+            var bytes = await protocol.Serializer.Serialize(value);
 
             var newFile = new File<byte[]>(uri, bytes);
 

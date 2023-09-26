@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Padoru.Core.Files
@@ -14,15 +15,17 @@ namespace Padoru.Core.Files
 			this.importSettings = importSettings;
 		}
 
-		public void Serialize(object value, out byte[] bytes)
+		public Task<byte[]> Serialize(object value)
 		{
 			var sprite = (Sprite) value;
 			var texture = sprite.texture;
 
-			bytes = texture.EncodeToPNG();
+			var bytes = texture.EncodeToPNG();
+			
+			return Task.FromResult(bytes);
 		}
 
-		public void Deserialize(Type type, ref byte[] bytes, string uri, out object value)
+		public Task<object> Deserialize(Type type, byte[] bytes, string uri)
 		{
 			var textureName = fileNameGenerator.GetName(uri);
 
@@ -31,7 +34,9 @@ namespace Padoru.Core.Files
 			var pivot = new Vector2(0.5f, 0.5f);
 			var rect = new Rect(0.0f, 0.0f, texture.width, texture.height);
 			
-			value = Sprite.Create(texture, rect, pivot, 100.0f);
+			object value = Sprite.Create(texture, rect, pivot, 100.0f);
+			
+			return Task.FromResult(value);
 		}
 	}
 }
