@@ -9,26 +9,20 @@ namespace Padoru.Core.Files
     public class FileManager : IFileManager
     {
         private const string PROTOCOL_HEADER_REGEX = @"^\w+://$";
-        private const string DEFAULT_PROTOCOL_HEADER_REGEX = "default://";
 
-        private readonly Dictionary<string, FileSystemProtocol> protocols = new();
+        private readonly Dictionary<string, IProtocol> protocols = new();
         private readonly Regex protocolRegex;
-        private readonly FileSystemProtocol defaultProtocol;
+        private readonly Protocol defaultProtocol;
 
         public FileManager(ISerializer defaultSerializer, IFileSystem defaultFileSystem)
         {
             protocolRegex = new Regex(PROTOCOL_HEADER_REGEX);
 
-            defaultProtocol = new FileSystemProtocol(DEFAULT_PROTOCOL_HEADER_REGEX, defaultSerializer, defaultFileSystem);
+            defaultProtocol = new Protocol(defaultSerializer, defaultFileSystem);
         }
 
         public void RegisterProtocol(string protocolHeader, ISerializer serializer, IFileSystem fileSystem)
         {
-            if (!protocolRegex.IsMatch(protocolHeader ?? string.Empty))
-            {
-                throw new Exception($"Invalid protocol '{protocolHeader}'. Only word characters allowed.");
-            }
-
             if (serializer == null)
             {
                 throw new Exception($"Cannot register protocol with a null {nameof(ISerializer)}");
@@ -39,12 +33,22 @@ namespace Padoru.Core.Files
                 throw new Exception($"Cannot register protocol with a null {nameof(IFileSystem)}");
             }
 
+            var protocol = new Protocol(serializer, fileSystem);
+
+            RegisterProtocol(protocolHeader, protocol);
+        }
+
+        public void RegisterProtocol(string protocolHeader, IProtocol protocol)
+        {
+            if (!protocolRegex.IsMatch(protocolHeader ?? string.Empty))
+            {
+                throw new Exception($"Invalid protocol '{protocolHeader}'. Only word characters allowed.");
+            }
+
             if (protocols.ContainsKey(protocolHeader))
             {
                 throw new Exception($"Cannot register protocol {protocolHeader}, it is already registered");
             }
-
-            var protocol = new FileSystemProtocol(protocolHeader, serializer, fileSystem);
 
             protocols.Add(protocolHeader, protocol);
         }
@@ -62,72 +66,31 @@ namespace Padoru.Core.Files
 
         public async Task<bool> Exists(string uri)
         {
-            if (string.IsNullOrEmpty(uri))
-            {
-                throw new ArgumentException("The provided uri is null or empty");
-            }
-
-            return await GetProtocol(uri).FileSystem.Exists(uri);
+            return await GetProtocol(uri).Exists(uri);
         }
 
         public async Task<File<T>> Read<T>(string uri)
         {
-            if (string.IsNullOrEmpty(uri))
-            {
-                throw new ArgumentException("The provided uri is null or empty");
-            }
-            
-            var protocol = GetProtocol(uri);
-                
-            var file = await protocol.FileSystem.Read(uri);
-                    
-            var bytes = file.Data;
+            var value = await GetProtocol(uri).Read<T>(uri);
 
-            var result = await protocol.Serializer.Deserialize(typeof(T), bytes, uri);
-
-            return new File<T>(uri, (T)result);
+            return new File<T>(uri, (T)value);
         }
 
         public async Task<File<T>> Write<T>(string uri, T value)
         {
-            if (string.IsNullOrEmpty(uri))
-            {
-                throw new ArgumentException("The provided uri is null or empty");
-            }
-            
-            var protocol = GetProtocol(uri);
-                
-            var bytes = await protocol.Serializer.Serialize(value);
-
-            var newFile = new File<byte[]>(uri, bytes);
-
-            await protocol.FileSystem.Write(newFile);
-
-            return new File<T>(uri, value);
+            return await GetProtocol(uri).Write<T>(uri, value);
         }
 
         public async Task Delete(string uri)
         {
-            if (string.IsNullOrEmpty(uri))
-            {
-                throw new ArgumentException("The provided uri is null or empty");
-            }
-            
-            var protocol = GetProtocol(uri);
-                
-            if (!await protocol.FileSystem.Exists(uri))
-            {
-                throw new Exception($"Cannot delete file because it does not exists: {uri}");
-            }
-            
-            await protocol.FileSystem.Delete(uri);
+            await GetProtocol(uri).Delete(uri);
         }
 
-        private FileSystemProtocol GetProtocol(string uri)
+        private IProtocol GetProtocol(string uri)
         {
             foreach (var protocol in protocols)
             {
-                if (uri.StartsWith(protocol.Value.ProtocolHeader))
+                if (uri.StartsWith(protocol.Key))
                 {
                     return protocol.Value;
                 }

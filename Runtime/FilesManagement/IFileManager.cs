@@ -4,9 +4,11 @@ namespace Padoru.Core.Files
 {
     public interface IFileManager
     {
-        void RegisterProtocol(string protocol, ISerializer serializer, IFileSystem fileSystem);
+        void RegisterProtocol(string protocolHeader, ISerializer serializer, IFileSystem fileSystem);
+        
+        void RegisterProtocol(string protocolHeader, IProtocol protocol);
 
-        bool UnregisterProtocol(string protocol);
+        bool UnregisterProtocol(string protocolHeader);
 
         Task<bool> Exists(string uri);
 
