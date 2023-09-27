@@ -4,6 +4,6 @@ namespace Padoru.Core
     {
         string Name { get; }
         
-        void SetActive(bool isActive);
+        //void SetActive(bool isActive);
     }
 }
