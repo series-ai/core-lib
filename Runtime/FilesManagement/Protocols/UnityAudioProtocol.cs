@@ -11,13 +11,15 @@ namespace Padoru.Core.Files
 		private readonly CoroutineProxy coroutineProxy;
 		private readonly IFileNameGenerator fileNameGenerator;
 		private readonly string webRequestProtocol;
+		private readonly bool streamAudio;
 
-		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, IFileNameGenerator fileNameGenerator, string webRequestProtocol)
+		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, IFileNameGenerator fileNameGenerator, string webRequestProtocol, bool streamAudio)
 		{
 			this.basePath = basePath;
 			this.coroutineProxy = coroutineProxy;
 			this.fileNameGenerator = fileNameGenerator;
 			this.webRequestProtocol = webRequestProtocol;
+			this.streamAudio = streamAudio;
 		}
 		
 		public Task<bool> Exists(string uri)
@@ -27,13 +29,13 @@ namespace Padoru.Core.Files
 
 		public async Task<object> Read<T>(string uri)
 		{
-			var path = GetFullPath(uri);
+			var path = Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
         
 			var requestUri = webRequestProtocol + path;
         
 			var uwr = UnityWebRequestMultimedia.GetAudioClip(requestUri, AudioType.MPEG);
         
-			((DownloadHandlerAudioClip)uwr.downloadHandler).streamAudio = true;
+			((DownloadHandlerAudioClip)uwr.downloadHandler).streamAudio = streamAudio;
  
 			await uwr.SendWebRequest().AsTask(coroutineProxy);
         
@@ -51,8 +53,7 @@ namespace Padoru.Core.Files
 				return clip;
 			}
         
-			Debug.Log("The download process is not completely finished.");
-            
+			Debug.LogError("The download process is not completely finished.");
 			return null;
 		}
 
@@ -64,11 +65,6 @@ namespace Padoru.Core.Files
 		public Task Delete(string uri)
 		{
 			throw new System.NotImplementedException();
-		}
-
-		private string GetFullPath(string uri)
-		{
-			return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
 		}
 	}
 }
