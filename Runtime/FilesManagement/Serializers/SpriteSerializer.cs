@@ -20,7 +20,15 @@ namespace Padoru.Core.Files
 			var sprite = (Sprite) value;
 			var texture = sprite.texture;
 
-			var bytes = texture.EncodeToPNG();
+			//We need to convert the texture into an uncompressed version in order to encode to PNG
+			
+			var newTexture = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
+			
+			newTexture.SetPixels(0,0,texture.width,texture.height,texture.GetPixels());
+			
+			newTexture.Apply();
+			
+			var bytes = newTexture.EncodeToPNG();
 			
 			return Task.FromResult(bytes);
 		}
