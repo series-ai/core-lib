@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -16,24 +15,18 @@ namespace Padoru.Core.Files
 
 		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, IFileNameGenerator fileNameGenerator, string webRequestProtocol, bool streamAudio)
 		{
-			this.basePath = basePath;
-			int protocolIndex = this.basePath.IndexOf("://");
-
-			if (protocolIndex != -1)
-			{
-				this.basePath = this.basePath.Substring(protocolIndex + 3);
-			}
+			this.basePath = FileUtils.PathFromUri(basePath);
 			this.coroutineProxy = coroutineProxy;
 			this.fileNameGenerator = fileNameGenerator;
 			this.webRequestProtocol = webRequestProtocol;
 			this.streamAudio = streamAudio;
 		}
 		
-		public async Task<bool> Exists(string uri)
+		public Task<bool> Exists(string uri)
 		{
 			var path = GetFullPath(uri);
 
-			return await Task.FromResult(File.Exists(path));
+			return Task.FromResult(File.Exists(path));
 		}
 
 		public async Task<object> Read<T>(string uri)
@@ -43,7 +36,7 @@ namespace Padoru.Core.Files
 			var requestUri = webRequestProtocol + path;
         
 			var dh = new DownloadHandlerAudioClip(requestUri, AudioType.MPEG);
-			dh.compressed = true; // This
+			dh.compressed = true;
  
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
@@ -59,32 +52,14 @@ namespace Padoru.Core.Files
 			return null;
 		}
 
-		public async Task<File<T>> Write<T>(string uri, T value)
+		public Task<File<T>> Write<T>(string uri, T value)
 		{
-			var path = GetFullPath(uri);
-
-			var directory = Path.GetDirectoryName(path) ?? ".";
-            
-			Directory.CreateDirectory(directory);
-
-			var bytes = value as byte[];
-			
-			await File.WriteAllBytesAsync(path, bytes);
-			return new File<T>(uri, value);
+			throw new System.NotImplementedException();
 		}
 
-		public async Task Delete(string uri)
+		public Task Delete(string uri)
 		{
-			var path = GetFullPath(uri);
-
-			if (!File.Exists(path))
-			{
-				throw new FileNotFoundException($"Could not find file. Uri {uri}");
-			}
-            
-			File.Delete(path);
-            
-			await Task.CompletedTask;
+			throw new System.NotImplementedException();
 		}
 		
 		private string GetFullPath(string uri)
