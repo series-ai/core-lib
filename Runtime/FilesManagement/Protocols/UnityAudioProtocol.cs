@@ -24,9 +24,7 @@ namespace Padoru.Core.Files
 		
 		public Task<bool> Exists(string uri)
 		{
-			var path = GetFullPath(uri);
-
-			return Task.FromResult(File.Exists(path));
+			throw new System.NotImplementedException();
 		}
 
 		public async Task<object> Read<T>(string uri)
