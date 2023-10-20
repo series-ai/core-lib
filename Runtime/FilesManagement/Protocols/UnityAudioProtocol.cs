@@ -15,7 +15,7 @@ namespace Padoru.Core.Files
 
 		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, IFileNameGenerator fileNameGenerator, string webRequestProtocol, bool streamAudio)
 		{
-			this.basePath = basePath;
+			this.basePath = FileUtils.PathFromUri(basePath);
 			this.coroutineProxy = coroutineProxy;
 			this.fileNameGenerator = fileNameGenerator;
 			this.webRequestProtocol = webRequestProtocol;
@@ -33,24 +33,17 @@ namespace Padoru.Core.Files
         
 			var requestUri = webRequestProtocol + path;
         
-			var uwr = UnityWebRequestMultimedia.GetAudioClip(requestUri, AudioType.MPEG);
-        
-			((DownloadHandlerAudioClip)uwr.downloadHandler).streamAudio = streamAudio;
+			var dh = new DownloadHandlerAudioClip(requestUri, AudioType.MPEG);
+			dh.compressed = true;
  
-			await uwr.SendWebRequest().AsTask(coroutineProxy);
-        
-			if (uwr.isNetworkError || uwr.isHttpError)
+			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
-				throw new FileNotFoundException($"File not found for uri: {requestUri}");
-			}
-            
-			var dlHandler = (DownloadHandlerAudioClip)uwr.downloadHandler;
- 
-			if (dlHandler.isDone)
-			{
-				var clip = DownloadHandlerAudioClip.GetContent(uwr);
-				clip.name = fileNameGenerator.GetName(uri);
-				return clip;
+				await wr.SendWebRequest().AsTask(coroutineProxy);
+				if (wr.responseCode == 200) 
+				{
+					return dh.audioClip;
+				}
+				Debug.LogError($"Download failed. Uri {requestUri} Response {wr.responseCode}. Error: {wr.error}");
 			}
         
 			Debug.LogError("The download process is not completely finished.");
@@ -65,6 +58,11 @@ namespace Padoru.Core.Files
 		public Task Delete(string uri)
 		{
 			throw new System.NotImplementedException();
+		}
+		
+		private string GetFullPath(string uri)
+		{
+			return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
 		}
 	}
 }
