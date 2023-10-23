@@ -23,7 +23,7 @@ namespace Padoru.Core.Files
 			
 			var newTexture = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
 			
-			newTexture.SetPixels(0,0,texture.width,texture.height,texture.GetPixels());
+			newTexture.SetPixels(0, 0, texture.width, texture.height, texture.GetPixels());
 			
 			newTexture.Apply();
 			
