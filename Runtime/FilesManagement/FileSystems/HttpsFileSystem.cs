@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,16 +9,18 @@ namespace Padoru.Core.Files
     public class HttpsFileSystem : IFileSystem
     {
         private readonly string basePath;
+        private readonly int requestTimeout;
 
-        public HttpsFileSystem(string basePath)
+        public HttpsFileSystem(string basePath, int requestTimeout)
         {
             this.basePath = basePath;
+            this.requestTimeout = requestTimeout;
         }
         
         public async Task<bool> Exists(string uri)
         {
             var path = GetFullPath(uri);
-            var client = new HttpClient();
+            var client = GetNewHttpClient();
             var response = await client.GetAsync(path);
             return response.IsSuccessStatusCode;
         }
@@ -25,7 +28,7 @@ namespace Padoru.Core.Files
         public async Task<File<byte[]>> Read(string uri)
         {
             var path = GetFullPath(uri);
-            var client = new HttpClient();
+            var client = GetNewHttpClient();
             var response = await client.GetAsync(path);
 
             if (response.IsSuccessStatusCode)
@@ -41,7 +44,7 @@ namespace Padoru.Core.Files
         public async Task Write(File<byte[]> file)
         {
             var path = GetFullPath(file.Uri);
-            var client = new HttpClient();
+            var client = GetNewHttpClient();
             var content = new ByteArrayContent(file.Data);
             var response = await client.PostAsync(path, content);
             
@@ -58,7 +61,7 @@ namespace Padoru.Core.Files
         public async Task Delete(string uri)
         {
             var path = GetFullPath(uri);
-            var client = new HttpClient();
+            var client = GetNewHttpClient();
             var response = await client.DeleteAsync(path);
 
             if (response.IsSuccessStatusCode)
@@ -73,6 +76,13 @@ namespace Padoru.Core.Files
         private string GetFullPath(string uri)
         {
             return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
+        }
+
+        private HttpClient GetNewHttpClient()
+        {
+            var client = new HttpClient();
+            client.Timeout = new TimeSpan(0, 0, requestTimeout);
+            return client;
         }
     }
 }
