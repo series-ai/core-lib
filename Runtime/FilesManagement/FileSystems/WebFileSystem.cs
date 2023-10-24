@@ -67,7 +67,7 @@ namespace Padoru.Core.Files
             Debug.Log($"Wrote file to path '{path}'");
         }
 
-        public async Task Delete(string uri)
+        public Task Delete(string uri)
         {
             var path = GetFullPath(uri);
 
@@ -78,7 +78,7 @@ namespace Padoru.Core.Files
             
             File.Delete(path);
             
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
         
         private string GetFullPath(string uri)
