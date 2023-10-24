@@ -5,7 +5,8 @@ using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
 {
-    //Unity web request does not support writing local files, so it needs to use File for writing and deleting
+    //On Android you need to read with WebRequest but write with File.WriteAllBytes,
+    //while on WebGL you can't write no matter what so it doesn't really matter
     public class WebFileSystem : IFileSystem
     {
         private readonly string basePath;
