@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
 {
+    //Unity web request does not support writing local files, so it needs to use File for writing and deleting
     public class WebFileSystem : IFileSystem
     {
         private readonly string basePath;
