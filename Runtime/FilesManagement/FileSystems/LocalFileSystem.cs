@@ -25,11 +25,30 @@ namespace Padoru.Core.Files
         {
             var path = GetFullPath(uri);
 
-            var bytes = await File.ReadAllBytesAsync(path);
+            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                var bytes = new byte[fileStream.Length];
+                var remaining = (int) fileStream.Length;
+                var offset = 0;
+                var bytesRead = 0;
 
-            Debug.Log($"Read file from path '{path}'");
+                while (remaining > 0)
+                {
+                    bytesRead = await fileStream.ReadAsync(bytes, offset, remaining);
 
-            return new File<byte[]>(uri, bytes);
+                    if (bytesRead == 0)
+                    {
+                        throw new EndOfStreamException($"End of stream reached with {remaining} bytes remaining to read");
+                    }
+                    
+                    remaining -= bytesRead;
+                    offset += bytesRead;
+                }
+
+                Debug.Log($"Read file from path '{path}'");
+
+                return new File<byte[]>(uri, bytes);
+            }
         }
 
         public async Task Write(File<byte[]> file)
@@ -39,8 +58,11 @@ namespace Padoru.Core.Files
             var directory = Path.GetDirectoryName(path) ?? ".";
             
             Directory.CreateDirectory(directory);
-
-            await File.WriteAllBytesAsync(path, file.Data);
+            
+            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+            {
+                await fs.WriteAsync(file.Data, 0, file.Data.Length);
+            }
 
             Debug.Log($"Wrote file to path '{path}'");
         }
