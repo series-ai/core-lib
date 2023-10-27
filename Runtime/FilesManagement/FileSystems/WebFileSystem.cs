@@ -20,9 +20,8 @@ namespace Padoru.Core.Files
         
         public async Task<bool> Exists(string uri)
         {
-            var path = GetAppropiateUri(uri);
-            
-            var uwr = UnityWebRequest.Get(path);
+            var requestUri = GetRequestUri(uri);
+            var uwr = UnityWebRequest.Get(requestUri);
             var request = uwr.SendWebRequest();
 
             while (!request.isDone)
@@ -35,9 +34,8 @@ namespace Padoru.Core.Files
 
         public async Task<File<byte[]>> Read(string uri)
         {
-            var path = GetAppropiateUri(uri);
-            
-            var uwr = UnityWebRequest.Get(path);
+            var requestUri = GetRequestUri(uri);
+            var uwr = UnityWebRequest.Get(requestUri);
             var request = uwr.SendWebRequest();
 
             while (!request.isDone)
@@ -47,13 +45,13 @@ namespace Padoru.Core.Files
             
             if (uwr.result == UnityWebRequest.Result.Success) 
             {
-                Debug.Log($"Read file at path '{path}'.");
+                Debug.Log($"Read file at path '{requestUri}'.");
                 
                 var manifestData = uwr.downloadHandler.data;
                 return new File<byte[]>(uri, manifestData);
             }
             
-            throw new FileNotFoundException($"Could not read file at path '{path}'. Error: {uwr.error}");
+            throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
         }
 
         public async Task Write(File<byte[]> file)
@@ -88,9 +86,10 @@ namespace Padoru.Core.Files
             return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
         }
 
-        private string GetAppropiateUri(string uri)
+        private string GetRequestUri(string uri)
         {
             var path = GetFullPath(uri);
+            
             return protocol + path;
         }
     }
