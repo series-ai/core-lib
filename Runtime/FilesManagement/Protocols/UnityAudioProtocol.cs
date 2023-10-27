@@ -1,7 +1,9 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
 
 namespace Padoru.Core.Files
 {
@@ -9,15 +11,15 @@ namespace Padoru.Core.Files
 	{
 		private readonly string basePath;
 		private readonly CoroutineProxy coroutineProxy;
-		private readonly IFileNameGenerator fileNameGenerator;
 		private readonly string webRequestProtocol;
 		private readonly bool streamAudio;
+		private readonly Regex protocolRegex;
 
-		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, IFileNameGenerator fileNameGenerator, string webRequestProtocol, bool streamAudio)
+		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, string webRequestProtocol, bool streamAudio)
 		{
-			this.basePath = FileUtils.PathFromUri(basePath);
+			this.basePath = basePath;
 			this.coroutineProxy = coroutineProxy;
-			this.fileNameGenerator = fileNameGenerator;
+			this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
 			this.webRequestProtocol = webRequestProtocol;
 			this.streamAudio = streamAudio;
 		}
@@ -29,12 +31,13 @@ namespace Padoru.Core.Files
 
 		public async Task<object> Read<T>(string uri)
 		{
-			var path = Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
-        
-			var requestUri = webRequestProtocol + path;
+			var requestUri = GetRequestUri(uri);
+			
+			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
         
 			var dh = new DownloadHandlerAudioClip(requestUri, AudioType.MPEG);
 			dh.compressed = true;
+			dh.streamAudio = streamAudio;
  
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
@@ -59,10 +62,23 @@ namespace Padoru.Core.Files
 		{
 			throw new System.NotImplementedException();
 		}
-		
+        
 		private string GetFullPath(string uri)
 		{
 			return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
+		}
+
+		private string GetRequestUri(string uri)
+		{
+			var path = GetFullPath(uri);
+
+			if (protocolRegex.IsMatch(path))
+			{
+				Debug.LogWarning($"Skipped adding web protocol to URI '{path}' because it already has a protocol.");
+				return path;
+			}
+            
+			return webRequestProtocol + path;
 		}
 	}
 }

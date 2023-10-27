@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Padoru.Diagnostics;
 using UnityEngine.Networking;
@@ -10,12 +11,14 @@ namespace Padoru.Core.Files
     public class WebFileSystem : IFileSystem
     {
         private readonly string basePath;
-        private readonly string protocol;
+        private readonly string webRequestProtocol;
+        private readonly Regex protocolRegex;
 
-        public WebFileSystem(string basePath, string protocol)
+        public WebFileSystem(string basePath, string webRequestProtocol)
         {
             this.basePath = basePath;
-            this.protocol = protocol;
+            this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
+            this.webRequestProtocol = webRequestProtocol;
         }
         
         public async Task<bool> Exists(string uri)
@@ -92,8 +95,14 @@ namespace Padoru.Core.Files
         private string GetRequestUri(string uri)
         {
             var path = GetFullPath(uri);
+
+            if (protocolRegex.IsMatch(path))
+            {
+                Debug.LogWarning($"Skipped adding web protocol to URI '{path}' because it already has a protocol.");
+                return path;
+            }
             
-            return protocol + path;
+            return webRequestProtocol + path;
         }
     }
 }
