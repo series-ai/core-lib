@@ -35,6 +35,9 @@ namespace Padoru.Core.Files
         public async Task<File<byte[]>> Read(string uri)
         {
             var requestUri = GetRequestUri(uri);
+			
+			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
+			
             var uwr = UnityWebRequest.Get(requestUri);
             var request = uwr.SendWebRequest();
 
