@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -6,15 +7,15 @@ using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
 {
-    //On Android you need to read with WebRequest but write with File.WriteAllBytes,
-    //while on WebGL you can't write no matter what so it doesn't really matter
-    public class WebFileSystem : IFileSystem
+    public class WebGLFileSystem : IFileSystem
     {
         private readonly string basePath;
         private readonly string webRequestProtocol;
         private readonly Regex protocolRegex;
+        
+        private readonly Dictionary<string, File<byte[]>> files = new();
 
-        public WebFileSystem(string basePath, string webRequestProtocol)
+        public WebGLFileSystem(string basePath, string webRequestProtocol)
         {
             this.basePath = basePath;
             this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
@@ -23,20 +24,16 @@ namespace Padoru.Core.Files
         
         public async Task<bool> Exists(string uri)
         {
-            var requestUri = GetRequestUri(uri);
-            var uwr = UnityWebRequest.Get(requestUri);
-            var request = uwr.SendWebRequest();
-
-            while (!request.isDone)
-            {
-                await Task.Yield();
-            }
-
-            return uwr.result == UnityWebRequest.Result.Success;
+            return await Task.FromResult(files.ContainsKey(uri));
         }
 
         public async Task<File<byte[]>> Read(string uri)
         {
+            if (files.ContainsKey(uri))
+            {
+                return files[uri];
+            }
+            
             var requestUri = GetRequestUri(uri);
 			
 			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
@@ -62,29 +59,21 @@ namespace Padoru.Core.Files
 
         public async Task Write(File<byte[]> file)
         {
-            var path = GetFullPath(file.Uri);
+            files[file.Uri] = file;
 
-            var directory = Path.GetDirectoryName(path) ?? ".";
-            
-            Directory.CreateDirectory(directory);
-
-            await File.WriteAllBytesAsync(path, file.Data);
-
-            Debug.Log($"Wrote file to path '{path}'");
+            await Task.CompletedTask;
         }
 
-        public Task Delete(string uri)
+        public async Task Delete(string uri)
         {
-            var path = GetFullPath(uri);
-
-            if (!File.Exists(path))
+            if (!files.ContainsKey(uri))
             {
                 throw new FileNotFoundException($"Could not find file. Uri {uri}");
             }
             
-            File.Delete(path);
+            files.Remove(uri);
             
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
         
         private string GetFullPath(string uri)
