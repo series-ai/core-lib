@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
@@ -8,12 +9,12 @@ namespace Padoru.Core.Files
     {
         private readonly Dictionary<string, File<byte[]>> files = new();
 
-        public async Task<bool> Exists(string uri)
+        public async Task<bool> Exists(string uri, CancellationToken token = default)
         {
             return await Task.FromResult(files.ContainsKey(uri));
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
         {
             if (files.TryGetValue(uri, out var file))
             {
@@ -23,14 +24,14 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not find file. Uri {uri}");
         }
 
-        public async Task Write(File<byte[]> file)
+        public async Task Write(File<byte[]> file, CancellationToken token = default)
         {
             files[file.Uri] = file;
 
             await Task.CompletedTask;
         }
 
-        public async Task Delete(string uri)
+        public async Task Delete(string uri, CancellationToken token = default)
         {
             if (!files.ContainsKey(uri))
             {

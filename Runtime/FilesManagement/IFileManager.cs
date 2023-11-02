@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Padoru.Core.Files
 {
@@ -10,12 +11,12 @@ namespace Padoru.Core.Files
 
         bool UnregisterProtocol(string protocolHeader);
 
-        Task<bool> Exists(string uri);
+        Task<bool> Exists(string uri, CancellationToken token = default);
 
-        Task<File<T>> Read<T>(string uri);
+        Task<File<T>> Read<T>(string uri, CancellationToken token = default);
 
-        Task<File<T>> Write<T>(string uri, T value);
+        Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default);
 
-        Task Delete(string uri);
+        Task Delete(string uri, CancellationToken token = default);
     }
 }

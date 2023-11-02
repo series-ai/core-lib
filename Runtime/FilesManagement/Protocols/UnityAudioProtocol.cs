@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,12 +25,12 @@ namespace Padoru.Core.Files
 			this.streamAudio = streamAudio;
 		}
 		
-		public Task<bool> Exists(string uri)
+		public Task<bool> Exists(string uri, CancellationToken token = default)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public async Task<object> Read<T>(string uri)
+		public async Task<object> Read<T>(string uri, CancellationToken token = default)
 		{
 			var requestUri = GetRequestUri(uri);
 			
@@ -53,12 +54,12 @@ namespace Padoru.Core.Files
 			return null;
 		}
 
-		public Task<File<T>> Write<T>(string uri, T value)
+		public Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public Task Delete(string uri)
+		public Task Delete(string uri, CancellationToken token = default)
 		{
 			throw new System.NotImplementedException();
 		}

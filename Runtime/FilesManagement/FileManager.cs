@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Debug = Padoru.Diagnostics.Debug;
 
@@ -64,26 +65,26 @@ namespace Padoru.Core.Files
             return false;
         }
 
-        public async Task<bool> Exists(string uri)
+        public async Task<bool> Exists(string uri, CancellationToken token = default)
         {
-            return await GetProtocol(uri).Exists(uri);
+            return await GetProtocol(uri).Exists(uri, token);
         }
 
-        public async Task<File<T>> Read<T>(string uri)
+        public async Task<File<T>> Read<T>(string uri, CancellationToken token = default)
         {
-            var value = await GetProtocol(uri).Read<T>(uri);
+            var value = await GetProtocol(uri).Read<T>(uri, token);
 
             return new File<T>(uri, (T)value);
         }
 
-        public async Task<File<T>> Write<T>(string uri, T value)
+        public async Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default)
         {
-            return await GetProtocol(uri).Write<T>(uri, value);
+            return await GetProtocol(uri).Write<T>(uri, value, token);
         }
 
-        public async Task Delete(string uri)
+        public async Task Delete(string uri, CancellationToken token = default)
         {
-            await GetProtocol(uri).Delete(uri);
+            await GetProtocol(uri).Delete(uri, token);
         }
 
         private IProtocol GetProtocol(string uri)

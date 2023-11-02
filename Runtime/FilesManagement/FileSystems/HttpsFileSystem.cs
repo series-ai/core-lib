@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Debug = Padoru.Diagnostics.Debug;
 
@@ -9,28 +10,28 @@ namespace Padoru.Core.Files
     public class HttpsFileSystem : IFileSystem
     {
         private readonly string basePath;
-        private readonly int requestTimeout;
         private readonly HttpClient client;
 
-        public HttpsFileSystem(string basePath, int requestTimeout)
+        public HttpsFileSystem(string basePath, int requestTimeoutInSeconds)
         {
             this.basePath = basePath;
-            this.requestTimeout = requestTimeout;
+            
             client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, requestTimeout);
+            client.Timeout = TimeSpan.FromSeconds(requestTimeoutInSeconds);
+            // TODO: Use client base address instead of appending it to every request
         }
         
-        public async Task<bool> Exists(string uri)
+        public async Task<bool> Exists(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
-            var response = await client.GetAsync(path);
+            var response = await client.GetAsync(path, token);
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
-            var response = await client.GetAsync(path);
+            var response = await client.GetAsync(path, token);
 
             if (response.IsSuccessStatusCode)
             {
@@ -42,11 +43,11 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not read file at path '{path}'. Error code: {response.StatusCode}");
         }
 
-        public async Task Write(File<byte[]> file)
+        public async Task Write(File<byte[]> file, CancellationToken token = default)
         {
             var path = GetFullPath(file.Uri);
             var content = new ByteArrayContent(file.Data);
-            var response = await client.PostAsync(path, content);
+            var response = await client.PostAsync(path, content, token);
             
             if (response.IsSuccessStatusCode)
             {
@@ -58,10 +59,10 @@ namespace Padoru.Core.Files
             }
         }
 
-        public async Task Delete(string uri)
+        public async Task Delete(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
-            var response = await client.DeleteAsync(path);
+            var response = await client.DeleteAsync(path, token);
 
             if (response.IsSuccessStatusCode)
             {

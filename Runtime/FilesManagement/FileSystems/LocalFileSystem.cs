@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Debug = Padoru.Diagnostics.Debug;
@@ -14,14 +15,14 @@ namespace Padoru.Core.Files
             this.basePath = basePath;
         }
 
-        public async Task<bool> Exists(string uri)
+        public async Task<bool> Exists(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
 
             return await Task.FromResult(File.Exists(path));
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
 
@@ -34,7 +35,7 @@ namespace Padoru.Core.Files
 
                 while (remaining > 0)
                 {
-                    bytesRead = await fileStream.ReadAsync(bytes, offset, remaining);
+                    bytesRead = await fileStream.ReadAsync(bytes, offset, remaining, token);
 
                     if (bytesRead == 0)
                     {
@@ -51,7 +52,7 @@ namespace Padoru.Core.Files
             }
         }
 
-        public async Task Write(File<byte[]> file)
+        public async Task Write(File<byte[]> file, CancellationToken token = default)
         {
             var path = GetFullPath(file.Uri);
 
@@ -61,13 +62,13 @@ namespace Padoru.Core.Files
             
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
             {
-                await fs.WriteAsync(file.Data, 0, file.Data.Length);
+                await fs.WriteAsync(file.Data, 0, file.Data.Length, token);
             }
 
             Debug.Log($"Wrote file to path '{path}'");
         }
 
-        public Task Delete(string uri)
+        public Task Delete(string uri, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
 

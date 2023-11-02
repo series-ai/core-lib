@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Padoru.Diagnostics;
 using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
 {
+    // WebGL uses a hybrid file system with a dictionary for in-memory files and web requests for files that 
+    // don't exist in the dictionary because it is unable to store files locally.
     public class WebGLFileSystem : IFileSystem
     {
         private readonly string basePath;
@@ -18,16 +21,36 @@ namespace Padoru.Core.Files
         public WebGLFileSystem(string basePath, string webRequestProtocol)
         {
             this.basePath = basePath;
-            this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
             this.webRequestProtocol = webRequestProtocol;
+            
+            protocolRegex = new Regex(@"^[a-zA-Z]+://");;
         }
         
-        public async Task<bool> Exists(string uri)
+        public async Task<bool> Exists(string uri, CancellationToken token = default)
         {
-            return await Task.FromResult(files.ContainsKey(uri));
+            if (files.ContainsKey(uri))
+            {
+                return await Task.FromResult(true);
+            }
+            
+            var requestUri = GetRequestUri(uri);
+            var uwr = UnityWebRequest.Get(requestUri);
+            var request = uwr.SendWebRequest();
+
+            while (!request.isDone)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
+                
+                await Task.Yield();
+            }
+
+            return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
         {
             if (files.ContainsKey(uri))
             {
@@ -43,6 +66,11 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
+                
                 await Task.Yield();
             }
             
@@ -57,14 +85,14 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
         }
 
-        public async Task Write(File<byte[]> file)
+        public async Task Write(File<byte[]> file, CancellationToken token = default)
         {
             files[file.Uri] = file;
 
             await Task.CompletedTask;
         }
 
-        public async Task Delete(string uri)
+        public async Task Delete(string uri, CancellationToken token = default)
         {
             if (!files.ContainsKey(uri))
             {
