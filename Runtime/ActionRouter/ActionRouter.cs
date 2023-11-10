@@ -40,7 +40,6 @@ namespace Padoru.Core.ActionRouter
 
             if (actionGroup == null)
             {
-                Debug.LogError($"Unable to invoke the action {actionId} because is not registered");
                 return;
             }
             
