@@ -46,6 +46,13 @@ namespace Padoru.Core.ActionRouter
             actionGroup.Invoke(actionObject);
         }
 
+        public bool IsActionSubscribed(string actionId)
+        {
+            var actionGroup = GetActionRouterGroup(actionId);
+			
+			return actionGroup != null;
+        }
+
         private ActionRouterGroup GetActionRouterGroup(string actionId)
         {
             foreach (var actionRouterGroup in actionRouterGroups)
