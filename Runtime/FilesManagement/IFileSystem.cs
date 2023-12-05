@@ -7,7 +7,7 @@ namespace Padoru.Core.Files
     {
         Task<bool> Exists(string uri, CancellationToken token = default);
 
-        Task<File<byte[]>> Read(string uri, CancellationToken token = default);
+        Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default);
 
         Task Write(File<byte[]> file, CancellationToken token = default);
 

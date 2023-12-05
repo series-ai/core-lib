@@ -50,12 +50,14 @@ namespace Padoru.Core.Files
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
         {
             if (files.ContainsKey(uri))
             {
                 return files[uri];
             }
+
+            uri += $"?version={version}";
             
             var requestUri = GetRequestUri(uri);
 			

@@ -14,7 +14,7 @@ namespace Padoru.Core.Files
             return await Task.FromResult(files.ContainsKey(uri));
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
         {
             if (files.TryGetValue(uri, out var file))
             {

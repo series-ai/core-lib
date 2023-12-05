@@ -25,14 +25,14 @@ namespace Padoru.Core.Files
             return await fileSystem.Exists(uri, token);
         }
 
-        public async Task<object> Read<T>(string uri, CancellationToken token = default)
+        public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
                 
-            var file = await fileSystem.Read(uri, token);
+            var file = await fileSystem.Read(uri, version, token);
                     
             var bytes = file.Data;
 

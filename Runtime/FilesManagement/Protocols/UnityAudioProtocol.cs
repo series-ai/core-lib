@@ -30,7 +30,7 @@ namespace Padoru.Core.Files
 			throw new System.NotImplementedException();
 		}
 
-		public async Task<object> Read<T>(string uri, CancellationToken token = default)
+		public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
 		{
 			var requestUri = GetRequestUri(uri);
 			
