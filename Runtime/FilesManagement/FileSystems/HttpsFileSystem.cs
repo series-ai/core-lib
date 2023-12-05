@@ -28,9 +28,12 @@ namespace Padoru.Core.Files
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
         {
             var path = GetFullPath(uri);
+
+            path += $"?version={version}";
+            
             var response = await client.GetAsync(path, token);
 
             if (response.IsSuccessStatusCode)

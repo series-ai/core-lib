@@ -70,9 +70,9 @@ namespace Padoru.Core.Files
             return await GetProtocol(uri).Exists(uri, token);
         }
 
-        public async Task<File<T>> Read<T>(string uri, CancellationToken token = default)
+        public async Task<File<T>> Read<T>(string uri, string version = null, CancellationToken token = default)
         {
-            var value = await GetProtocol(uri).Read<T>(uri, token);
+            var value = await GetProtocol(uri).Read<T>(uri, version, token);
 
             return new File<T>(uri, (T)value);
         }
