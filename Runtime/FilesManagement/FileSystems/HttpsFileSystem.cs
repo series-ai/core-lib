@@ -36,14 +36,14 @@ namespace Padoru.Core.Files
             
             var response = await client.GetAsync(path, token);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var data = await response.Content.ReadAsByteArrayAsync();
-                Debug.Log($"Read file at path '{path}'.");
-                return new File<byte[]>(uri, data);
+                throw new FileNotFoundException($"Could not read file at path '{path}'. Error code: {response.StatusCode}");
             }
             
-            throw new FileNotFoundException($"Could not read file at path '{path}'. Error code: {response.StatusCode}");
+            var data = await response.Content.ReadAsByteArrayAsync();
+                
+            return new File<byte[]>(uri, data);
         }
 
         public async Task Write(File<byte[]> file, CancellationToken token = default)
@@ -52,13 +52,9 @@ namespace Padoru.Core.Files
             var content = new ByteArrayContent(file.Data);
             var response = await client.PostAsync(path, content, token);
             
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                Debug.Log($"Written file at path '{path}'.");
-            }
-            else
-            {
-                Debug.LogError($"Could not write file at path '{path}'. Error code: {response.StatusCode}");
+                throw new Exception($"Could not write file at path '{path}'. Error code: {response.StatusCode}");
             }
         }
 
@@ -67,13 +63,11 @@ namespace Padoru.Core.Files
             var path = GetFullPath(uri);
             var response = await client.DeleteAsync(path, token);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                Debug.Log($"Deleted file at path '{path}'.");
-                return;
+                throw new FileNotFoundException($"Could not find file. Uri {uri}. Error code: {response.StatusCode}");
             }
 
-            throw new FileNotFoundException($"Could not find file. Uri {uri}. Error code: {response.StatusCode}");
         }
         
         private string GetFullPath(string uri)

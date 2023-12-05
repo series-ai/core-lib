@@ -46,8 +46,6 @@ namespace Padoru.Core.Files
                     offset += bytesRead;
                 }
 
-                Debug.Log($"Read file from path '{path}'");
-
                 return new File<byte[]>(uri, bytes);
             }
         }
@@ -64,8 +62,6 @@ namespace Padoru.Core.Files
             {
                 await fs.WriteAsync(file.Data, 0, file.Data.Length, token);
             }
-
-            Debug.Log($"Wrote file to path '{path}'");
         }
 
         public Task Delete(string uri, CancellationToken token = default)

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UIElements;
 
 namespace Padoru.Core.Files
 {
@@ -33,8 +32,6 @@ namespace Padoru.Core.Files
 		public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
 		{
 			var requestUri = GetRequestUri(uri);
-			
-			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
         
 			var dh = new DownloadHandlerAudioClip(requestUri, AudioType.MPEG);
 			dh.compressed = true;
@@ -42,15 +39,17 @@ namespace Padoru.Core.Files
  
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
-				await wr.SendWebRequest().AsTask(coroutineProxy);
+				await wr.SendWebRequest().AsTask(coroutineProxy, token);
 				if (wr.responseCode == 200) 
 				{
 					return dh.audioClip;
 				}
+				
 				Debug.LogError($"Download failed. Uri {requestUri} Response {wr.responseCode}. Error: {wr.error}");
 			}
         
 			Debug.LogError("The download process is not completely finished.");
+			
 			return null;
 		}
 
@@ -75,7 +74,6 @@ namespace Padoru.Core.Files
 
 			if (protocolRegex.IsMatch(path))
 			{
-				Debug.LogWarning($"Skipped adding web protocol to URI '{path}' because it already has a protocol.");
 				return path;
 			}
             

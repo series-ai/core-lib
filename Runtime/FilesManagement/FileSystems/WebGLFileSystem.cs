@@ -61,8 +61,6 @@ namespace Padoru.Core.Files
             
             var requestUri = GetRequestUri(uri);
 			
-			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
-			
             var uwr = UnityWebRequest.Get(requestUri);
             var request = uwr.SendWebRequest();
 
@@ -78,8 +76,6 @@ namespace Padoru.Core.Files
             
             if (uwr.result == UnityWebRequest.Result.Success) 
             {
-                Debug.Log($"Read file at path '{requestUri}'.");
-                
                 var manifestData = uwr.downloadHandler.data;
                 return new File<byte[]>(uri, manifestData);
             }
@@ -117,7 +113,6 @@ namespace Padoru.Core.Files
 
             if (protocolRegex.IsMatch(path))
             {
-                Debug.LogWarning($"Skipped adding web protocol to URI '{path}' because it already has a protocol.");
                 return path;
             }
             

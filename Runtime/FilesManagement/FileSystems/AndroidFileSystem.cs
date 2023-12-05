@@ -2,7 +2,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Padoru.Diagnostics;
 using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
@@ -45,8 +44,6 @@ namespace Padoru.Core.Files
         {
             var requestUri = GetRequestUri(uri);
 			
-			Debug.Log($"Sending Get Web Request. Uri: {requestUri}");
-			
             var uwr = UnityWebRequest.Get(requestUri);
             var request = uwr.SendWebRequest();
 
@@ -60,15 +57,13 @@ namespace Padoru.Core.Files
                 await Task.Yield();
             }
             
-            if (uwr.result == UnityWebRequest.Result.Success) 
+            if (uwr.result != UnityWebRequest.Result.Success) 
             {
-                Debug.Log($"Read file at path '{requestUri}'.");
-                
-                var manifestData = uwr.downloadHandler.data;
-                return new File<byte[]>(uri, manifestData);
+                throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
             }
             
-            throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
+            var manifestData = uwr.downloadHandler.data;
+            return new File<byte[]>(uri, manifestData);
         }
 
         public async Task Write(File<byte[]> file, CancellationToken token = default)
@@ -80,8 +75,6 @@ namespace Padoru.Core.Files
             Directory.CreateDirectory(directory);
 
             await File.WriteAllBytesAsync(path, file.Data, token);
-
-            Debug.Log($"Wrote file to path '{path}'");
         }
 
         public Task Delete(string uri, CancellationToken token = default)
@@ -109,7 +102,6 @@ namespace Padoru.Core.Files
 
             if (protocolRegex.IsMatch(path))
             {
-                Debug.LogWarning($"Skipped adding web protocol to URI '{path}' because it already has a protocol.");
                 return path;
             }
             
