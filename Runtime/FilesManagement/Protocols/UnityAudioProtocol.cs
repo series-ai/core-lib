@@ -12,16 +12,16 @@ namespace Padoru.Core.Files
 		private readonly string basePath;
 		private readonly CoroutineProxy coroutineProxy;
 		private readonly string webRequestProtocol;
-		private readonly bool streamAudio;
+		private readonly AudioImportSettings importSettings;
 		private readonly Regex protocolRegex;
 
-		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, string webRequestProtocol, bool streamAudio)
+		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, string webRequestProtocol, AudioImportSettings importSettings)
 		{
 			this.basePath = basePath;
 			this.coroutineProxy = coroutineProxy;
 			this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
 			this.webRequestProtocol = webRequestProtocol;
-			this.streamAudio = streamAudio;
+			this.importSettings = importSettings;
 		}
 		
 		public Task<bool> Exists(string uri, CancellationToken token = default)
@@ -33,9 +33,10 @@ namespace Padoru.Core.Files
 		{
 			var requestUri = GetRequestUri(uri);
         
+			// Cannot compress audio if stream is set to true
 			var dh = new DownloadHandlerAudioClip(requestUri, AudioType.MPEG);
-			dh.compressed = true;
-			dh.streamAudio = streamAudio;
+			dh.streamAudio = importSettings.StreamAudio;
+			dh.compressed = !importSettings.StreamAudio && importSettings.CompressAudio;
  
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
