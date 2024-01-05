@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core.Files
 {
@@ -11,13 +10,15 @@ namespace Padoru.Core.Files
     {
         private readonly string basePath;
         private readonly HttpClient client;
-
-        public HttpsFileSystem(string basePath, int requestTimeoutInSeconds)
+        private readonly int maxDownloadRetries;
+        
+        public HttpsFileSystem(string basePath, int requestTimeoutInSeconds, int maxDownloadRetries)
         {
             this.basePath = basePath;
             
             client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(requestTimeoutInSeconds);
+            this.maxDownloadRetries = maxDownloadRetries;
             // TODO: Use client base address instead of appending it to every request
         }
         
@@ -33,9 +34,29 @@ namespace Padoru.Core.Files
             var path = GetFullPath(uri);
 
             path += $"?version={version}";
-            
-            var response = await client.GetAsync(path, token);
 
+            HttpResponseMessage response = null;
+            for (var i = 0; i < maxDownloadRetries; i++)
+            {
+                try
+                {
+                    response = await client.GetAsync(path, token);
+                }
+                catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+                {
+                    if (token.IsCancellationRequested || i == maxDownloadRetries - 1)
+                    {
+                        throw;
+                    }
+                    continue;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    break;
+                }
+            }
+            
             if (!response.IsSuccessStatusCode)
             {
                 throw new FileNotFoundException($"Could not read file at path '{path}'. Error code: {response.StatusCode}");
