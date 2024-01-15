@@ -18,7 +18,7 @@ namespace Padoru.Core.Files
             this.basePath = basePath;
             this.webRequestProtocol = webRequestProtocol;
             
-            protocolRegex = new Regex(@"^[a-zA-Z]+://");;
+            protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
         }
         
         public async Task<bool> Exists(string uri, CancellationToken token = default)

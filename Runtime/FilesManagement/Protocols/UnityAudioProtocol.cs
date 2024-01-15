@@ -19,7 +19,7 @@ namespace Padoru.Core.Files
 		{
 			this.basePath = basePath;
 			this.coroutineProxy = coroutineProxy;
-			this.protocolRegex = new Regex(@"^[a-zA-Z]+://");;
+			this.protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
 			this.webRequestProtocol = webRequestProtocol;
 			this.importSettings = importSettings;
 		}

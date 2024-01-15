@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Padoru.Diagnostics;
 using UnityEngine.Networking;
 
 namespace Padoru.Core.Files
@@ -23,7 +22,7 @@ namespace Padoru.Core.Files
             this.basePath = basePath;
             this.webRequestProtocol = webRequestProtocol;
             
-            protocolRegex = new Regex(@"^[a-zA-Z]+://");;
+            protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
         }
         
         public async Task<bool> Exists(string uri, CancellationToken token = default)
