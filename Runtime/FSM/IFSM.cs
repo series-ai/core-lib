@@ -22,6 +22,8 @@ namespace Padoru.Core
 
 		void SetTrigger(TTrigger trigger);
 
+		void SetState(TState stateId);
+
 		State GetState(TState stateId);
 	}
 }

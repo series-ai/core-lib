@@ -22,5 +22,10 @@ namespace Padoru.Core
 		{
 			fsm.SetTrigger(trigger);
 		}
+
+		public void SetState(TState state)
+		{
+			fsm.SetState(state);
+		}
 	}
 }

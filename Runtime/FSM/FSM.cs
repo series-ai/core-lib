@@ -72,7 +72,7 @@ namespace Padoru.Core
 
 		public void AddTransition(TState initialState, TState targetState, TTrigger trigger)
 		{
-			var transition = new Transition<TState, TTrigger>()
+			var transition = new Transition<TState, TTrigger>
 			{
 				initialState = initialState,
 				targetState = targetState,
@@ -99,10 +99,20 @@ namespace Padoru.Core
 			Debug.Log($"Trigger set {trigger}");
 			foreach (var transition in transitions)
 			{
-				if (!ShouldTransition(transition, trigger)) continue;
+				if (!ShouldTransition(transition, trigger))
+				{
+					continue;
+				}
 
 				ChangeState(transition.targetState);
 			}
+		}
+
+		public void SetState(TState stateId)
+		{
+			Debug.Log($"State set {stateId}");
+			
+			ChangeState(stateId);
 		}
 
 		public State GetState(TState stateId)

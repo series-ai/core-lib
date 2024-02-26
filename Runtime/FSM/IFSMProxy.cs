@@ -7,5 +7,7 @@ namespace Padoru.Core
 		void Setup(IFSM<TState, TTrigger> fsm);
 		
 		void SetTrigger(TTrigger trigger);
+		
+		void SetState(TState state);
 	}
 }
