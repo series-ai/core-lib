@@ -13,6 +13,8 @@ namespace Padoru.Core
 		IFSMProxy<TState, TTrigger> Proxy { get; }
 
 		void Start();
+
+		void Start(TState initialState);
 		
 		void Stop();
 		

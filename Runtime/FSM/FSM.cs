@@ -37,6 +37,11 @@ namespace Padoru.Core
 
 		public void Start()
 		{
+			Start(initialStateId);
+		}
+
+		public void Start(TState initialState)
+		{
 			if (IsActive)
 			{
 				throw new Exception("Could not start FSM, it is already active");
@@ -44,8 +49,8 @@ namespace Padoru.Core
 
 			SetupCallbackReceivers();
 
-			PreviousStateId = initialStateId;
-			ChangeState(initialStateId);
+			PreviousStateId = initialState;
+			ChangeState(initialState);
 			IsActive = true;
 			tickManager.Register(this);
 		}
