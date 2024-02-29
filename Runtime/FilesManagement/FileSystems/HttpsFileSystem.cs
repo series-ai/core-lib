@@ -12,11 +12,11 @@ namespace Padoru.Core.Files
         private readonly HttpClient client;
         private readonly int maxDownloadRetries;
         
-        public HttpsFileSystem(string basePath, int requestTimeoutInSeconds, int maxDownloadRetries)
+        public HttpsFileSystem(string basePath, int requestTimeoutInSeconds, int maxDownloadRetries, HttpMessageHandler messageHandler = null)
         {
             this.basePath = basePath;
             
-            client = new HttpClient();
+            client = messageHandler == null ? new HttpClient() : new HttpClient(messageHandler);
             client.Timeout = TimeSpan.FromSeconds(requestTimeoutInSeconds);
             this.maxDownloadRetries = maxDownloadRetries;
             // TODO: Use client base address instead of appending it to every request
