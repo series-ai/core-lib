@@ -17,7 +17,7 @@ namespace Padoru.Core
 
         public bool IsInitialized { get; private set; }
 
-        public event Action OnInitializationFinish;
+        public event Action<long> OnInitializationFinish;
 
         private async void Awake()
         {
@@ -75,7 +75,7 @@ namespace Padoru.Core
             Debug.Log(sb, gameObject);
 
             IsInitialized = true;
-            OnInitializationFinish?.Invoke();
+            OnInitializationFinish?.Invoke(watch.ElapsedMilliseconds);
         }
 
         public void Shutdown()
