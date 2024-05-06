@@ -26,9 +26,9 @@ namespace Padoru.Core.Files
 		
 		public Task<bool> Exists(string uri, CancellationToken token = default)
 		{
-			var requestUri = GetRequestUri(uri);
+			var filePath = GetFullPath(uri);
 
-			return Task.FromResult(File.Exists(requestUri));
+			return Task.FromResult(File.Exists(filePath));
 		}
 
 		public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
