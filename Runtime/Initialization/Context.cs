@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using Padoru.Core.ActionRouter;
 using UnityEngine;
 
 using Debug = Padoru.Diagnostics.Debug;
@@ -16,9 +17,11 @@ namespace Padoru.Core
         [SerializeField] private InitializationStage[] initializationStages;
 
         public bool IsInitialized { get; private set; }
+        
+        public float InitializationPercentage { get; private set; }
 
         public event Action<long> OnInitializationFinish;
-
+        public event Action<float> OnInitializationStageFinished; 
         private async void Awake()
         {
             if (registerOnLocator)
@@ -53,6 +56,16 @@ namespace Padoru.Core
             {
                 throw new Exception($"Trying to initialize context more than once");
             }
+            
+            try
+            {
+                var actionRouter = Locator.Get<IActionRouter>();
+                actionRouter.Invoke(ActionRouterEvents.ON_CONTEXT_INIT, this);
+            }
+            catch (Exception e)
+            {
+                // ignored
+            }
 
             var watch = new Stopwatch();
             watch.Start();
@@ -66,6 +79,9 @@ namespace Padoru.Core
                 var stage = initializationStages[i];
                 
                 await stage.Init(sb);
+
+                InitializationPercentage = (i + 1f) / initializationStages.Length;
+                OnInitializationStageFinished?.Invoke(InitializationPercentage);
             }
 
             watch.Stop();
@@ -89,6 +105,16 @@ namespace Padoru.Core
             foreach (var item in shutdownables)
             {
                 item.Shutdown();
+            }
+            
+            try
+            {
+                var actionRouter = Locator.Get<IActionRouter>();
+                actionRouter.Invoke(ActionRouterEvents.ON_CONTEXT_SHUTDOWN, this);
+            }
+            catch (Exception e)
+            {
+                // ignored
             }
 
             IsInitialized = false;
