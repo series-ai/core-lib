@@ -22,6 +22,10 @@ namespace Padoru.Core
 
 		List<T> GetAll<T>();
 
+		bool Has<T>();
+		
+		bool Has<T>(string tag);
+
 		void Clear();
 	}
 }
