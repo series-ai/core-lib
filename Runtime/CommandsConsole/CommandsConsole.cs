@@ -21,7 +21,7 @@ namespace Padoru.Core.DebugConsole
 			this.config = config;
 			
 			var sb = new StringBuilder();
-			sb.Append("Debug Commands Console initialized. Commands:");
+			sb.Append("Commands console available commands:");
 			sb.Append(Environment.NewLine);
 
 			foreach (var command in config.Commands)
