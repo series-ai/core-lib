@@ -5,13 +5,13 @@ namespace Padoru.Core
 {
 	public class TickManager : MonoBehaviour, ITickManager, IInitializable, IShutdowneable
 	{
-		private List<ITickable> tickables = new List<ITickable>();
+		private readonly List<ITickable> tickables = new ();
 
 		private void Update()
 		{
-			for (int i = 0; i < tickables.Count; i++)
+			foreach (var tickable in tickables)
 			{
-				tickables[i].Tick(Time.deltaTime);
+				tickable.Tick(Time.deltaTime);
 			}
 		}
 
