@@ -29,6 +29,8 @@ namespace Padoru.Core
             }
             
             await SetupProjectContext(settings);
+
+            InitializeGameFsm(settings);
         }
 
         private static void ConfigLog(Settings settings)
@@ -56,6 +58,19 @@ namespace Padoru.Core
 
             Debug.Log("Initializing ProjectContext", DebugChannels.APP_LIFE_CYCLE);
             await projectContext.Init();
+        }
+
+        private static void InitializeGameFsm(Settings settings)
+        {
+            Debug.Log("Initializing GameFSM", DebugChannels.APP_LIFE_CYCLE);
+            
+            var fsmInitializer = new GameFsmInitializer(settings);
+            
+            var fsm = fsmInitializer.Init();
+            
+            Locator.Register(fsm, Constants.GAME_FSM_TAG);
+            
+            Debug.Log($"GameFSM registered under tag '{Constants.GAME_FSM_TAG}' and type '{fsm.GetType()}'", DebugChannels.APP_LIFE_CYCLE);
         }
 
         private static bool ShouldInitializeFramework(Settings settings)

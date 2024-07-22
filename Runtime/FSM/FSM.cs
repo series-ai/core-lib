@@ -5,7 +5,7 @@ using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
-	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger>
 	{
 		private readonly Dictionary<TState, State> states;
 		private readonly List<Transition<TState, TTrigger>> transitions;
@@ -21,7 +21,7 @@ namespace Padoru.Core
 		public bool IsActive { get; private set; }
 		public IFSMProxy<TState, TTrigger> Proxy { get; }
 
-		public FSM(TState initialStateId, IFSMProxy<TState, TTrigger> proxy = null, string debugChannel = null)
+		public FSM(TState initialStateId, IEnumerable<TState> stateIds, IFSMProxy<TState, TTrigger> proxy = null, string debugChannel = null)
 		{
 			states = new();
 			transitions = new();
@@ -34,7 +34,7 @@ namespace Padoru.Core
 
 			tickManager = Locator.Get<ITickManager>();
 
-			CreateStates();
+			CreateStates(stateIds);
 		}
 
 		public void Start()
@@ -162,16 +162,15 @@ namespace Padoru.Core
 			return false;
 		}
 
-		private void CreateStates()
+		private void CreateStates(IEnumerable<TState> stateIds)
 		{
 			var sb = new StringBuilder();
 			sb.Append("Created FSM with states:");
 
-			var stateIds = Enum.GetValues(typeof(TState));
 			foreach (var stateId in stateIds)
 			{
 				var state = new State(stateId.ToString(), debugChannel);
-				states.Add((TState)stateId, state);
+				states.Add(stateId, state);
 				sb.Append(Environment.NewLine);
 				sb.Append($" {stateId}");
 			}

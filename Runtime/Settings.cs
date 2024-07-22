@@ -13,6 +13,7 @@ namespace Padoru.Core
 		public string ProjectContextPrefabName = "ProjectContext";
 		[Tooltip("Only the scenes specified in the list will trigger the initialization of the framework")]
 		public List<string> scenes;
+		public string initialScene;
 
 		[Header("Logging")] 
 		public LogSettings logSettings;

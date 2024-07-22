@@ -2,7 +2,7 @@ using System;
 
 namespace Padoru.Core
 {
-	public interface IFSMProxy<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public interface IFSMProxy<TState, TTrigger>
 	{
 		void Setup(IFSM<TState, TTrigger> fsm);
 		

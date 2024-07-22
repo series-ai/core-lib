@@ -2,7 +2,7 @@ using System;
 
 namespace Padoru.Core
 {
-	public class Transition<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public class Transition<TState, TTrigger>
 	{
 		public TState initialState;
 		public TState targetState;

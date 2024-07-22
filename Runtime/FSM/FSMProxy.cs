@@ -2,7 +2,7 @@ using System;
 
 namespace Padoru.Core
 {
-	public class FSMProxy<TState, TTrigger> : IFSMProxy<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public class FSMProxy<TState, TTrigger> : IFSMProxy<TState, TTrigger>
 	{
 		private IFSM<TState, TTrigger> fsm;
 		
