@@ -14,6 +14,7 @@ namespace Padoru.Core
         private readonly Settings settings;
         
         private FSM<string, string> fsm;
+        private string startingState;
 
         public GameFsmInitializer(Settings settings)
         {
@@ -22,7 +23,7 @@ namespace Padoru.Core
         
         public IFSM<string, string> Init()
         {
-            var startingState = GetInitialGameState();
+            startingState = GetInitialGameState();
 
             SetupFsm(startingState);
 
@@ -38,6 +39,16 @@ namespace Padoru.Core
             if (Application.isEditor)
             {
                 return SceneManager.GetActiveScene().name;
+            }
+
+            if (string.IsNullOrWhiteSpace(settings.initialScene))
+            {
+                throw new Exception("Initial scene in padoru settings is empty.");
+            }
+
+            if (!settings.scenes.Contains(settings.initialScene))
+            {
+                throw new Exception($"Initial scene '{settings.initialScene}' in padoru settings is not in the defined scenes list.");
             }
 
             return settings.initialScene;
@@ -67,20 +78,22 @@ namespace Padoru.Core
             }
         }
 
-        private void LoadScene(string sceneName)
+        private void LoadScene(string nextSceneName)
         {
-            var scene = SceneManager.GetSceneByName(sceneName);
-            var comeFromDifferentState = fsm.CurrentStateId != fsm.PreviousStateId;
+            var currentSceneName = SceneManager.GetActiveScene().name;
+            var comesFromDifferentScene = currentSceneName != nextSceneName;
             
-            if (!comeFromDifferentState || scene.isLoaded)
+            if (!comesFromDifferentScene)
             {
+                var scene = SceneManager.GetSceneByName(nextSceneName);
+                
                 OnSceneLoaded(scene, LoadSceneMode.Single);
             }
             else
             {
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 
-                SceneManager.LoadScene(sceneName);
+                SceneManager.LoadScene(nextSceneName);
             }
         }
 
