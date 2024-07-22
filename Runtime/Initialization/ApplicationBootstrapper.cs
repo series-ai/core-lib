@@ -41,7 +41,7 @@ namespace Padoru.Core
 
         private static async Task SetupProjectContext(Settings settings)
         {
-            var projectContextPrefab = Resources.Load<Context>(settings.ProjectContextPrefabName);
+            var projectContextPrefab = Resources.Load<Context>(settings.projectContextPrefabName);
 
             if (projectContextPrefab == null)
             {
@@ -53,8 +53,8 @@ namespace Padoru.Core
             var projectContext = Object.Instantiate(projectContextPrefab);
             Object.DontDestroyOnLoad(projectContext);
 
-            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}", DebugChannels.APP_LIFE_CYCLE);
-            Locator.Register(projectContext, settings.ProjectContextPrefabName);
+            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.projectContextPrefabName}", DebugChannels.APP_LIFE_CYCLE);
+            Locator.Register(projectContext, settings.projectContextPrefabName);
 
             Debug.Log("Initializing ProjectContext", DebugChannels.APP_LIFE_CYCLE);
             await projectContext.Init();
