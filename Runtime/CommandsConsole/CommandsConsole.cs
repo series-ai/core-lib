@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -8,43 +7,40 @@ using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core.DebugConsole
 {
-	public class CommandsConsole : MonoBehaviour
+	public class CommandsConsole : IGUIItem
 	{
 		private const string TEXT_FIELD_CONTROL_NAME = "ConsoleTextField";
 
-		private Dictionary<string, InstancedTypeData<ConsoleCommand, ConsoleCommandAttribute>> commands;
+		private readonly CommandsConsoleConfig config;
+		
 		private bool showConsole;
 		private string input;
 
-		private void Awake()
+		public CommandsConsole(CommandsConsoleConfig config)
 		{
+			this.config = config;
+			
 			var sb = new StringBuilder();
 			sb.Append("Debug Commands Console initialized. Commands:");
 			sb.Append(Environment.NewLine);
 
-			var data = AttributeUtils.GetTypesWithAttributeInstanced<ConsoleCommand, ConsoleCommandAttribute>();
-			commands = new Dictionary<string, InstancedTypeData<ConsoleCommand, ConsoleCommandAttribute>>();
-
-			foreach (var entry in data)
+			foreach (var command in config.Commands)
 			{
-				var commandName = entry.Attribute.CommandName.ToLower();
-				commands.Add(commandName, entry);
-
-				sb.Append($"  - {commandName}");
+				sb.Append($"  - {command.Key}");
 				sb.Append(Environment.NewLine);
 			}
 
-			Debug.Log(sb);
+			Debug.Log(sb, DebugChannels.COMMANDS_CONSOLE);
 		}
 
-		private void OnGUI()
+		public void OnGUI()
 		{
-			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.BackQuote)
+			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == config.ToggleConsoleKey)
 			{
 				ToggleConsole();
 			}
 
-			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
+			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == config.HandleInputKey)
 			{
 				HandleInput();
 				input = string.Empty;
@@ -62,7 +58,7 @@ namespace Padoru.Core.DebugConsole
 				return;
 			}
 
-			float y = 0f;
+			var y = 0f;
 
 			GUI.Box(new Rect(0, y, Screen.width, 30), "");
 			GUI.backgroundColor = new Color(0, 0, 0, 0);
@@ -110,10 +106,9 @@ namespace Padoru.Core.DebugConsole
 			}
 
 			var args = parameters.Skip(1).ToArray();
-			var command = parameters[0].ToLower();
-			if (commands.ContainsKey(command))
+			if (config.Commands.TryGetValue(parameters[0].ToLower(), out var command))
 			{
-				commands[command].Instance.Execute(args);
+				command.Execute(args);
 			}
 		}
 	}
