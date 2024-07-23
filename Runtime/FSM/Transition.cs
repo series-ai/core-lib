@@ -1,5 +1,3 @@
-using System;
-
 namespace Padoru.Core
 {
 	public class Transition<TState, TTrigger>
