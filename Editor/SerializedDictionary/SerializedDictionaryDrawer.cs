@@ -1,165 +1,150 @@
-using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
 namespace Padoru.Core.Editor
 {
-	[CustomPropertyDrawer(typeof(SerializedDictionary<,>))]
+    [CustomPropertyDrawer(typeof(SerializedDictionary<,>))]
     public class SerializedDictionaryDrawer : PropertyDrawer
-	{
-		private const int ADD_BUTTON_WIDTH = 20;
-		private const int VERTICAL_SPACING = 5;
+    {
+        private const int ADD_BUTTON_WIDTH = 20;
+        private const int VERTICAL_SPACING = 5;
 
-		private bool show = true;
-		private int itemsCount;
-		private bool initialized;
-		private bool shouldCheckIfValueWasAdded;
+        private bool show = true;
+        private int itemsCount;
+        private bool initialized;
+        private bool shouldCheckIfValueWasAdded;
 
-		private SerializedProperty keysProperty;
-		private SerializedProperty valuesProperty;
-		private SerializedProperty addedValueThroughEditorProperty;
-		private SerializedObject serializedObject;
-		private KeyValueDrawer keyValueDrawer;
+        private SerializedProperty keysProperty;
+        private SerializedProperty valuesProperty;
+        private SerializedProperty addedValueThroughEditorProperty;
+        private SerializedObject serializedObject;
+        private KeyValueDrawer keyValueDrawer;
 
-		private void Initialize(SerializedProperty property)
-		{
-			serializedObject = property.serializedObject;
+        private void Initialize(SerializedProperty property)
+        {
+            keysProperty = property.FindPropertyRelative("keys");
+            valuesProperty = property.FindPropertyRelative("values");
+            addedValueThroughEditorProperty = property.FindPropertyRelative("addedItemThroughEditor");
 
-			keysProperty = property.FindPropertyRelative("keys");
-			valuesProperty = property.FindPropertyRelative("values");
-			addedValueThroughEditorProperty = property.FindPropertyRelative("addedItemThroughEditor");
+            itemsCount = keysProperty.arraySize;
+        }
 
-			itemsCount = keysProperty.arraySize;
-		}
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            if (!initialized)
+            {
+                initialized = true;
+                Initialize(property);
+            }
 
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			if (!initialized)
-			{
-				initialized = true;
-				Initialize(property);
-			}
+            if (shouldCheckIfValueWasAdded)
+            {
+                shouldCheckIfValueWasAdded = false;
+                if (itemsCount > keysProperty.arraySize)
+                {
+                    itemsCount = keysProperty.arraySize;
+                }
+            }
 
-			if (shouldCheckIfValueWasAdded)
-			{
-				shouldCheckIfValueWasAdded = false;
-				if (itemsCount > keysProperty.arraySize)
-				{
-					itemsCount = keysProperty.arraySize;
-				}
-			}
+            EditorGUI.BeginProperty(position, label, property);
 
-			EditorGUI.BeginProperty(position, label, property);
+            var titlePosition = new Rect(position.x, position.y, position.width - ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
+            var addButtonPosition = new Rect(position.width - ADD_BUTTON_WIDTH, position.y, ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
 
-			var titlePosition = new Rect(position.x, position.y, position.width - ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
-			var addButtonPosition = new Rect(position.width - ADD_BUTTON_WIDTH, position.y, ADD_BUTTON_WIDTH, EditorGUIUtility.singleLineHeight);
+            // Add the title height and some spacing
+            position.y += EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
 
-			// Add the title height and some spacing
-			position.y += EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
+            show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
 
-			show = EditorGUI.Foldout(titlePosition, show, label, false, GUIStyles.FoldableTitle);
+            if (GUI.Button(addButtonPosition, UnityIcons.GetPlusIcon(), GUIStyles.ListButtonStyle))
+            {
+                OnAddButtonClick();
+            }
 
-			if (GUI.Button(addButtonPosition, UnityIcons.GetPlusIcon(), GUIStyles.ListButtonStyle))
-			{
-				OnAddButtonClick();
-			}
+            if (show)
+            {
+                DrawKeyAndValues(position);
+            }
 
-			if (show)
-			{
-				DrawKeyAndValues(position);
-			}
+            EditorGUI.EndProperty();
+        }
 
-			EditorGUI.EndProperty();
-		}
+        private void OnAddButtonClick()
+        {
+            addedValueThroughEditorProperty.boolValue = true;
 
-		private void OnAddButtonClick()
-		{
-			serializedObject.Update();
+            keysProperty.arraySize++;
+            valuesProperty.arraySize++;
+            itemsCount++;
 
-			addedValueThroughEditorProperty.boolValue = true;
+            shouldCheckIfValueWasAdded = true;
+        }
 
-			keysProperty.arraySize++;
-			valuesProperty.arraySize++;
-			itemsCount++;
+        private void DrawKeyAndValues(Rect position)
+        {
+            if (keysProperty.arraySize <= 0)
+            {
+                return;
+            }
 
-			shouldCheckIfValueWasAdded = true;
+            if (keyValueDrawer == null)
+            {
+                CreateKeyValueDrawer();
+            }
 
-			serializedObject.ApplyModifiedProperties();
-		}
+            var keyValueRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+            var yOffset = keyValueDrawer.KeyValueHeight + VERTICAL_SPACING;
 
-		private void DrawKeyAndValues(Rect position)
-		{
-			if(keysProperty.arraySize <= 0)
-			{
-				return;
-			}
+            for (int i = 0; i < keysProperty.arraySize; i++)
+            {
+                var key = keysProperty.GetArrayElementAtIndex(i);
+                var value = valuesProperty.GetArrayElementAtIndex(i);
 
-			if (keyValueDrawer == null)
-			{
-				CreateKeyValueDrawer();
-			}
+                keyValueDrawer.Draw(keyValueRect, key, value, () => RemoveElement(i));
 
-			var keyValueRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-			var yOffset = keyValueDrawer.KeyValueHeight + VERTICAL_SPACING;
+                keyValueRect.y += yOffset;
+            }
+        }
 
-			serializedObject.Update();
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            var titleHeight = EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
 
-			for (int i = 0; i < keysProperty.arraySize; i++)
-			{
-				var key = keysProperty.GetArrayElementAtIndex(i);
-				var value = valuesProperty.GetArrayElementAtIndex(i);
+            if (keyValueDrawer == null || !show)
+            {
+                return titleHeight;
+            }
 
-				keyValueDrawer.Draw(keyValueRect, key, value, () => RemoveElement(i));
+            var propertiesHeight = (keyValueDrawer.KeyValueHeight + VERTICAL_SPACING) * itemsCount;
 
-				keyValueRect.y += yOffset;
-			}
+            var height = titleHeight + propertiesHeight;
 
-			serializedObject.ApplyModifiedProperties();
-		}
+            return height;
+        }
 
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			var titleHeight = EditorGUIUtility.singleLineHeight + VERTICAL_SPACING;
+        private void CreateKeyValueDrawer()
+        {
+            if (keysProperty.arraySize <= 0)
+            {
+                Debug.LogError($"Cannot create {typeof(KeyValueDrawer)} because there are no elements in the array so the height cannot be calculated");
+                return;
+            }
 
-			if (keyValueDrawer == null || !show)
-			{
-				return titleHeight;
-			}
+            var firstKey = keysProperty.GetArrayElementAtIndex(0);
+            var firstValue = valuesProperty.GetArrayElementAtIndex(0);
 
-			var propertiesHeight = (keyValueDrawer.KeyValueHeight + VERTICAL_SPACING) * itemsCount;
+            var highestPropertyHeight = Mathf.Max(EditorGUI.GetPropertyHeight(firstKey),
+                                        EditorGUI.GetPropertyHeight(firstValue));
 
-			var height = titleHeight + propertiesHeight;
+            keyValueDrawer = new KeyValueDrawer(highestPropertyHeight);
+        }
 
-			return height;
-		}
+        private void RemoveElement(int index)
+        {
+            keysProperty.DeleteArrayElementAtIndex(index);
+            valuesProperty.DeleteArrayElementAtIndex(index);
 
-		private void CreateKeyValueDrawer()
-		{
-			if (keysProperty.arraySize <= 0)
-			{
-				Debug.LogError($"Cannot create {typeof(KeyValueDrawer)} because there are no elements in the array so the height cannot be calculated");
-				return;
-			}
-
-			var firstKey = keysProperty.GetArrayElementAtIndex(0);
-			var firstValue = valuesProperty.GetArrayElementAtIndex(0);
-
-			var highestPropertyHeight = Mathf.Max(EditorGUI.GetPropertyHeight(firstKey),
-										EditorGUI.GetPropertyHeight(firstValue));
-
-			keyValueDrawer = new KeyValueDrawer(highestPropertyHeight);
-		}
-
-		private void RemoveElement(int index)
-		{
-			serializedObject.Update();
-
-			keysProperty.DeleteArrayElementAtIndex(index);
-			valuesProperty.DeleteArrayElementAtIndex(index);
-
-			itemsCount--;
-
-			serializedObject.ApplyModifiedProperties();
-		}
-	}
+            itemsCount--;
+        }
+    }
 }
