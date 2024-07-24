@@ -1,37 +1,48 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 
-// TODO: Migrate this to a class, and instantiate it on the development screen
-public class FpsCounter : MonoBehaviour
+namespace Padoru.Core.Utils
 {
-    [SerializeField] private UnityEvent<string> onFpsChanged;
+    public class FpsCounter : ITickable, IShutdowneable
+    {
+        private readonly ITickManager tickManager;
     
-    private int lastFrameIndex;
-    private float[] frameDeltaTimeArray;
+        private int lastFrameIndex;
+        private float[] frameDeltaTimeArray;
+        
+        public event Action<string> OnFpsChanged;
 
-    private void Awake()
-    {
-        frameDeltaTimeArray = new float[50];
-    }
-
-    private void Update()
-    {
-        frameDeltaTimeArray[lastFrameIndex] = Time.deltaTime;
-        lastFrameIndex = (lastFrameIndex + 1) % frameDeltaTimeArray.Length;
-
-        var fps = Mathf.RoundToInt(CalculateFps());
-        onFpsChanged?.Invoke(fps.ToString());
-    }
-
-    private float CalculateFps()
-    {
-        var total = 0f;
-        foreach (var deltaTime in frameDeltaTimeArray)
+        public FpsCounter(ITickManager tickManager)
         {
-            total += deltaTime;
+            this.tickManager = tickManager;
+            frameDeltaTimeArray = new float[50];
+            
+            tickManager.Register(this);
         }
 
-        return frameDeltaTimeArray.Length / total;
+        public void Tick(float deltaTime)
+        {
+            frameDeltaTimeArray[lastFrameIndex] = Time.deltaTime;
+            lastFrameIndex = (lastFrameIndex + 1) % frameDeltaTimeArray.Length;
+
+            var fps = Mathf.RoundToInt(CalculateFps());
+            OnFpsChanged?.Invoke(fps.ToString());
+        }
+
+        public void Shutdown()
+        {
+            tickManager.Unregister(this);
+        }
+
+        private float CalculateFps()
+        {
+            var total = 0f;
+            foreach (var deltaTime in frameDeltaTimeArray)
+            {
+                total += deltaTime;
+            }
+
+            return frameDeltaTimeArray.Length / total;
+        }
     }
 }
