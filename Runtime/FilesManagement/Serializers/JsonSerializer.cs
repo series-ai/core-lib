@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -22,7 +23,7 @@ namespace Padoru.Core.Files
             this.settings = settings;
         }
 
-        public Task<byte[]> Serialize(object value)
+        public Task<byte[]> Serialize(object value, CancellationToken cancellationToken)
         {
             var text = JsonConvert.SerializeObject(value, settings);
             
@@ -31,7 +32,7 @@ namespace Padoru.Core.Files
             return Task.FromResult(bytes);
         }
 
-        public Task<object> Deserialize(Type type, byte[] bytes, string uri)
+        public Task<object> Deserialize(Type type, byte[] bytes, string uri, CancellationToken cancellationToken)
         {
             var text = Encoding.UTF8.GetString(bytes);
             

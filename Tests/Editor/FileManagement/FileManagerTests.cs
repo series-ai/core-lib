@@ -41,9 +41,9 @@ namespace Padoru.Core.Files.Tests
             fileManager = new FileManager(new JsonSerializer(), new MemoryFileSystem());
 
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
-            if (await fileManager.Exists(testUri))
+            if (await fileManager.Exists(testUri, default))
             {
-                await fileManager.Delete(testUri);
+                await fileManager.Delete(testUri, default);
             }
             fileManager.UnregisterProtocol(TEST_PROTOCOL_HEADER);
         }
@@ -104,9 +104,9 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            await fileManager.Write(testUri, value);
+            await fileManager.Write(testUri, value, default);
 
-            var exists = await fileManager.Exists(testUri);
+            var exists = await fileManager.Exists(testUri, default);
 
             Assert.IsTrue(exists);
         }
@@ -116,7 +116,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            var exists = await fileManager.Exists(testUri);
+            var exists = await fileManager.Exists(testUri, default);
 
             Assert.IsFalse(exists);
         }
@@ -126,7 +126,7 @@ namespace Padoru.Core.Files.Tests
         {
             LogAssert.Expect(LogType.Warning, new Regex(""));
 
-            await fileManager.Exists(testUri);
+            await fileManager.Exists(testUri, default);
         }
         
         [Test]
@@ -134,7 +134,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null, default));
         }
     
         [Test]
@@ -142,7 +142,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null, default));
         }
         
         [Test]
@@ -150,9 +150,9 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            await fileManager.Write(testUri, value);
+            await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri));
+            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<FileNotFoundException>(async () => await fileManager.Delete(testUri));
+            Assert.Throws<FileNotFoundException>(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(null));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(null, default));
         }
         
         [Test]
@@ -176,7 +176,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(string.Empty));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(string.Empty, default));
         }
         
         [Test]
@@ -184,9 +184,9 @@ namespace Padoru.Core.Files.Tests
         {
             LogAssert.Expect(LogType.Warning, new Regex(""));
 
-            await fileManager.Write(testUri, value);
+            await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri));
+            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
@@ -194,7 +194,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write<TestClass>(testUri, null));
+            Assert.DoesNotThrow(async () => await fileManager.Write<TestClass>(testUri, null, default));
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value));
+            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value, default));
         }
 
         [Test]
@@ -210,9 +210,9 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            await fileManager.Write(testUri, value);
+            await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value));
+            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value, default));
         }
 
         [Test]
@@ -220,7 +220,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Write(null, value));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Write(null, value, default));
         }
     
         [Test]
@@ -228,7 +228,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Write(string.Empty, value));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Write(string.Empty, value, default));
         }
 
         [Test]
@@ -236,7 +236,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<FileNotFoundException>(async () => await fileManager.Read<TestClass>(testUri));
+            Assert.Throws<FileNotFoundException>(async () => await fileManager.Read<TestClass>(testUri, default));
         }
 
         [Test]
@@ -244,9 +244,9 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            await fileManager.Write(testUri, value);
+            await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Read<TestClass>(testUri));
+            Assert.DoesNotThrow(async () => await fileManager.Read<TestClass>(testUri, default));
         }
         
         [Test]
@@ -254,7 +254,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(null));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(null, default));
         }
     
         [Test]
@@ -262,7 +262,7 @@ namespace Padoru.Core.Files.Tests
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(string.Empty));
+            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(string.Empty, default));
         }
     }
 }

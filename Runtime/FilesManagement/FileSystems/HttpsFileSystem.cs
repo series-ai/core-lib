@@ -22,14 +22,14 @@ namespace Padoru.Core.Files
             // TODO: Use client base address instead of appending it to every request
         }
         
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             var path = GetFullPath(uri);
-            var response = await client.GetAsync(path, token);
+            var response = await client.GetAsync(path, cancellationToken);
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var path = GetFullPath(uri);
 
@@ -40,11 +40,11 @@ namespace Padoru.Core.Files
             {
                 try
                 {
-                    response = await client.GetAsync(path, token);
+                    response = await client.GetAsync(path, cancellationToken);
                 }
                 catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
                 {
-                    if (token.IsCancellationRequested || i == maxDownloadRetries - 1)
+                    if (cancellationToken.IsCancellationRequested || i == maxDownloadRetries - 1)
                     {
                         throw;
                     }
@@ -67,11 +67,11 @@ namespace Padoru.Core.Files
             return new File<byte[]>(uri, data);
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken token = default)
+        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
         {
             var path = GetFullPath(file.Uri);
             var content = new ByteArrayContent(file.Data);
-            var response = await client.PostAsync(path, content, token);
+            var response = await client.PostAsync(path, content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -79,16 +79,15 @@ namespace Padoru.Core.Files
             }
         }
 
-        public async Task Delete(string uri, CancellationToken token = default)
+        public async Task Delete(string uri, CancellationToken cancellationToken)
         {
             var path = GetFullPath(uri);
-            var response = await client.DeleteAsync(path, token);
+            var response = await client.DeleteAsync(path, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
                 throw new FileNotFoundException($"Could not find file. Uri {uri}. Error code: {response.StatusCode}");
             }
-
         }
         
         private string GetFullPath(string uri)

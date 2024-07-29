@@ -65,26 +65,26 @@ namespace Padoru.Core.Files
             return false;
         }
 
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
-            return await GetProtocol(uri).Exists(uri, token);
+            return await GetProtocol(uri).Exists(uri, cancellationToken);
         }
 
-        public async Task<File<T>> Read<T>(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<T>> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
         {
-            var value = await GetProtocol(uri).Read<T>(uri, version, token);
+            var value = await GetProtocol(uri).Read<T>(uri, cancellationToken, version);
 
             return new File<T>(uri, (T)value);
         }
 
-        public async Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default)
+        public async Task<File<T>> Write<T>(string uri, T value, CancellationToken cancellationToken)
         {
-            return await GetProtocol(uri).Write<T>(uri, value, token);
+            return await GetProtocol(uri).Write<T>(uri, value, cancellationToken);
         }
 
-        public async Task Delete(string uri, CancellationToken token = default)
+        public async Task Delete(string uri, CancellationToken cancellationToken)
         {
-            await GetProtocol(uri).Delete(uri, token);
+            await GetProtocol(uri).Delete(uri, cancellationToken);
         }
 
         private IProtocol GetProtocol(string uri)

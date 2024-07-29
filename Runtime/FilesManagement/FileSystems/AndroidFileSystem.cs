@@ -21,7 +21,7 @@ namespace Padoru.Core.Files
             protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
         }
         
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             var requestUri = GetRequestUri(uri);
             var uwr = UnityWebRequest.Get(requestUri);
@@ -29,9 +29,9 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (token.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    token.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
                 
                 await Task.Yield();
@@ -40,7 +40,7 @@ namespace Padoru.Core.Files
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var requestUri = GetRequestUri(uri);
 			
@@ -49,9 +49,9 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (token.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    token.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
                 
                 await Task.Yield();
@@ -66,7 +66,7 @@ namespace Padoru.Core.Files
             return new File<byte[]>(uri, manifestData);
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken token = default)
+        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
         {
             var path = GetFullPath(file.Uri);
 
@@ -74,10 +74,10 @@ namespace Padoru.Core.Files
             
             Directory.CreateDirectory(directory);
 
-            await File.WriteAllBytesAsync(path, file.Data, token);
+            await File.WriteAllBytesAsync(path, file.Data, cancellationToken);
         }
 
-        public Task Delete(string uri, CancellationToken token = default)
+        public Task Delete(string uri, CancellationToken cancellationToken)
         {
             var path = GetFullPath(uri);
 

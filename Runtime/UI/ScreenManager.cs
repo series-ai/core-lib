@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -33,12 +34,12 @@ namespace Padoru.Core
             this.parentCanvas = parentCanvas;
         }
 
-        public async Task ShowScreen(TScreenId id)
+        public async Task ShowScreen(TScreenId id, CancellationToken cancellationToken)
         {
-            await ShowScreen(id, parentCanvas.transform);
+            await ShowScreen(id, parentCanvas.transform, cancellationToken);
         }
 
-        public async Task ShowScreen(TScreenId id, Transform parent)
+        public async Task ShowScreen(TScreenId id, Transform parent, CancellationToken cancellationToken)
         {
             if (id == null)
             {
@@ -71,10 +72,10 @@ namespace Padoru.Core
             activeScreens.Add(id);
             screens.Add(id, screen);
             
-            await screen.Show();
+            await screen.Show(cancellationToken);
         }
 
-        public async Task CloseScreen(TScreenId id)
+        public async Task CloseScreen(TScreenId id, CancellationToken cancellationToken)
         {
             if (id == null)
             {
@@ -89,7 +90,7 @@ namespace Padoru.Core
             var screen = screens[id];
             activeScreens.Remove(id);
             screens.Remove(id);
-            await screen.Close();
+            await screen.Close(cancellationToken);
         }
 
         /// <summary>
@@ -97,14 +98,19 @@ namespace Padoru.Core
         /// </summary>
         /// <param name="id">The id of the screen to show</param>
         /// <returns></returns>
-        public async Task CloseAndShowScreen(TScreenId id)
+        public async Task CloseAndShowScreen(TScreenId id, CancellationToken cancellationToken)
         {
             if (CurrentActiveScreen != null)
             {
-                await CloseScreen(CurrentActiveScreen);
+                await CloseScreen(CurrentActiveScreen, cancellationToken);
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
             }
             
-            await ShowScreen(id);
+            await ShowScreen(id, cancellationToken);
         }
 
         public bool IsScreenOpened(TScreenId id)
@@ -112,13 +118,18 @@ namespace Padoru.Core
             return activeScreens.Contains(id);
         }
 
-        public async void Clear()
+        public async Task Clear(CancellationToken cancellationToken)
         {
             var screensList = screens.Keys.ToList();
 
             for (var i = screensList.Count - 1; i >= 0; i--)
             {
-                await CloseScreen(screensList[i]);
+                await CloseScreen(screensList[i], cancellationToken);
+                
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
             }
         }
     }

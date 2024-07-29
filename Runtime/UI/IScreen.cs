@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Padoru.Core
 {
     public interface IScreen
     {
-        Task Show();
+        Task Show(CancellationToken cancellationToken);
 
-        Task Close();
+        Task Close(CancellationToken cancellationToken);
     }
 }
