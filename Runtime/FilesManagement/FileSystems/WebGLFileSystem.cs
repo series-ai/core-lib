@@ -38,13 +38,11 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                
+                cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }
+            
+            cancellationToken.ThrowIfCancellationRequested();
 
             return uwr.result == UnityWebRequest.Result.Success;
         }
@@ -65,13 +63,11 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                
+                cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }
+            
+            cancellationToken.ThrowIfCancellationRequested();
             
             if (uwr.result == UnityWebRequest.Result.Success) 
             {
