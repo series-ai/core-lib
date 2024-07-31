@@ -24,14 +24,14 @@ namespace Padoru.Core.Files
 			this.importSettings = importSettings;
 		}
 		
-		public Task<bool> Exists(string uri, CancellationToken token = default)
+		public Task<bool> Exists(string uri, CancellationToken cancellationToken)
 		{
 			var filePath = GetFullPath(uri);
 
 			return Task.FromResult(File.Exists(filePath));
 		}
 
-		public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
+		public async Task<object> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
 		{
 			var requestUri = GetRequestUri(uri);
         
@@ -42,7 +42,7 @@ namespace Padoru.Core.Files
  
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
-				await wr.SendWebRequest().AsTask(coroutineProxy, token);
+				await wr.SendWebRequest().AsTask(coroutineProxy, cancellationToken);
 				if (wr.responseCode == 200) 
 				{
 					return dh.audioClip;
@@ -56,12 +56,12 @@ namespace Padoru.Core.Files
 			return null;
 		}
 
-		public Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default)
+		public Task<File<T>> Write<T>(string uri, T value, CancellationToken cancellationToken)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public Task Delete(string uri, CancellationToken token = default)
+		public Task Delete(string uri, CancellationToken cancellationToken)
 		{
 			throw new System.NotImplementedException();
 		}

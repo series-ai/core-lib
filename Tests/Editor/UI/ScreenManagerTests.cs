@@ -60,7 +60,7 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
 
-            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId, default));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
 
-            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId, default));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace Padoru.Core.Tests
             var screenId = TestScreenId.Test;
             var screenManager = new ScreenManager<TestScreenId>();
 
-            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.ShowScreen(screenId, default));
         }
         
         [Test]
@@ -92,8 +92,8 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
+            await screenManager.ShowScreen(screenId, default);
             
             LogAssert.Expect(LogType.Warning, new Regex(string.Empty));
         }
@@ -106,10 +106,10 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
-            screenManager.Clear();
+            await screenManager.ShowScreen(screenId, default);
+            await screenManager.Clear(default);
             
-            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.ShowScreen(screenId, default));
         }
 
         [Test]
@@ -120,9 +120,9 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
             
-            Assert.DoesNotThrow(async () => await screenManager.CloseScreen(screenId));
+            Assert.DoesNotThrow(async () => await screenManager.CloseScreen(screenId, default));
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
             
-            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId, default));
         }
 
         [Test]
@@ -145,11 +145,11 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
             
-            screenManager.Clear();
+            await screenManager.Clear(default);
             
-            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId));
+            Assert.Throws<Exception>(async () => await screenManager.CloseScreen(screenId, default));
         }
 
         [Test]
@@ -161,9 +161,9 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
 
-            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId2, default)); 
         }
 
         [Test]
@@ -175,7 +175,7 @@ namespace Padoru.Core.Tests
             
             screenManager.Init(provider, parentCanvas);
 
-            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId)); 
+            Assert.DoesNotThrow(async () => await screenManager.CloseAndShowScreen(screenId, default)); 
         }
         
         [Test]
@@ -186,9 +186,9 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(null, parentCanvas);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
 
-            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2, default)); 
         }
         
         [Test]
@@ -200,9 +200,9 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
+            await screenManager.ShowScreen(screenId, default);
 
-            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2, default)); 
         }
         
         [Test]
@@ -214,10 +214,10 @@ namespace Padoru.Core.Tests
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
-            await screenManager.ShowScreen(screenId);
-            screenManager.Clear();
+            await screenManager.ShowScreen(screenId, default);
+            await screenManager.Clear(default);
 
-            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2)); 
+            Assert.Throws<Exception>(async () => await screenManager.CloseAndShowScreen(screenId2, default)); 
         }
     }
 }

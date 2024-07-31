@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace Padoru.Core.Files
 			this.importSettings = importSettings;
 		}
 
-		public Task<byte[]> Serialize(object value)
+		public Task<byte[]> Serialize(object value, CancellationToken cancellationToken)
 		{
 			var sprite = (Sprite) value;
 			var texture = sprite.texture;
@@ -33,7 +34,7 @@ namespace Padoru.Core.Files
 			return Task.FromResult(bytes);
 		}
 
-		public Task<object> Deserialize(Type type, byte[] bytes, string uri)
+		public Task<object> Deserialize(Type type, byte[] bytes, string uri, CancellationToken cancellationToken)
 		{
 			var textureName = fileNameGenerator.GetName(uri);
 

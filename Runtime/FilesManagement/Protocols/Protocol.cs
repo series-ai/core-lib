@@ -15,61 +15,61 @@ namespace Padoru.Core.Files
             this.fileSystem = fileSystem;
         }
         
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
 
-            return await fileSystem.Exists(uri, token);
+            return await fileSystem.Exists(uri, cancellationToken);
         }
 
-        public async Task<object> Read<T>(string uri, string version = null, CancellationToken token = default)
+        public async Task<object> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
                 
-            var file = await fileSystem.Read(uri, version, token);
+            var file = await fileSystem.Read(uri, cancellationToken, version);
                     
             var bytes = file.Data;
 
-            var result = await serializer.Deserialize(typeof(T), bytes, uri);
+            var result = await serializer.Deserialize(typeof(T), bytes, uri, cancellationToken);
 
             return result;
         }
 
-        public async Task<File<T>> Write<T>(string uri, T value, CancellationToken token = default)
+        public async Task<File<T>> Write<T>(string uri, T value, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
                 
-            var bytes = await serializer.Serialize(value);
+            var bytes = await serializer.Serialize(value, cancellationToken);
 
             var newFile = new File<byte[]>(uri, bytes);
 
-            await fileSystem.Write(newFile, token);
+            await fileSystem.Write(newFile, cancellationToken);
 
             return new File<T>(uri, value);
         }
 
-        public async Task Delete(string uri, CancellationToken token = default)
+        public async Task Delete(string uri, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
                 
-            if (!await fileSystem.Exists(uri, token))
+            if (!await fileSystem.Exists(uri, cancellationToken))
             {
                 throw new Exception($"Cannot delete file because it does not exists: {uri}");
             }
             
-            await fileSystem.Delete(uri, token);
+            await fileSystem.Delete(uri, cancellationToken);
         }
     }
 }

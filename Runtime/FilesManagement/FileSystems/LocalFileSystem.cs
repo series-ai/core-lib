@@ -15,14 +15,14 @@ namespace Padoru.Core.Files
             this.basePath = basePath;
         }
 
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             var path = GetFullPath(uri);
 
             return await Task.FromResult(File.Exists(path));
         }
 
-        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var path = GetFullPath(uri);
 
@@ -35,7 +35,7 @@ namespace Padoru.Core.Files
 
                 while (remaining > 0)
                 {
-                    bytesRead = await fileStream.ReadAsync(bytes, offset, remaining, token);
+                    bytesRead = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken);
 
                     if (bytesRead == 0)
                     {
@@ -50,7 +50,7 @@ namespace Padoru.Core.Files
             }
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken token = default)
+        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
         {
             var path = GetFullPath(file.Uri);
 
@@ -60,11 +60,11 @@ namespace Padoru.Core.Files
             
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
             {
-                await fs.WriteAsync(file.Data, 0, file.Data.Length, token);
+                await fs.WriteAsync(file.Data, 0, file.Data.Length, cancellationToken);
             }
         }
 
-        public Task Delete(string uri, CancellationToken token = default)
+        public Task Delete(string uri, CancellationToken cancellationToken)
         {
             var path = GetFullPath(uri);
 

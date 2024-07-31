@@ -25,7 +25,7 @@ namespace Padoru.Core.Files
             protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
         }
         
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             if (files.ContainsKey(uri))
             {
@@ -38,18 +38,16 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (token.IsCancellationRequested)
-                {
-                    token.ThrowIfCancellationRequested();
-                }
-                
+                cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }
+            
+            cancellationToken.ThrowIfCancellationRequested();
 
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (files.ContainsKey(uri))
             {
@@ -65,13 +63,11 @@ namespace Padoru.Core.Files
 
             while (!request.isDone)
             {
-                if (token.IsCancellationRequested)
-                {
-                    token.ThrowIfCancellationRequested();
-                }
-                
+                cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }
+            
+            cancellationToken.ThrowIfCancellationRequested();
             
             if (uwr.result == UnityWebRequest.Result.Success) 
             {
@@ -82,14 +78,14 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken token = default)
+        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
         {
             files[file.Uri] = file;
 
             await Task.CompletedTask;
         }
 
-        public async Task Delete(string uri, CancellationToken token = default)
+        public async Task Delete(string uri, CancellationToken cancellationToken)
         {
             if (!files.ContainsKey(uri))
             {

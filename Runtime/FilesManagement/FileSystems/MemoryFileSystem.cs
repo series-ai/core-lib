@@ -9,12 +9,12 @@ namespace Padoru.Core.Files
     {
         private readonly Dictionary<string, File<byte[]>> files = new();
 
-        public async Task<bool> Exists(string uri, CancellationToken token = default)
+        public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             return await Task.FromResult(files.ContainsKey(uri));
         }
 
-        public async Task<File<byte[]>> Read(string uri, string version = null, CancellationToken token = default)
+        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (files.TryGetValue(uri, out var file))
             {
@@ -24,14 +24,14 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not find file. Uri {uri}");
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken token = default)
+        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
         {
             files[file.Uri] = file;
 
             await Task.CompletedTask;
         }
 
-        public async Task Delete(string uri, CancellationToken token = default)
+        public async Task Delete(string uri, CancellationToken cancellationToken)
         {
             if (!files.ContainsKey(uri))
             {

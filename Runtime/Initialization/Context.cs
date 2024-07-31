@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Padoru.Core.ActionRouter;
 using UnityEngine;
@@ -17,11 +18,14 @@ namespace Padoru.Core
         [SerializeField] private InitializationStage[] initializationStages;
 
         public bool IsInitialized { get; private set; }
-        
         public float InitializationPercentage { get; private set; }
 
+        private CancellationTokenSource cancellationTokenSource;
+        
         public event Action<long> OnInitializationFinish;
-        public event Action<float> OnInitializationStageFinished; 
+        public event Action<float> OnInitializationStageFinished;
+        
+        
         private async void Awake()
         {
             if (registerOnLocator)
@@ -30,6 +34,8 @@ namespace Padoru.Core
                 
                 Locator.Register<Context>(this, gameObject.scene.name);
             }
+
+            cancellationTokenSource = new CancellationTokenSource();
             
             if (initializeOnAwake)
             {
@@ -44,10 +50,11 @@ namespace Padoru.Core
                 Locator.Unregister<Context>(gameObject.scene.name);
             }
 
-            if (IsInitialized)
-            {
-                Shutdown();
-            }
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = null;
+            
+            Shutdown();
         }
 
         public async Task Init()
@@ -74,19 +81,28 @@ namespace Padoru.Core
             sb.Append($"Context {name} initialization finished. Report:");
             sb.Append(Environment.NewLine);
 
-            for (int i = 0; i < initializationStages.Length; i++)
+            try
             {
-                var stage = initializationStages[i];
+                for (var i = 0; i < initializationStages.Length; i++)
+                {
+                    var stage = initializationStages[i];
                 
-                await stage.Init(sb);
+                    await stage.Init(sb, cancellationTokenSource.Token);
 
-                InitializationPercentage = (i + 1f) / initializationStages.Length;
-                OnInitializationStageFinished?.Invoke(InitializationPercentage);
+                    InitializationPercentage = (i + 1f) / initializationStages.Length;
+                    OnInitializationStageFinished?.Invoke(InitializationPercentage);
+                }
+
+                watch.Stop();
+                sb.Append($"Total initialization time: {watch.ElapsedMilliseconds}. " +
+                          $"Keep in mind some modules might be initialized in parallel");
             }
-
-            watch.Stop();
-            sb.Append($"Total initialization time: {watch.ElapsedMilliseconds}. " +
-                      $"Keep in mind some modules might be initialized in parallel");
+            catch (Exception)
+            {
+                watch.Stop();
+                sb.Append($"Context initialization interrupted.");
+                throw;
+            }
             
             Debug.Log(sb, gameObject);
 
@@ -96,15 +112,9 @@ namespace Padoru.Core
 
         public void Shutdown()
         {
-            if (!IsInitialized)
+            foreach (var stage in initializationStages)
             {
-                throw new Exception($"Trying to shutdown context when not initialized: {gameObject.name}");
-            }
-
-            var shutdownables = GetComponentsInChildren<IShutdowneable>();
-            foreach (var item in shutdownables)
-            {
-                item.Shutdown();
+                stage.Shutdown();
             }
             
             try
