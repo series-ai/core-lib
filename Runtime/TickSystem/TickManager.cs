@@ -9,9 +9,11 @@ namespace Padoru.Core
 
 		private void Update()
 		{
-			foreach (var tickable in tickables)
+			// Use a for loop instead a foreach loop to avoid:
+			// InvalidOperationException: Collection was modified; enumeration operation may not execute.
+			for (int i = 0; i < tickables.Count; i++)
 			{
-				tickable.Tick(Time.deltaTime);
+				tickables[i].Tick(Time.deltaTime);
 			}
 		}
 
