@@ -17,7 +17,7 @@ namespace Padoru.Core
 		
 		public string GetStatText()
 		{
-			return "-------------------------------------------FPS: " + currentFpsCount;
+			return "FPS: " + currentFpsCount;
 		}
 
 		public void Dispose()

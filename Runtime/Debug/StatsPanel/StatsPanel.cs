@@ -3,32 +3,31 @@ using UnityEngine;
 
 namespace Padoru.Core
 {
-	// TODO: Make width dynamic as well as height
-	// TODO: Make it so it does not go off screen
-	// TODO: Make this screen look better
-	// TODO: Make it so we can toggle this with a key
-	// TODO: Make it so this always appears in development builds and editor only
-	// TODO: Make it so we have configs to set the default state (enabled/disabled)
-	// TODO: Make it so there is a padoru context with this and some other basic stuff.
-	
 	public class StatsPanel : IGUIItem
 	{
 		private const string STATS_WINDOW_NAME = "Stats";
-		private const int WINDOW_X_PADDING = 20;
+		private const int WINDOW_PADDING = 20;
+		
+		private static readonly Vector2 StartingPos = new (10, 10);
 
 		private readonly List<IStatDisplay> statDisplays;
 		private readonly IGUIManager guiManager;
+		private readonly KeyCode toggleKey;
 		
 		private Rect windowRect;
 		private bool isDragging;
 		private Vector2 dragStartPos;
-
-		public StatsPanel(List<IStatDisplay> statDisplays, IGUIManager guiManager, Rect windowRect)
+		private bool isVisible;
+		
+		public StatsPanel(List<IStatDisplay> statDisplays, IGUIManager guiManager, bool isVisible, KeyCode toggleKey)
 		{
 			this.statDisplays = statDisplays;
 			this.guiManager = guiManager;
-			this.windowRect = windowRect;
+			this.isVisible = isVisible;
+			this.toggleKey = toggleKey;
 
+			windowRect = new Rect(StartingPos, Vector2.zero);
+			
 			guiManager.Register(this);
 		}
 
@@ -39,24 +38,42 @@ namespace Padoru.Core
 
 		public void OnGUI()
 		{
+			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == toggleKey)
+			{
+				isVisible = !isVisible;
+			}
+
+			if (!isVisible)
+			{
+				return;
+			}
+			
+			var maxWidth = 0f;
+			var totalHeight = 0f;
+			var style = GUI.skin.label;
+
+			foreach (var statDisplay in statDisplays)
+			{
+				var statText = statDisplay.GetStatText();
+				var labelSize = style.CalcSize(new GUIContent(statText));
+				maxWidth = Mathf.Max(maxWidth, labelSize.x);
+				totalHeight += labelSize.y;
+			}
+
+			windowRect.width = maxWidth + WINDOW_PADDING;
+			windowRect.height = totalHeight + WINDOW_PADDING;
+
 			windowRect = GUILayout.Window(0, windowRect, DrawWindow, STATS_WINDOW_NAME);
 			HandleDragging();
 		}
 
 		private void DrawWindow(int windowID)
 		{
-			var maxLabelWidth = 0f;
-			var style = GUI.skin.label;
-			
 			foreach (var statDisplay in statDisplays)
 			{
-				var statText = statDisplay.GetStatText();
-				var labelSize = style.CalcSize(new GUIContent(statText));
-				maxLabelWidth = Mathf.Max(maxLabelWidth, labelSize.x);
-				GUILayout.Label(statText);
+				GUILayout.Label(statDisplay.GetStatText());
 			}
-
-			windowRect.width = maxLabelWidth + WINDOW_X_PADDING; // Adding some padding
+			
 			GUI.DragWindow(); // This ensures that the window is draggable
 		}
 		
