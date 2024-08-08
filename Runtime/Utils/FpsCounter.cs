@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Padoru.Core.Utils
 {
-    public class FpsCounter : ITickable, IShutdowneable
+    public class FpsCounter : ITickable, IDisposable
     {
         private readonly ITickManager tickManager;
     
@@ -29,7 +29,7 @@ namespace Padoru.Core.Utils
             OnFpsChanged?.Invoke(fps.ToString());
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             tickManager.Unregister(this);
         }
