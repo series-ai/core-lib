@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace Padoru.Core
 {
-	public class StatsPanel : IGUIItem
+	public class InfoPanel : IGUIItem
 	{
-		private const string STATS_WINDOW_NAME = "Stats";
+		private const string STATS_WINDOW_NAME = "Info";
 		private const int WINDOW_PADDING = 20;
 		
 		private static readonly Vector2 StartingPos = new (10, 10);
 
-		private readonly List<IStatDisplay> statDisplays;
+		private readonly List<IInfoDisplay> statDisplays;
 		private readonly IGUIManager guiManager;
 		private readonly KeyCode toggleKey;
 		
@@ -19,7 +19,7 @@ namespace Padoru.Core
 		private Vector2 dragStartPos;
 		private bool isVisible;
 		
-		public StatsPanel(List<IStatDisplay> statDisplays, IGUIManager guiManager, bool isVisible, KeyCode toggleKey)
+		public InfoPanel(List<IInfoDisplay> statDisplays, IGUIManager guiManager, bool isVisible, KeyCode toggleKey)
 		{
 			this.statDisplays = statDisplays;
 			this.guiManager = guiManager;
@@ -54,7 +54,7 @@ namespace Padoru.Core
 
 			foreach (var statDisplay in statDisplays)
 			{
-				var statText = statDisplay.GetStatText();
+				var statText = statDisplay.GetInfoText();
 				var labelSize = style.CalcSize(new GUIContent(statText));
 				maxWidth = Mathf.Max(maxWidth, labelSize.x);
 				totalHeight += labelSize.y;
@@ -71,7 +71,7 @@ namespace Padoru.Core
 		{
 			foreach (var statDisplay in statDisplays)
 			{
-				GUILayout.Label(statDisplay.GetStatText());
+				GUILayout.Label(statDisplay.GetInfoText());
 			}
 			
 			GUI.DragWindow(); // This ensures that the window is draggable

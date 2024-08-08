@@ -3,28 +3,28 @@ using UnityEngine;
 
 namespace Padoru.Core
 {
-	public class StatsPanelInitializer : MonoBehaviour, IInitializable, IShutdowneable
+	public class InfoPanelInitializer : MonoBehaviour, IInitializable, IShutdowneable
 	{
 		[SerializeField] private KeyCode toggleKey = KeyCode.S;
 		[SerializeField] private bool startsEnabled;
 		
-		private StatsPanel statsPanel;
+		private InfoPanel infoPanel;
 		
 		public void Init()
 		{
 			var guiManager = Locator.Get<IGUIManager>();
 			
-			var statDisplays = new List<IStatDisplay>()
+			var statDisplays = new List<IInfoDisplay>()
 			{
-				new FpsStatDisplay(Locator.Get<ITickManager>()),
+				new FpsInfoDisplay(Locator.Get<ITickManager>()),
 			};
 			
-			statsPanel = new StatsPanel(statDisplays, guiManager, startsEnabled, toggleKey);
+			infoPanel = new InfoPanel(statDisplays, guiManager, startsEnabled, toggleKey);
 		}
 
 		public void Shutdown()
 		{
-			statsPanel.Dispose();
+			infoPanel.Dispose();
 		}
 	}
 }

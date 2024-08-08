@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace Padoru.Core
 {
-	public class FpsStatDisplay : IStatDisplay
+	public class FpsInfoDisplay : IInfoDisplay
 	{
 		private readonly FpsCounter fpsCounter;
 
 		private string currentFpsCount = "0";
 
-		public FpsStatDisplay(ITickManager tickManager)
+		public FpsInfoDisplay(ITickManager tickManager)
 		{
 			fpsCounter = new FpsCounter(tickManager);
 			fpsCounter.OnFpsChanged += OnFpsChanged;
 		}
 		
-		public string GetStatText()
+		public string GetInfoText()
 		{
 			return "FPS: " + currentFpsCount;
 		}
