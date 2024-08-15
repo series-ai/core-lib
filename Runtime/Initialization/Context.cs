@@ -38,6 +38,8 @@ namespace Padoru.Core
         {
             if (registerOnLocator)
             {
+                Debug.Log($"Context unregistered with tag '{gameObject.scene.name}'", DebugChannels.APP_LIFE_CYCLE);
+                
                 Locator.Unregister<Context>(gameObject.scene.name);
             }
 
