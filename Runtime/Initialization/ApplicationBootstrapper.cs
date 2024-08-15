@@ -16,16 +16,21 @@ namespace Padoru.Core
 
             if(settings == null)
             {
-                Debug.LogError($"Failed to initialize application. Could not find settings object.");
+                Debug.LogError("Failed to initialize application. Could not find settings object.", DebugChannels.APP_LIFE_CYCLE);
                 return;
             }
 
             ConfigLog(settings);
 
-            if (ShouldInitializeFramework(settings))
+            if (!ShouldInitializeFramework(settings))
             {
-                await SetupProjectContext(settings);
+                Debug.Log("Will not initialize Padoru Framework because the current scene is not added to the settings.");
+                return;
             }
+            
+            await SetupProjectContext(settings);
+
+            InitializeGameFsm(settings);
         }
 
         private static void ConfigLog(Settings settings)
@@ -36,23 +41,36 @@ namespace Padoru.Core
 
         private static async Task SetupProjectContext(Settings settings)
         {
-            var projectContextPrefab = Resources.Load<Context>(settings.ProjectContextPrefabName);
+            var projectContextPrefab = Resources.Load<Context>(settings.projectContextPrefabName);
 
             if (projectContextPrefab == null)
             {
-                Debug.LogError("Could not find ProjectContext.");
+                Debug.LogError("Could not find ProjectContext.", DebugChannels.APP_LIFE_CYCLE);
                 return;
             }
 
-            Debug.Log($"Instantiating ProjectContext");
+            Debug.Log("Instantiating ProjectContext", DebugChannels.APP_LIFE_CYCLE);
             var projectContext = Object.Instantiate(projectContextPrefab);
             Object.DontDestroyOnLoad(projectContext);
 
-            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}");
-            Locator.Register(projectContext, settings.ProjectContextPrefabName);
+            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.projectContextPrefabName}", DebugChannels.APP_LIFE_CYCLE);
+            Locator.Register(projectContext, settings.projectContextPrefabName);
 
-            Debug.Log($"Initializing ProjectContext");
+            Debug.Log("Initializing ProjectContext", DebugChannels.APP_LIFE_CYCLE);
             await projectContext.Init();
+        }
+
+        private static void InitializeGameFsm(Settings settings)
+        {
+            Debug.Log("Initializing GameFSM", DebugChannels.APP_LIFE_CYCLE);
+            
+            var fsmInitializer = new GameFsmInitializer(settings);
+            
+            var fsm = fsmInitializer.Init();
+            
+            Locator.Register(fsm, Constants.GAME_FSM_TAG);
+            
+            Debug.Log($"GameFSM registered under tag '{Constants.GAME_FSM_TAG}' and type '{fsm.GetType()}'", DebugChannels.APP_LIFE_CYCLE);
         }
 
         private static bool ShouldInitializeFramework(Settings settings)

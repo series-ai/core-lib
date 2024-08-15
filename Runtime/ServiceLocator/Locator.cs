@@ -56,6 +56,16 @@ namespace Padoru.Core
 			return serviceLocator.GetAll<T>();
 		}
 
+		public static bool Has<T>()
+		{
+			return serviceLocator.Has<T>();
+		}
+
+		public static bool Has<T>(string tag)
+		{
+			return serviceLocator.Has<T>(tag);
+		}
+
 		public static void Clear()
 		{
 			serviceLocator.Clear();

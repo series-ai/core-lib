@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using NUnit.Framework.Internal;
 
 namespace Padoru.Core.Tests
 {
@@ -7,12 +8,15 @@ namespace Padoru.Core.Tests
     {
         private FSM<TestStates, TestTriggers> fsm;
         private TestStates startState = TestStates.State1;
+        private TestStates[] allStates;
 
         [OneTimeSetUp]
         public void Setup()
         {
             var tickManager = new MockTickManager();
             Locator.Register<ITickManager>(tickManager);
+
+            allStates = (TestStates[])Enum.GetValues(typeof(TestStates));
         }
 
         [OneTimeTearDown]
@@ -24,7 +28,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void StartFSM_WhenNotStarted_InitialStateShouldBeTheOneSet()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.Start();
 
             Assert.AreEqual(fsm.CurrentStateId, startState);
@@ -33,7 +37,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void StartFSM_WhenNotStarted_ShouldBeActive()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.Start();
 
             Assert.IsTrue(fsm.IsActive);
@@ -42,7 +46,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void StartFSM_WhenStarted_ShouldThrowException()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.Start();
 
             Assert.Throws<Exception>(fsm.Start);
@@ -51,7 +55,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void StopFSM_WhenStarted_ShouldNotBeActive()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.Start();
             fsm.Stop();
 
@@ -61,7 +65,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void StopFSM_WhenNotStarted_ShouldThrowException()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
 
             Assert.Throws<Exception>(fsm.Stop);
         }
@@ -69,7 +73,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void AddTransition_WhenNotAdded_ShouldNotThrow()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
 
             Assert.DoesNotThrow(() => fsm.AddTransition(TestStates.State1, TestStates.State2, TestTriggers.Trigger1));
         }
@@ -77,7 +81,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void AddTransition_WhenAdded_ShouldThrow()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.AddTransition(TestStates.State1, TestStates.State2, TestTriggers.Trigger1);
 
             Assert.Throws<Exception>(() => fsm.AddTransition(TestStates.State1, TestStates.State2, TestTriggers.Trigger1));
@@ -86,7 +90,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void GetState_WhenFSMCreated_ShouldNotThrowOrBeNull()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
 
             var stateIds = Enum.GetValues(typeof(TestStates));
             foreach (var stateId in stateIds)
@@ -101,7 +105,7 @@ namespace Padoru.Core.Tests
         {
             var targetState = TestStates.State2;
 
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.AddTransition(TestStates.State1, targetState, TestTriggers.Trigger1);
             fsm.Start();
 
@@ -112,7 +116,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void SetTrigger_WhenUnregistered_ShouldNotTransition()
         {
-            fsm = new FSM<TestStates, TestTriggers>(startState);
+            fsm = new FSM<TestStates, TestTriggers>(startState, allStates);
             fsm.Start();
 
             Assert.DoesNotThrow(() => fsm.SetTrigger(TestTriggers.Trigger1));

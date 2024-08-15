@@ -5,12 +5,13 @@ using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
-	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger> where TState : Enum where TTrigger : Enum
+	public class FSM<TState, TTrigger> : ITickable, IFSM<TState, TTrigger>
 	{
 		private readonly Dictionary<TState, State> states;
 		private readonly List<Transition<TState, TTrigger>> transitions;
 		private readonly Dictionary<TState, StateCallbacksReceiver> stateCallbacksReceivers;
 		private readonly TState initialStateId;
+		private readonly string debugChannel;
 		private readonly ITickManager tickManager;
 
 		private State currentState;
@@ -20,19 +21,20 @@ namespace Padoru.Core
 		public bool IsActive { get; private set; }
 		public IFSMProxy<TState, TTrigger> Proxy { get; }
 
-		public FSM(TState initialStateId, IFSMProxy<TState, TTrigger> proxy = null)
+		public FSM(TState initialStateId, IEnumerable<TState> stateIds, IFSMProxy<TState, TTrigger> proxy = null, string debugChannel = null)
 		{
 			states = new();
 			transitions = new();
 			stateCallbacksReceivers = new();
 
 			this.initialStateId = initialStateId;
+			this.debugChannel = debugChannel ?? DebugChannels.DEFAULT;
 
 			Proxy = proxy ?? new FSMProxy<TState, TTrigger>(this);
 
 			tickManager = Locator.Get<ITickManager>();
 
-			CreateStates();
+			CreateStates(stateIds);
 		}
 
 		public void Start()
@@ -89,7 +91,7 @@ namespace Padoru.Core
 				throw new Exception("Could not add transition, it was already registered");
 			}
 
-			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'");
+			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'", debugChannel);
 
 			transitions.Add(transition);
 		}
@@ -101,7 +103,7 @@ namespace Padoru.Core
 
 		public void SetTrigger(TTrigger trigger)
 		{
-			Debug.Log($"Trigger set {trigger}");
+			Debug.Log($"Trigger set {trigger}", debugChannel);
 			foreach (var transition in transitions)
 			{
 				if (!ShouldTransition(transition, trigger))
@@ -115,7 +117,7 @@ namespace Padoru.Core
 
 		public void SetState(TState stateId)
 		{
-			Debug.Log($"State set {stateId}");
+			Debug.Log($"State set {stateId}", debugChannel);
 			
 			ChangeState(stateId);
 		}
@@ -160,21 +162,20 @@ namespace Padoru.Core
 			return false;
 		}
 
-		private void CreateStates()
+		private void CreateStates(IEnumerable<TState> stateIds)
 		{
 			var sb = new StringBuilder();
 			sb.Append("Created FSM with states:");
 
-			var stateIds = Enum.GetValues(typeof(TState));
 			foreach (var stateId in stateIds)
 			{
-				var state = new State(stateId.ToString());
-				states.Add((TState)stateId, state);
+				var state = new State(stateId.ToString(), debugChannel);
+				states.Add(stateId, state);
 				sb.Append(Environment.NewLine);
 				sb.Append($" {stateId}");
 			}
 
-			Debug.Log(sb);
+			Debug.Log(sb, debugChannel);
 		}
 
 		private void ChangeState(TState stateId)

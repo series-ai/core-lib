@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
@@ -36,6 +37,8 @@ namespace Padoru.Core
             var initializable = module.GetComponent<IInitializable>();
             if (initializable != null)
             {
+                Debug.Log($"{initializable.GetType()}.Init()", DebugChannels.APP_LIFE_CYCLE);
+                
                 initializable.Init();
             }
             else
@@ -43,6 +46,8 @@ namespace Padoru.Core
                 var initializableAsync = module.GetComponent<IInitializableAsync>();
                 if (initializableAsync != null)
                 {
+                    Debug.Log($"{initializableAsync.GetType()}.Init()", DebugChannels.APP_LIFE_CYCLE);
+                    
                     await initializableAsync.Init();
                 }
             }

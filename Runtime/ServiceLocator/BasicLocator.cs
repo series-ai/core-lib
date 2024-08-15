@@ -121,6 +121,18 @@ namespace Padoru.Core
 			return servicesOfTypeT;
 		}
 
+		public bool Has<T>()
+		{
+			var type = typeof(T);
+			return services.ContainsKey(type);
+		}
+
+		public bool Has<T>(string tag)
+		{
+			var type = typeof(T);
+			return taggedServices.ContainsKey((tag, type));
+		}
+
 		public void Clear()
 		{
 			services.Clear();

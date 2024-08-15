@@ -23,9 +23,9 @@ namespace Padoru.Core
         {
             if (registerOnLocator)
             {
-                Debug.Log($"Context registered with tag '{gameObject.scene.name}'");
+                Debug.Log($"Context registered with tag '{gameObject.scene.name}'", DebugChannels.APP_LIFE_CYCLE);
                 
-                Locator.Register<Context>(this, gameObject.scene.name);
+                Locator.Register(this, gameObject.scene.name);
             }
             
             if (initializeOnAwake)
@@ -38,6 +38,8 @@ namespace Padoru.Core
         {
             if (registerOnLocator)
             {
+                Debug.Log($"Context unregistered with tag '{gameObject.scene.name}'", DebugChannels.APP_LIFE_CYCLE);
+                
                 Locator.Unregister<Context>(gameObject.scene.name);
             }
 
@@ -61,18 +63,16 @@ namespace Padoru.Core
             sb.Append($"Context {name} initialization finished. Report:");
             sb.Append(Environment.NewLine);
 
-            for (int i = 0; i < initializationStages.Length; i++)
+            foreach (var stage in initializationStages)
             {
-                var stage = initializationStages[i];
-                
                 await stage.Init(sb);
             }
 
             watch.Stop();
             sb.Append($"Total initialization time: {watch.ElapsedMilliseconds}. " +
-                      $"Keep in mind some modules might be initialized in parallel");
+                      "Keep in mind some modules might be initialized in parallel");
             
-            Debug.Log(sb, gameObject);
+            Debug.Log(sb, DebugChannels.APP_LIFE_CYCLE, gameObject);
 
             IsInitialized = true;
             OnInitializationFinish?.Invoke(watch.ElapsedMilliseconds);
@@ -88,12 +88,14 @@ namespace Padoru.Core
             var shutdownables = GetComponentsInChildren<IShutdowneable>();
             foreach (var item in shutdownables)
             {
+                Debug.Log($"{item.GetType()}.Shutdown()", DebugChannels.APP_LIFE_CYCLE);
+                
                 item.Shutdown();
             }
 
             IsInitialized = false;
 
-            Debug.Log($"Context shutdown: {gameObject.name}", gameObject);
+            Debug.Log($"Context shutdown: {gameObject.name}", DebugChannels.APP_LIFE_CYCLE, gameObject);
         }
     }
 }
