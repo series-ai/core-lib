@@ -15,6 +15,8 @@ namespace Padoru.Core
         
         private FSM<string, string> fsm;
         private string startingState;
+        private bool isFirstSceneLoad = true;
+        private string expectedSceneName;
 
         public GameFsmInitializer(Settings settings)
         {
@@ -83,7 +85,9 @@ namespace Padoru.Core
             var currentSceneName = SceneManager.GetActiveScene().name;
             var comesFromDifferentScene = currentSceneName != nextSceneName;
             
-            if (!comesFromDifferentScene)
+            expectedSceneName = nextSceneName;
+            
+            if (!comesFromDifferentScene && isFirstSceneLoad)
             {
                 var scene = SceneManager.GetSceneByName(nextSceneName);
                 
@@ -95,10 +99,21 @@ namespace Padoru.Core
                 
                 SceneManager.LoadScene(nextSceneName);
             }
+
+            isFirstSceneLoad = false;
         }
 
         private async void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
         {
+            // We set this to check OnSceneLoaded if the loaded scene is actually the one we are waiting for.
+            // This check is needed because on builds, when you launch the game, the first scene gets loaded after
+            // we subscribe to the SceneManager.sceneLoaded, but before it gets triggered by the scene we loaded,
+            // resulting in this method waiting forever on the context of a different scene
+            if (!scene.name.Equals(expectedSceneName))
+            {
+                return;
+            }
+            
             SceneManager.sceneLoaded -= OnSceneLoaded;
 
             try
