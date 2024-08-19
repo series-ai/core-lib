@@ -43,26 +43,22 @@ namespace Padoru.Core.Tests
             Assert.Throws<AggregateException>(() => Task.Run(context.Init).Wait());
         }
 
-        [UnityTest]
-        public IEnumerator ShutdownContext_WhenContextInitialized_ShouldNotBeInitialized()
+        [Test]
+        public async void ShutdownContext_WhenContextInitialized_ShouldNotBeInitialized()
         {
-            yield return null;
-
             var context = go.AddComponent<Context>();
-            context.Init();
+            await Task.Run(context.Init);
 
-            Assert.DoesNotThrow(context.Shutdown);
+            Assert.DoesNotThrow(() => Task.Run(context.Shutdown).Wait());
             Assert.IsFalse(context.IsInitialized);
         }
 
-        [UnityTest]
-        public IEnumerator ShutdownContext_WhenContextNotInitialized_ShouldThrowException()
+        [Test]
+        public async void ShutdownContext_WhenContextNotInitialized_ShouldThrowException()
         {
-            yield return null;
-
             var context = go.AddComponent<Context>();
 
-            Assert.Throws<Exception>(context.Shutdown);
+            Assert.Throws<AggregateException>(() => Task.Run(context.Shutdown).Wait());
         }
     }
 }

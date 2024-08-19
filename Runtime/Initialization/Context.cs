@@ -43,18 +43,18 @@ namespace Padoru.Core
             }
         }
 
-        private void OnDestroy()
+        private async void OnDestroy()
         {
             if (registerOnLocator)
             {
                 Locator.Unregister<Context>(gameObject.scene.name);
             }
-
+            
+            await Shutdown();
+            
             cancellationTokenSource?.Cancel();
             cancellationTokenSource?.Dispose();
             cancellationTokenSource = null;
-            
-            Shutdown();
         }
 
         public async Task Init()
@@ -110,11 +110,14 @@ namespace Padoru.Core
             OnInitializationFinish?.Invoke(watch.ElapsedMilliseconds);
         }
 
-        public void Shutdown()
+        public async Task Shutdown()
         {
-            foreach (var stage in initializationStages)
+            // Shutdown in reverse order so dependencies are shutdown
+            // before that which they depend on
+            for (int i=initializationStages.Length-1; i >=0; i--)
             {
-                stage.Shutdown();
+                var stage = initializationStages[i];
+                await stage.Shutdown(cancellationTokenSource.Token);
             }
             
             try
