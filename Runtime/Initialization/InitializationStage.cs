@@ -30,7 +30,7 @@ namespace Padoru.Core
             initializationTasks.Clear();
         }
         
-        public async Task Shutdown(CancellationToken cancellationToken)
+        public void Shutdown()
         {
             // Shutdown in reverse order so that dependencies are shutdown
             // before that which they depend on
@@ -40,7 +40,7 @@ namespace Padoru.Core
                 
                 if (ModuleIsInitialized(module))
                 {
-                    await ShutdownModule(module, cancellationToken);
+                    ShutdownModule(module);
                 }                
             }
             
@@ -82,20 +82,13 @@ namespace Padoru.Core
             sb.Append(Environment.NewLine);
         }
 
-        private async Task ShutdownModule(GameObject module, CancellationToken cancellationToken)
+        private void ShutdownModule(GameObject module)
         {
             var shutdownable = module.GetComponent<IShutdowneable>();
+            
             if (shutdownable != null)
             {
                 shutdownable.Shutdown();
-            }
-            else
-            {
-                var shutdownableAsync = module.GetComponent<IShutdownableAsync>();
-                if (shutdownableAsync != null)
-                {
-                    await shutdownableAsync.Shutdown(cancellationToken);
-                }
             }
         }
         
