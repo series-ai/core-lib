@@ -12,6 +12,7 @@ namespace Padoru.Core
     public class Context : MonoBehaviour
     {
         [SerializeField] private bool initializeOnAwake = true;
+        [SerializeField] private bool shutdownOnDestroy = true;
         [SerializeField] private bool registerOnLocator = true;
         [SerializeField] private InitializationStage[] initializationStages;
 
@@ -43,7 +44,7 @@ namespace Padoru.Core
                 Locator.Unregister<Context>(gameObject.scene.name);
             }
 
-            if (IsInitialized)
+            if (IsInitialized && shutdownOnDestroy)
             {
                 Shutdown();
             }
