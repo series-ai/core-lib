@@ -88,9 +88,11 @@ namespace Padoru.Core
             }
 
             var screen = screens[id];
+            
+            await screen.Close(cancellationToken);
+            
             activeScreens.Remove(id);
             screens.Remove(id);
-            await screen.Close(cancellationToken);
         }
 
         /// <summary>
