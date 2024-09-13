@@ -58,7 +58,7 @@ namespace Padoru.Core
 
             if (screens.ContainsKey(id))
             {
-                Debug.LogWarning($"Unable to show screen {id} because is already active");
+                Debug.LogWarning($"Unable to show screen of id '{id}' because is already active");
                 return;
             }
             
@@ -66,7 +66,7 @@ namespace Padoru.Core
             
             if (screen == null)
             {
-                throw new Exception("Screen is null. Cannot show screen");
+                throw new Exception($"Unable to show screen of id '{id}' because the provider returned null");
             }
             
             activeScreens.Add(id);
