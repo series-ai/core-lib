@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using UnityEngine;
 using System.Threading.Tasks;
+using System;
 
 namespace Padoru.Core
 {
@@ -13,5 +14,6 @@ namespace Padoru.Core
         Task CloseAndShowScreen(TScreenId id, CancellationToken cancellationToken);
         bool IsScreenOpened(TScreenId id);
         Task Clear(CancellationToken cancellationToken);
+        event Action<TScreenId> OnScreenShown;
     }
 }

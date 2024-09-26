@@ -17,6 +17,8 @@ namespace Padoru.Core
         private Canvas parentCanvas;
 
         private TScreenId CurrentActiveScreen => activeScreens.LastOrDefault();
+        
+        public event Action<TScreenId> OnScreenShown;
 
         public void Init(IScreenProvider<TScreenId> provider, Canvas parentCanvas)
         {
@@ -73,6 +75,7 @@ namespace Padoru.Core
             screens.Add(id, screen);
             
             await screen.Show(cancellationToken);
+            OnScreenShown?.Invoke(id);
         }
 
         public async Task CloseScreen(TScreenId id, CancellationToken cancellationToken)
