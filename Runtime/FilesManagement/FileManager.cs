@@ -97,7 +97,7 @@ namespace Padoru.Core.Files
                 }
             }
 
-            Debug.LogWarning($"There is not protocol registered for the uri : {uri}. Returning default protocol");
+            Debug.LogWarning($"There is not protocol registered for the uri : {uri}. Returning default protocol", Constants.DEBUG_CHANNEL_NAME);
 
             return defaultProtocol;
         }

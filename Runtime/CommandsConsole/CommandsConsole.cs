@@ -34,7 +34,7 @@ namespace Padoru.Core.DebugConsole
 				sb.Append(Environment.NewLine);
 			}
 
-			Debug.Log(sb);
+			Debug.Log(sb, Constants.DEBUG_CHANNEL_NAME);
 		}
 
 		private void OnGUI()

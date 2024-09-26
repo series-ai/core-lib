@@ -14,7 +14,7 @@ namespace Padoru.Core.DebugConsole
 
 			string log = string.Join(" ", args);
 
-			Debug.Log(log);
+			Debug.Log(log, Constants.DEBUG_CHANNEL_NAME);
 		}
 	}
 }

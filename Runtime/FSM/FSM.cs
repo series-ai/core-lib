@@ -89,7 +89,7 @@ namespace Padoru.Core
 				throw new Exception("Could not add transition, it was already registered");
 			}
 
-			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'");
+			Debug.Log($"Added transition from '{initialState}' to '{targetState}' upon '{trigger}'", Constants.DEBUG_CHANNEL_NAME);
 
 			transitions.Add(transition);
 		}
@@ -101,7 +101,7 @@ namespace Padoru.Core
 
 		public void SetTrigger(TTrigger trigger)
 		{
-			Debug.Log($"Trigger set {trigger}");
+			Debug.Log($"Trigger set {trigger}", Constants.DEBUG_CHANNEL_NAME);
 			foreach (var transition in transitions)
 			{
 				if (!ShouldTransition(transition, trigger))
@@ -115,7 +115,7 @@ namespace Padoru.Core
 
 		public void SetState(TState stateId)
 		{
-			Debug.Log($"State set {stateId}");
+			Debug.Log($"State set {stateId}", Constants.DEBUG_CHANNEL_NAME);
 			
 			ChangeState(stateId);
 		}
@@ -174,7 +174,7 @@ namespace Padoru.Core
 				sb.Append($" {stateId}");
 			}
 
-			Debug.Log(sb);
+			Debug.Log(sb, Constants.DEBUG_CHANNEL_NAME);
 		}
 
 		private void ChangeState(TState stateId)
