@@ -27,7 +27,7 @@ namespace Padoru.Core.ActionRouter
 
             if (actionGroup == null)
             {
-                Debug.LogWarning($"Unable to remove the subscriber because the action '{actionId}' is not registered");
+                Debug.LogWarning($"Unable to remove the subscriber because the action '{actionId}' is not registered", Constants.DEBUG_CHANNEL_NAME);
                 return;
             }
             

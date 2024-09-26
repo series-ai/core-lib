@@ -48,10 +48,10 @@ namespace Padoru.Core.Files
 					return dh.audioClip;
 				}
 				
-				Debug.LogError($"Download failed. Uri {requestUri} Response {wr.responseCode}. Error: {wr.error}");
+				Debug.LogError($"Download failed. Uri {requestUri} Response {wr.responseCode}. Error: {wr.error}", Constants.DEBUG_CHANNEL_NAME);
 			}
         
-			Debug.LogError("The download process is not completely finished.");
+			Debug.LogError("The download process is not completely finished.", Constants.DEBUG_CHANNEL_NAME);
 			
 			return null;
 		}
