@@ -24,7 +24,7 @@ namespace Padoru.Core.Files
 				}
 				else
 				{
-					Debug.LogWarning($"Could not compress texture `{texture.name}` because it is not divisible by 4", DebugChannels.TEXTURES));
+					Debug.LogWarning($"Could not compress texture `{texture.name}` because it is not divisible by 4", DebugChannels.TEXTURES);
 				}
 			}
 
