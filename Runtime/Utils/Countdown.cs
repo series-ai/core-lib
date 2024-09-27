@@ -27,7 +27,7 @@ namespace Padoru.Core.Utils
 
 		public void Start()
 		{
-			Debug.Log($"Countdown started. Time: {startTime}", Constants.DEBUG_CHANNEL_NAME);
+			Debug.Log($"Countdown started. Time: {startTime}", Constants.DEBUG_CHANNEL_TIME);
 
 			currentTime = startTime;
 			tickManager.Register(this);
@@ -35,7 +35,7 @@ namespace Padoru.Core.Utils
 
 		public void Stop()
 		{
-			Debug.Log("Countdown stopped", Constants.DEBUG_CHANNEL_NAME);
+			Debug.Log("Countdown stopped", Constants.DEBUG_CHANNEL_TIME);
 
 			tickManager.Unregister(this);
 		}

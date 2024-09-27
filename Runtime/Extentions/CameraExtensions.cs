@@ -81,7 +81,7 @@ namespace Padoru.Core
             camera.targetTexture = null;
             Object.Destroy(renderTexture);
             
-            Debug.Log($"Took screenshot to: {screenShot.name}", Constants.DEBUG_CHANNEL_NAME);
+            Debug.Log($"Took screenshot to: {screenShot.name}", Constants.DEBUG_CHANNEL_CAMERA);
 
             return screenShot;
         }

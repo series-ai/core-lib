@@ -9,7 +9,7 @@ namespace Padoru.Core
 		{
 			if (texture == null)
 			{
-				Debug.LogError("Could not convert null texture into sprite", Constants.DEBUG_CHANNEL_NAME);
+				Debug.LogError("Could not convert null texture into sprite", Constants.DEBUG_CHANNEL_TEXTURE);
 				return null;
 			}
             
