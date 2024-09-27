@@ -30,7 +30,7 @@ namespace Padoru.Core
         {
             if (registerOnLocator)
             {
-                Debug.Log($"Context registered with tag '{gameObject.scene.name}'", Constants.DEBUG_CHANNEL_NAME);
+                Debug.Log($"Context registered with tag '{gameObject.scene.name}'", DebugChannels.INIT);
                 
                 Locator.Register<Context>(this, gameObject.scene.name);
             }
@@ -104,7 +104,7 @@ namespace Padoru.Core
                 throw;
             }
             
-            Debug.Log(sb, Constants.DEBUG_CHANNEL_NAME, gameObject);
+            Debug.Log(sb, DebugChannels.INIT, gameObject);
 
             IsInitialized = true;
             OnInitializationFinish?.Invoke(watch.ElapsedMilliseconds);
@@ -132,7 +132,7 @@ namespace Padoru.Core
 
             IsInitialized = false;
 
-            Debug.Log($"Context shutdown: {gameObject.name}", Constants.DEBUG_CHANNEL_NAME, gameObject);
+            Debug.Log($"Context shutdown: {gameObject.name}", DebugChannels.INIT, gameObject);
         }
     }
 }
