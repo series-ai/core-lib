@@ -16,7 +16,7 @@ namespace Padoru.Core
 
             if(settings == null)
             {
-                Debug.LogError($"Failed to initialize application. Could not find settings object.", Constants.DEBUG_CHANNEL_INIT);
+                Debug.LogError($"Failed to initialize application. Could not find settings object.", DebugChannels.FSM);
                 return;
             }
 
@@ -40,18 +40,18 @@ namespace Padoru.Core
 
             if (projectContextPrefab == null)
             {
-                Debug.LogError("Could not find ProjectContext.", Constants.DEBUG_CHANNEL_INIT);
+                Debug.LogError("Could not find ProjectContext.", DebugChannels.INIT);
                 return;
             }
 
-            Debug.Log($"Instantiating ProjectContext", Constants.DEBUG_CHANNEL_INIT);
+            Debug.Log($"Instantiating ProjectContext", DebugChannels.INIT);
             var projectContext = Object.Instantiate(projectContextPrefab);
             Object.DontDestroyOnLoad(projectContext);
 
-            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}", Constants.DEBUG_CHANNEL_INIT);
+            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}", DebugChannels.INIT);
             Locator.Register(projectContext, settings.ProjectContextPrefabName);
 
-            Debug.Log($"Initializing ProjectContext", Constants.DEBUG_CHANNEL_INIT);
+            Debug.Log($"Initializing ProjectContext", DebugChannels.INIT);
             await projectContext.Init();
         }
 

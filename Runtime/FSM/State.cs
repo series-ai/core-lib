@@ -18,7 +18,7 @@ namespace Padoru.Core
 
 		internal void OnStateEnter()
 		{
-			Debug.Log(stateName, Constants.DEBUG_CHANNEL_FSM);
+			Debug.Log(stateName, DebugChannels.FSM);
 			OnStateEnterEvent?.Invoke();
 		}
 
@@ -29,7 +29,7 @@ namespace Padoru.Core
 
 		internal void OnStateExit()
 		{
-			Debug.Log(stateName, Constants.DEBUG_CHANNEL_FSM);
+			Debug.Log(stateName, DebugChannels.FSM);
 			OnStateExitEvent?.Invoke();
 		}
 	}

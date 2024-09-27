@@ -48,7 +48,7 @@ namespace Padoru.Core
 
             if(result == OpResult.Failed)
             {
-                Debug.LogWarning($"Command execution failed: {currentCommand}.", Constants.DEBUG_CHANNEL_COMMANDS);
+                Debug.LogWarning($"Command execution failed: {currentCommand}.", DebugChannels.COMMANDS);
             }
 
             if(IsQueueEmpty)
@@ -83,7 +83,7 @@ namespace Padoru.Core
             catch (Exception e)
             {
                 OnCommandFinished(OpResult.Failed);
-                Debug.LogException(e, Constants.DEBUG_CHANNEL_COMMANDS);
+                Debug.LogException(e, DebugChannels.COMMANDS);
             }
         }
     }

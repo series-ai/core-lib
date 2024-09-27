@@ -28,7 +28,7 @@ namespace Padoru.Core.ActionRouter
         {
             if (subscribers.Contains(subscriber))
             {
-                Debug.LogWarning($"Unable to subscribe to the action '{ActionId}' because is already subscribed", Constants.DEBUG_CHANNEL_ACTION_ROUTER);
+                Debug.LogWarning($"Unable to subscribe to the action '{ActionId}' because is already subscribed", DebugChannels.ACTION_ROUTER);
                 return;
             }
             
@@ -39,7 +39,7 @@ namespace Padoru.Core.ActionRouter
         {
             if (!subscribers.Remove(subscriber))
             {
-                Debug.LogWarning($"Unable to remove subscriber from event '{ActionId}' because it is not subscribed", Constants.DEBUG_CHANNEL_ACTION_ROUTER);
+                Debug.LogWarning($"Unable to remove subscriber from event '{ActionId}' because it is not subscribed", DebugChannels.ACTION_ROUTER);
             }
         }
     }
