@@ -16,15 +16,6 @@ namespace Padoru.Core.Files
 		private readonly AudioImportSettings importSettings;
 		private readonly Regex protocolRegex;
 
-		public UnityAudioProtocol(CoroutineProxy coroutineProxy, string webRequestProtocol, AudioImportSettings importSettings)
-		{
-			this.basePath = string.Empty;
-			this.coroutineProxy = coroutineProxy;
-			this.protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
-			this.webRequestProtocol = webRequestProtocol;
-			this.importSettings = importSettings;
-		}
-		
 		public UnityAudioProtocol(string basePath, CoroutineProxy coroutineProxy, string webRequestProtocol, AudioImportSettings importSettings)
 		{
 			this.basePath = basePath;
@@ -78,9 +69,7 @@ namespace Padoru.Core.Files
         
 		private string GetFullPath(string uri)
 		{
-			return string.IsNullOrEmpty(basePath) 
-				? FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)) 
-				: Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
+			return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
 		}
 
 		private string GetRequestUri(string uri)

@@ -13,14 +13,6 @@ namespace Padoru.Core.Files
         private readonly string webRequestProtocol;
         private readonly Regex protocolRegex;
 
-        public AndroidFileSystem(string webRequestProtocol)
-        {
-            this.basePath = string.Empty;
-            this.webRequestProtocol = webRequestProtocol;
-            
-            protocolRegex = new Regex(Constants.PROTOCOL_REGEX_PATTERN);
-        }
-        
         public AndroidFileSystem(string basePath, string webRequestProtocol)
         {
             this.basePath = basePath;
@@ -97,9 +89,7 @@ namespace Padoru.Core.Files
         
         private string GetFullPath(string uri)
         {
-            return string.IsNullOrEmpty(basePath) 
-                ? FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)) 
-                : Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
+            return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
         }
 
         private string GetRequestUri(string uri)

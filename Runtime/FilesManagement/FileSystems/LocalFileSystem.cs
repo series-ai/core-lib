@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core.Files
@@ -9,11 +10,6 @@ namespace Padoru.Core.Files
     {
         private readonly string basePath;
 
-        public LocalFileSystem()
-        {
-            this.basePath = string.Empty;
-        }
-        
         public LocalFileSystem(string basePath)
         {
             this.basePath = basePath;
@@ -84,9 +80,7 @@ namespace Padoru.Core.Files
 
         private string GetFullPath(string uri)
         {
-            return string.IsNullOrEmpty(basePath) 
-                ? FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)) 
-                : Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
+            return Path.Combine(basePath, FileUtils.ValidatedFileName(FileUtils.PathFromUri(uri)));
         }
     }
 }
