@@ -26,7 +26,7 @@ namespace Padoru.Core.Files
             return await Task.FromResult(File.Exists(path));
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
+        public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var path = GetFullPath(uri);
 
@@ -50,13 +50,13 @@ namespace Padoru.Core.Files
                     offset += bytesRead;
                 }
 
-                return new File<byte[]>(uri, bytes);
+                return bytes;
             }
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
+        public async Task Write(string uri, byte[] bytes, CancellationToken cancellationToken)
         {
-            var path = GetFullPath(file.Uri);
+            var path = GetFullPath(uri);
 
             var directory = Path.GetDirectoryName(path) ?? ".";
             
@@ -64,7 +64,7 @@ namespace Padoru.Core.Files
             
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
             {
-                await fs.WriteAsync(file.Data, 0, file.Data.Length, cancellationToken);
+                await fs.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
             }
         }
 
