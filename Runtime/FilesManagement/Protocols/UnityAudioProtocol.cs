@@ -32,7 +32,7 @@ namespace Padoru.Core.Files
 			return Task.FromResult(File.Exists(filePath));
 		}
 
-		public async Task<object> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
+		public async Task<File<T>> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
 		{
 			var requestUri = GetRequestUri(uri);
         
@@ -44,9 +44,10 @@ namespace Padoru.Core.Files
 			using (UnityWebRequest wr = new UnityWebRequest(requestUri, "GET", dh, null)) 
 			{
 				await wr.SendWebRequest().AsTask(coroutineProxy, cancellationToken);
-				if (wr.responseCode == 200) 
+				if (wr.responseCode == 200)
 				{
-					return dh.audioClip;
+					object audioClip = dh.audioClip;
+					return new File<T>(uri, (T) audioClip, dh.data);
 				}
 				
 				Debug.LogError($"Download failed. Uri {requestUri} Response {wr.responseCode}. Error: {wr.error}", DebugChannels.FILES);

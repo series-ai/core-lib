@@ -38,7 +38,7 @@ namespace Padoru.Core.Files
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
+        public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var requestUri = GetRequestUri(uri);
 			
@@ -59,18 +59,18 @@ namespace Padoru.Core.Files
             }
             
             var manifestData = uwr.downloadHandler.data;
-            return new File<byte[]>(uri, manifestData);
+            return manifestData;
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
+        public async Task Write(string uri, byte[] bytes, CancellationToken cancellationToken)
         {
-            var path = GetFullPath(file.Uri);
+            var path = GetFullPath(uri);
 
             var directory = Path.GetDirectoryName(path) ?? ".";
             
             Directory.CreateDirectory(directory);
 
-            await File.WriteAllBytesAsync(path, file.Data, cancellationToken);
+            await File.WriteAllBytesAsync(path, bytes, cancellationToken);
         }
 
         public Task Delete(string uri, CancellationToken cancellationToken)

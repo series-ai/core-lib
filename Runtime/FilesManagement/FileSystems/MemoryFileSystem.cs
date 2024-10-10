@@ -7,14 +7,14 @@ namespace Padoru.Core.Files
 {
     public class MemoryFileSystem : IFileSystem
     {
-        private readonly Dictionary<string, File<byte[]>> files = new();
+        private readonly Dictionary<string, byte[]> files = new();
 
         public async Task<bool> Exists(string uri, CancellationToken cancellationToken)
         {
             return await Task.FromResult(files.ContainsKey(uri));
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
+        public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (files.TryGetValue(uri, out var file))
             {
@@ -24,9 +24,9 @@ namespace Padoru.Core.Files
             throw new FileNotFoundException($"Could not find file. Uri {uri}");
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
+        public async Task Write(string uri, byte[] bytes, CancellationToken cancellationToken)
         {
-            files[file.Uri] = file;
+            files[uri] = bytes;
 
             await Task.CompletedTask;
         }

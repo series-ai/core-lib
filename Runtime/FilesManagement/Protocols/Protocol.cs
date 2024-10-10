@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Padoru.Core.Files
 {
@@ -25,20 +26,18 @@ namespace Padoru.Core.Files
             return await fileSystem.Exists(uri, cancellationToken);
         }
 
-        public async Task<object> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
+        [ItemCanBeNull]
+        public async Task<File<T>> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (string.IsNullOrEmpty(uri))
             {
                 throw new ArgumentException("The provided uri is null or empty");
             }
                 
-            var file = await fileSystem.Read(uri, cancellationToken, version);
-                    
-            var bytes = file.Data;
-
-            var result = await serializer.Deserialize(typeof(T), bytes, uri, cancellationToken);
-
-            return result;
+            var bytes = await fileSystem.Read(uri, cancellationToken, version);
+            var data = await serializer.Deserialize(typeof(T), bytes, uri, cancellationToken);
+            var file = new File<T>(uri, (T) data, bytes);
+            return file;
         }
 
         public async Task<File<T>> Write<T>(string uri, T value, CancellationToken cancellationToken)
@@ -50,11 +49,9 @@ namespace Padoru.Core.Files
                 
             var bytes = await serializer.Serialize(value, cancellationToken);
 
-            var newFile = new File<byte[]>(uri, bytes);
+            await fileSystem.Write(uri, bytes, cancellationToken);
 
-            await fileSystem.Write(newFile, cancellationToken);
-
-            return new File<T>(uri, value);
+            return new File<T>(uri, value, bytes);
         }
 
         public async Task Delete(string uri, CancellationToken cancellationToken)
