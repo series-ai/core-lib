@@ -72,9 +72,7 @@ namespace Padoru.Core.Files
 
         public async Task<File<T>> Read<T>(string uri, CancellationToken cancellationToken, string version = null)
         {
-            var value = await GetProtocol(uri).Read<T>(uri, cancellationToken, version);
-
-            return new File<T>(uri, (T)value);
+            return await GetProtocol(uri).Read<T>(uri, cancellationToken, version);
         }
 
         public async Task<File<T>> Write<T>(string uri, T value, CancellationToken cancellationToken)

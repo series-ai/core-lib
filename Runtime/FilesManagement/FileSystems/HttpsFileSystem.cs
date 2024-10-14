@@ -29,7 +29,7 @@ namespace Padoru.Core.Files
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
+        public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             var path = GetFullPath(uri);
 
@@ -63,14 +63,13 @@ namespace Padoru.Core.Files
             }
             
             var data = await response.Content.ReadAsByteArrayAsync();
-                
-            return new File<byte[]>(uri, data);
+            return data;
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
+        public async Task Write(string uri, byte[] bytes, CancellationToken cancellationToken)
         {
-            var path = GetFullPath(file.Uri);
-            var content = new ByteArrayContent(file.Data);
+            var path = GetFullPath(uri);
+            var content = new ByteArrayContent(bytes);
             var response = await client.PostAsync(path, content, cancellationToken);
             
             if (!response.IsSuccessStatusCode)

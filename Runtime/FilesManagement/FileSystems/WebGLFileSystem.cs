@@ -15,7 +15,7 @@ namespace Padoru.Core.Files
         private readonly string webRequestProtocol;
         private readonly Regex protocolRegex;
         
-        private readonly Dictionary<string, File<byte[]>> files = new();
+        private readonly Dictionary<string, byte[]> files = new();
 
         public WebGLFileSystem(string basePath, string webRequestProtocol)
         {
@@ -47,7 +47,7 @@ namespace Padoru.Core.Files
             return uwr.result == UnityWebRequest.Result.Success;
         }
 
-        public async Task<File<byte[]>> Read(string uri, CancellationToken cancellationToken, string version = null)
+        public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
             if (files.ContainsKey(uri))
             {
@@ -72,15 +72,15 @@ namespace Padoru.Core.Files
             if (uwr.result == UnityWebRequest.Result.Success) 
             {
                 var manifestData = uwr.downloadHandler.data;
-                return new File<byte[]>(uri, manifestData);
+                return manifestData;
             }
             
             throw new FileNotFoundException($"Could not read file at path '{requestUri}'. Error: {uwr.error}");
         }
 
-        public async Task Write(File<byte[]> file, CancellationToken cancellationToken)
+        public async Task Write(string uri, byte[] bytes, CancellationToken cancellationToken)
         {
-            files[file.Uri] = file;
+            files[uri] = bytes;
 
             await Task.CompletedTask;
         }
