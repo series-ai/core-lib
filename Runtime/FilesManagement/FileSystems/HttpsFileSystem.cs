@@ -16,7 +16,8 @@ namespace Padoru.Core.Files
         {
             this.basePath = basePath;
             
-            client = messageHandler == null ? new HttpClient() : new HttpClient(messageHandler);
+            client = messageHandler == null ? new HttpClient(new HttpClientHandler { AutomaticDecompression = System.Net.DecompressionMethods.GZip })
+                                            : new HttpClient(messageHandler);
             client.Timeout = TimeSpan.FromSeconds(requestTimeoutInSeconds);
             this.maxDownloadRetries = maxDownloadRetries;
             // TODO: Use client base address instead of appending it to every request
