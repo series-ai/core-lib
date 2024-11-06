@@ -62,7 +62,7 @@ namespace Padoru.Core.Files
                 return files[uri];
             }
 
-            uri += $"?version={version}";
+            uri = GetFullPath((version != null ? $"{version}/" : "") + FileUtils.PathFromUri(uri));
             
             var requestUri = GetRequestUri(uri);
 			
