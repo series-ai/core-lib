@@ -54,7 +54,7 @@ namespace Padoru.Core
 
         private static void ConfigLog(Settings settings)
         {
-            Debug.Configure(settings.logSettings, new UnityDefaultLogFormatter(), new UnityDefaultStackTraceFormatter());
+            Debug.Configure(settings.logSettings);
             Debug.AddOutput(new UnityConsoleOutput());
         }
 
