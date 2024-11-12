@@ -32,9 +32,8 @@ namespace Padoru.Core.Files
 
         public async Task<byte[]> Read(string uri, CancellationToken cancellationToken, string version = null)
         {
-            var path = GetFullPath(uri);
 
-            path += $"?version={version}";
+            var path = GetFullPath((version != null ? $"{version}/" : "") + FileUtils.PathFromUri(uri));
 
             HttpResponseMessage response = null;
             for (var i = 0; i < maxDownloadRetries; i++)
