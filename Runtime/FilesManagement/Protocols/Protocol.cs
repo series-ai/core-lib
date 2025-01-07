@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -63,7 +64,7 @@ namespace Padoru.Core.Files
                 
             if (!await fileSystem.Exists(uri, cancellationToken))
             {
-                throw new Exception($"Cannot delete file because it does not exists: {uri}");
+                throw new FileNotFoundException($"Cannot delete file because it does not exists: {uri}");
             }
             
             await fileSystem.Delete(uri, cancellationToken);

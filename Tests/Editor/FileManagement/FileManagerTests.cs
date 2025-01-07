@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -36,7 +37,7 @@ namespace Padoru.Core.Files.Tests
         }
 
         [SetUp]
-        public async void Setup()
+        public async Task Setup()
         {
             fileManager = new FileManager(new JsonSerializer(), new MemoryFileSystem());
 
@@ -100,7 +101,7 @@ namespace Padoru.Core.Files.Tests
         }
 
         [Test]
-        public async void CheckFileIfExists_WhenFileDoesExist_ShouldReturnTrue()
+        public async Task CheckFileIfExists_WhenFileDoesExist_ShouldReturnTrue()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
@@ -112,7 +113,7 @@ namespace Padoru.Core.Files.Tests
         }
 
         [Test]
-        public async void CheckFileIfExists_WhenFileDoesNotExist_ShouldReturnFalse()
+        public async Task CheckFileIfExists_WhenFileDoesNotExist_ShouldReturnFalse()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
@@ -122,7 +123,7 @@ namespace Padoru.Core.Files.Tests
         }
 
         [Test]
-        public async void CheckFileIfExists_WhenProtocolNotRegistered_ShouldLogWarning()
+        public async Task CheckFileIfExists_WhenProtocolNotRegistered_ShouldLogWarning()
         {
             LogAssert.Expect(LogType.Warning, new Regex(""));
 
@@ -130,139 +131,139 @@ namespace Padoru.Core.Files.Tests
         }
         
         [Test]
-        public async void CheckFileIfExists_WhenUriIsNull_ShouldThrow()
+        public async Task CheckFileIfExists_WhenUriIsNull_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null, default));
+            var exception = Assert.ThrowsAsync<ArgumentException>(async() => await fileManager.Exists(null, default));
         }
     
         [Test]
-        public async void CheckFileIfExists_WhenUriIsEmpty_ShouldThrow()
+        public async Task CheckFileIfExists_WhenUriIsEmpty_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Exists(null, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Exists("", default));
         }
         
         [Test]
-        public async void DeleteFile_WhenFileDoesExist_ShouldNotThrow()
+        public async Task DeleteFile_WhenFileDoesExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
-        public async void DeleteFile_WhenFileDoesNotExist_ShouldThrow()
+        public async Task DeleteFile_WhenFileDoesNotExist_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<FileNotFoundException>(async () => await fileManager.Delete(testUri, default));
+            Assert.ThrowsAsync<FileNotFoundException>(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
-        public async void DeleteFile_WhenUriIsNull_ShouldThrow()
+        public async Task DeleteFile_WhenUriIsNull_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(null, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Delete(null, default));
         }
         
         [Test]
-        public async void DeleteFile_WhenUriIsEmpty_ShouldThrow()
+        public async Task DeleteFile_WhenUriIsEmpty_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Delete(string.Empty, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Delete(string.Empty, default));
         }
         
         [Test]
-        public async void DeleteFile_WhenProtocolNotRegistered_ShouldLogWarningAndNotThrow()
+        public async Task DeleteFile_WhenProtocolNotRegistered_ShouldLogWarningAndNotThrow()
         {
             LogAssert.Expect(LogType.Warning, new Regex(""));
 
             await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Delete(testUri, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Delete(testUri, default));
         }
 
         [Test]
-        public async void Write_WhenValueNull_ShouldNotThrow()
+        public async Task Write_WhenValueNull_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write<TestClass>(testUri, null, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Write<TestClass>(testUri, null, default));
         }
 
         [Test]
-        public async void Write_WhenValueNotNull_ShouldNotThrow()
+        public async Task Write_WhenValueNotNull_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Write(testUri, value, default));
         }
 
         [Test]
-        public async void Write_WhenFileAlreadyExist_ShouldNotThrow()
+        public async Task Write_WhenFileAlreadyExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Write(testUri, value, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Write(testUri, value, default));
         }
 
         [Test]
-        public async void Write_WhenUriIsNull_ShouldThrow()
+        public async Task Write_WhenUriIsNull_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Write(null, value, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Write(null, value, default));
         }
     
         [Test]
-        public async void Write_WhenUriIsEmpty_ShouldThrow()
+        public async Task Write_WhenUriIsEmpty_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Write(string.Empty, value, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Write(string.Empty, value, default));
         }
 
         [Test]
-        public async void Read_WhenFileDoesNotExist_ShouldThrow()
+        public async Task Read_WhenFileDoesNotExist_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<FileNotFoundException>(async () => await fileManager.Read<TestClass>(testUri, default));
+            Assert.ThrowsAsync<FileNotFoundException>(async () => await fileManager.Read<TestClass>(testUri, default));
         }
 
         [Test]
-        public async void Read_WhenFileDoesExist_ShouldNotThrow()
+        public async Task Read_WhenFileDoesExist_ShouldNotThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
             await fileManager.Write(testUri, value, default);
 
-            Assert.DoesNotThrow(async () => await fileManager.Read<TestClass>(testUri, default));
+            Assert.DoesNotThrowAsync(async () => await fileManager.Read<TestClass>(testUri, default));
         }
         
         [Test]
-        public async void Read_WhenUriIsNull_ShouldThrow()
+        public async Task Read_WhenUriIsNull_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(null, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Read<TestClass>(null, default));
         }
     
         [Test]
-        public async void Read_WhenUriIsEmpty_ShouldThrow()
+        public async Task Read_WhenUriIsEmpty_ShouldThrow()
         {
             fileManager.RegisterProtocol(TEST_PROTOCOL_HEADER, serializer, fileSystem);
 
-            Assert.Throws<ArgumentException>(async () => await fileManager.Read<TestClass>(string.Empty, default));
+            Assert.ThrowsAsync<ArgumentException>(async () => await fileManager.Read<TestClass>(string.Empty, default));
         }
     }
 }

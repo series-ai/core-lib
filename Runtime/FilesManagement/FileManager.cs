@@ -87,6 +87,11 @@ namespace Padoru.Core.Files
 
         private IProtocol GetProtocol(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                throw new ArgumentException("The provided uri is null or empty");
+            }
+            
             foreach (var protocol in protocols)
             {
                 if (uri.StartsWith(protocol.Key))

@@ -24,23 +24,21 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public async void InitContext_WhenContextNotInitialized_ShouldBeInitialized()
+        public async Task InitContext_WhenContextNotInitialized_ShouldBeInitialized()
         {
             var context = go.AddComponent<Context>();
 
-            await Task.Run(context.Init);
+            await context.Init();
             
             Assert.IsTrue(context.IsInitialized);
         }
 
         [Test]
-        public async void InitContext_WhenContextInitialized_ShouldThrowException()
+        public async Task InitContext_WhenContextInitialized_ShouldThrowException()
         {
             var context = go.AddComponent<Context>();
-            
-            await Task.Run(context.Init);
 
-            Assert.Throws<AggregateException>(() => Task.Run(context.Init).Wait());
+            Assert.ThrowsAsync<AggregateException>(async () => await context.Init());
         }
 
         [UnityTest]

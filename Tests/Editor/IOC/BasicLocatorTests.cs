@@ -2,6 +2,7 @@ using UnityEngine;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace Padoru.Core.Tests
 {
@@ -25,17 +26,17 @@ namespace Padoru.Core.Tests
         }
 
         [Test]
-        public void RegisterServiceWithoutTag_WhenServiceNotRegistered_ShouldNotThrow()
+        public async Task RegisterServiceWithoutTag_WhenServiceNotRegistered_ShouldNotThrow()
         {
-            ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithoutTag<IEnumerable<GameObject>, List<GameObject>>();
+            await ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithoutTag<IEnumerable<GameObject>, List<GameObject>>();
         }
 
         [Test]
-        public void RegisterServiceWithoutTag_WhenServiceAlreadyRegistered_ShouldThrow()
+        public async Task RegisterServiceWithoutTag_WhenServiceAlreadyRegistered_ShouldThrow()
         {
             GivenAnAlreadyRegisteredServiceWithoutTag<IEnumerable<GameObject>, List<GameObject>>();
 
-            ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithoutTag<IEnumerable<GameObject>, List<GameObject>>();
+            await ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithoutTag<IEnumerable<GameObject>, List<GameObject>>();
         }
 
         [Test]
@@ -191,14 +192,14 @@ namespace Padoru.Core.Tests
             locator.Register<T, S>(tag);
         }
 
-        private void ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithoutTag<T, S>() where S : T, new()
+        private async Task ThenRegisterServiceThrows_WhenRegisteringAnAlreadyRegisteredServiceWithoutTag<T, S>() where S : T, new()
         {
-            Assert.Throws<Exception>(locator.Register<T, S>);
+            Assert.ThrowsAsync<Exception>(async () => locator.Register<T, S>());
         }
 
-        private void ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithoutTag<T, S>() where S : T, new()
+        private async Task ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithoutTag<T, S>() where S : T, new()
         {
-            Assert.DoesNotThrow(locator.Register<T, S>);
+            Assert.DoesNotThrowAsync(async () => locator.Register<T, S>());
         }
 
         private void ThenRegisterServiceDoesNotThrow_WhenServiceNotRegisteredWithTag<T, S>(string tag) where S : T, new()

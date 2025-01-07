@@ -7,12 +7,12 @@ namespace Padoru.Core.Tests
     {
         public async Task Close(CancellationToken cancellationToken)
         {
-            await Task.Delay(10);
+            //await Task.Delay(10, cancellationToken);
         }
 
         public async Task Show(CancellationToken cancellationToken)
         {
-            await Task.Delay(10);
+            //await Task.Delay(10, cancellationToken);
         }
     }
 }
