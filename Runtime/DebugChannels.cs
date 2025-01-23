@@ -4,6 +4,7 @@ namespace Padoru.Core
     {
         public const string INIT = "Initialization";
         public const string FILES = "FilesManagement";
+        public const string RUNTIME_DATA = "DataManagement";
         public const string FSM = "Fsm";
         public const string ACTION_ROUTER = "ActionRouter";
         public const string COMMANDS = "Commands";
