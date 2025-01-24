@@ -28,7 +28,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void Init_WhenProviderNotNullAndCanvasNotNull_ShouldNotThrowException()
         {
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             Assert.DoesNotThrow(() => screenManager.Init(provider, parentCanvas));
@@ -37,7 +37,7 @@ namespace Padoru.Core.Tests
         [Test]
         public void Init_WhenProviderNotNullAndCanvasNull_ShouldThrowException()
         {
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             Assert.Throws<Exception>(() => screenManager.Init(provider, null));
@@ -55,7 +55,7 @@ namespace Padoru.Core.Tests
         public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -67,7 +67,7 @@ namespace Padoru.Core.Tests
         public async void ShowScreen_WhenProviderNotNullAndScreenNull_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestNullScreenProvider();
+            var provider = new TestNullScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -88,7 +88,7 @@ namespace Padoru.Core.Tests
         public async void ShowScreen_WhenProviderNotNullAndScreenNotNullAndIsShowed_ShouldLogWarning()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -102,7 +102,7 @@ namespace Padoru.Core.Tests
         public async void ShowScreen_WhenOpenedAndCleared_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -116,7 +116,7 @@ namespace Padoru.Core.Tests
         public async void CloseScreen_WhenShowed_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -129,7 +129,7 @@ namespace Padoru.Core.Tests
         public async void CloseScreen_WhenNotShowed_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -141,7 +141,7 @@ namespace Padoru.Core.Tests
         public async void CloseScreen_WhenCleared_ShouldThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -157,7 +157,7 @@ namespace Padoru.Core.Tests
         {
             var screenId = TestScreenId.Test;
             var screenId2 = TestScreenId.Test2;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -170,7 +170,7 @@ namespace Padoru.Core.Tests
         public async void CloseAndShowScreen_WhenProviderNotNullAndScreenNotNullAndScreenNotShowed_ShouldNotThrowException()
         {
             var screenId = TestScreenId.Test;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -196,7 +196,7 @@ namespace Padoru.Core.Tests
         {
             var screenId = TestScreenId.Test;
             var screenId2 = TestScreenId.Test2;
-            var provider = new TestNullScreenProvider();
+            var provider = new TestNullScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
@@ -210,7 +210,7 @@ namespace Padoru.Core.Tests
         {
             var screenId = TestScreenId.Test;
             var screenId2 = TestScreenId.Test2;
-            var provider = new TestScreenProvider();
+            var provider = new TestScreenHandler();
             var screenManager = new ScreenManager<TestScreenId>();
             
             screenManager.Init(provider, parentCanvas);
