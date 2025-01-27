@@ -3,6 +3,7 @@ namespace Padoru.Core
     public static class DebugChannels
     {
         public const string INIT = "Initialization";
+        public const string RELAUNCH = "Relaunch";
         public const string FILES = "FilesManagement";
         public const string FSM = "Fsm";
         public const string ACTION_ROUTER = "ActionRouter";

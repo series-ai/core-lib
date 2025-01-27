@@ -2,8 +2,12 @@
 
 namespace Padoru.Core.Tests
 {
-    public class TestScreenProvider : IScreenProvider<TestScreenId>
+    public class TestScreenHandler : IScreenHandler<TestScreenId>
     {
+        public void DisposeScreen(TestScreenId id)
+        {
+        }
+
         public IScreen GetScreen(TestScreenId id, Transform parent = null)
         {
             return new TestScreen();
