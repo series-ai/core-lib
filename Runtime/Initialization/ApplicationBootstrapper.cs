@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Padoru.Diagnostics;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace Padoru.Core
 {
     public static class ApplicationBootstrapper
     {
+        public static string ProjectContextName { get; private set; }
+        
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static async void StartApplication()
         {
@@ -51,6 +54,22 @@ namespace Padoru.Core
                 await SetupProjectContext(settings);
             }
         }
+        
+        public static void RelaunchApplication()
+        {
+            Debug.Log("Relaunching application", DebugChannels.RELAUNCH);
+            Debug.Log("Reloading scene 0", DebugChannels.RELAUNCH);
+            
+            SceneManager.LoadScene(0);
+
+            ShutdownProjectContext();
+
+            CleanupResources();
+            
+            StartApplication();
+            
+            Debug.Log("Application relaunched", DebugChannels.RELAUNCH);
+        }
 
         private static void ConfigLog(Settings settings)
         {
@@ -60,7 +79,9 @@ namespace Padoru.Core
 
         private static async Task SetupProjectContext(Settings settings)
         {
-            var projectContextPrefab = Resources.Load<Context>(settings.ProjectContextPrefabName);
+            ProjectContextName = settings.ProjectContextPrefabName;
+            
+            var projectContextPrefab = Resources.Load<Context>(ProjectContextName);
 
             if (projectContextPrefab == null)
             {
@@ -72,8 +93,8 @@ namespace Padoru.Core
             var projectContext = Object.Instantiate(projectContextPrefab);
             Object.DontDestroyOnLoad(projectContext);
 
-            Debug.Log($"ProjectContext registered to the Locator under the tag: {settings.ProjectContextPrefabName}", DebugChannels.INIT);
-            Locator.Register(projectContext, settings.ProjectContextPrefabName);
+            Debug.Log($"ProjectContext registered to the Locator under the tag: {ProjectContextName}", DebugChannels.INIT);
+            Locator.Register(projectContext, ProjectContextName);
 
             Debug.Log($"Initializing ProjectContext", DebugChannels.INIT);
             await projectContext.Init();
@@ -84,6 +105,35 @@ namespace Padoru.Core
             var activeSceneName = SceneManager.GetActiveScene().name;
 
             return settings.scenes.Contains(activeSceneName);
+        }
+        
+        private static void ShutdownProjectContext()
+        {
+            try
+            {
+                var projectContextName = ApplicationBootstrapper.ProjectContextName;
+                var projectContext = Locator.Get<Context>(projectContextName);
+                
+                Debug.Log("Shutting down project context", DebugChannels.RELAUNCH);
+                
+                Locator.Unregister<Context>(projectContextName);
+
+                projectContext.Shutdown();
+                
+                Object.Destroy(projectContext.gameObject);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, DebugChannels.RELAUNCH);
+            }
+        }
+
+        private static void CleanupResources()
+        {
+            Debug.Log("Cleaning up resources", DebugChannels.RELAUNCH);
+            
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
         }
     }
 }

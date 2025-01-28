@@ -13,16 +13,16 @@ namespace Padoru.Core
     {
         private readonly Dictionary<TScreenId, IScreen> screens = new();
         private readonly List<TScreenId> activeScreens = new();
-        private IScreenProvider<TScreenId> provider;
+        private IScreenHandler<TScreenId> handler;
         private Canvas parentCanvas;
 
         private TScreenId CurrentActiveScreen => activeScreens.LastOrDefault();
         
         public event Action<TScreenId> OnScreenShown;
 
-        public void Init(IScreenProvider<TScreenId> provider, Canvas parentCanvas)
+        public void Init(IScreenHandler<TScreenId> handler, Canvas parentCanvas)
         {
-            if (provider == null)
+            if (handler == null)
             {
                 throw new Exception("The provider reference is null");
             }
@@ -32,7 +32,7 @@ namespace Padoru.Core
                 throw new Exception("The parent canvas reference is null");
             }
             
-            this.provider = provider;
+            this.handler = handler;
             this.parentCanvas = parentCanvas;
         }
 
@@ -53,7 +53,7 @@ namespace Padoru.Core
                 throw new Exception("Parent is null. Cannot show screen");
             }
             
-            if (provider == null)
+            if (handler == null)
             {
                 throw new Exception("ScreenProvider is null. Cannot show screen");
             }
@@ -64,7 +64,7 @@ namespace Padoru.Core
                 return;
             }
             
-            var screen = provider.GetScreen(id, parent);
+            var screen = handler.GetScreen(id, parent);
             
             if (screen == null)
             {
@@ -94,6 +94,24 @@ namespace Padoru.Core
             
             await screen.Close(cancellationToken);
             
+            handler.DisposeScreen(id);
+            activeScreens.Remove(id);
+            screens.Remove(id);
+        }
+        
+        public void CloseScreenImmediately(TScreenId id)
+        {
+            if (id == null)
+            {
+                throw new Exception("Cannot close screen. Provided screen id is null");
+            }
+            
+            if (!screens.ContainsKey(id))
+            {
+                throw new Exception("Trying to close a closed screen");
+            }
+
+            handler.DisposeScreen(id);
             activeScreens.Remove(id);
             screens.Remove(id);
         }
