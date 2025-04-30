@@ -16,5 +16,6 @@ namespace Padoru.Core
         bool IsScreenOpened(TScreenId id);
         Task Clear(CancellationToken cancellationToken);
         event Action<TScreenId> OnScreenShown;
+        event Action<TScreenId> OnScreenClosed;
     }
 }

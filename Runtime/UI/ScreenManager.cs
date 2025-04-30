@@ -19,6 +19,7 @@ namespace Padoru.Core
         private TScreenId CurrentActiveScreen => activeScreens.LastOrDefault();
         
         public event Action<TScreenId> OnScreenShown;
+        public event Action<TScreenId> OnScreenClosed;
 
         public void Init(IScreenHandler<TScreenId> handler, Canvas parentCanvas)
         {
@@ -97,6 +98,7 @@ namespace Padoru.Core
             handler.DisposeScreen(id);
             activeScreens.Remove(id);
             screens.Remove(id);
+            OnScreenClosed?.Invoke(id);
         }
         
         public void CloseScreenImmediately(TScreenId id)
@@ -114,6 +116,7 @@ namespace Padoru.Core
             handler.DisposeScreen(id);
             activeScreens.Remove(id);
             screens.Remove(id);
+            OnScreenClosed?.Invoke(id);
         }
 
         /// <summary>
