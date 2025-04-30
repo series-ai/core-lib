@@ -116,6 +116,7 @@ namespace Padoru.Core
             handler.DisposeScreen(id);
             activeScreens.Remove(id);
             screens.Remove(id);
+            OnScreenClosed?.Invoke(id);
         }
 
         /// <summary>
