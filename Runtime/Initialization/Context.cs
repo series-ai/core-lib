@@ -66,6 +66,7 @@ namespace Padoru.Core
             
             try
             {
+                Debug.Log($"Initializing Context {name}", DebugChannels.INIT);
                 var actionRouter = Locator.Get<IActionRouter>();
                 actionRouter.Invoke(ActionRouterEvents.ON_CONTEXT_INIT, this);
             }
@@ -94,7 +95,7 @@ namespace Padoru.Core
                 }
 
                 watch.Stop();
-                sb.Append($"Total initialization time: {watch.ElapsedMilliseconds}. " +
+                sb.Append($"Total initialization time: {watch.ElapsedMilliseconds} ms. " +
                           $"Keep in mind some modules might be initialized in parallel");
             }
             catch (Exception)
