@@ -53,6 +53,8 @@ namespace Padoru.Core
             {
                 await SetupProjectContext(settings);
             }
+            
+            UnityEngine.Debug.Log("Finish ApplicationBootstrapper initialization");
         }
         
         public static void RelaunchApplication()
@@ -98,6 +100,7 @@ namespace Padoru.Core
 
             Debug.Log($"Initializing ProjectContext", DebugChannels.INIT);
             await projectContext.Init();
+            Debug.Log($"ProjectContext initialization finished", DebugChannels.INIT);
         }
 
         private static bool ShouldInitializeFramework(Settings settings)

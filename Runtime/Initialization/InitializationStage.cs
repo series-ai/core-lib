@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core
 {
@@ -71,14 +72,18 @@ namespace Padoru.Core
             
             if (cancellationToken.IsCancellationRequested)
             {
-                sb.Append($"Module {module.name} initialization interrupted. Elapsed time: {watch.ElapsedMilliseconds}");
+                var cancelledMessage = $"Module {module.name} initialization interrupted. Elapsed time: {watch.ElapsedMilliseconds} ms";
+                Debug.Log(cancelledMessage, DebugChannels.INIT);
+                sb.Append(cancelledMessage);
                 sb.Append(Environment.NewLine);
                 return;
             }
 
             initializedModules.Add(module);
 
-            sb.Append($"Module {module.name} initialization time: {watch.ElapsedMilliseconds}");
+            var finishMessage = $"Module {module.name} initialization time: {watch.ElapsedMilliseconds} ms";
+            Debug.Log(finishMessage, DebugChannels.INIT);
+            sb.Append(finishMessage);
             sb.Append(Environment.NewLine);
         }
 
