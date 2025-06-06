@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Debug = Padoru.Diagnostics.Debug;
 
 namespace Padoru.Core.Files
 {

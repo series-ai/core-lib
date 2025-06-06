@@ -61,7 +61,6 @@ namespace Padoru.Core
 
             if (screens.ContainsKey(id))
             {
-                Debug.LogWarning($"Unable to show screen of id '{id}' because is already active", DebugChannels.INIT);
                 return;
             }
             
