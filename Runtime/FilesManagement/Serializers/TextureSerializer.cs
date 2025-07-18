@@ -24,13 +24,20 @@ namespace Padoru.Core.Files
 			
 			var newTexture = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false);
 			
-			newTexture.SetPixels(0, 0, texture.width, texture.height, texture.GetPixels());
-			
-			newTexture.Apply();
-			
-			var bytes = newTexture.EncodeToPNG();
-			
-			return Task.FromResult(bytes);
+			try
+			{
+				newTexture.SetPixels(0, 0, texture.width, texture.height, texture.GetPixels());
+				newTexture.Apply();
+        
+				var bytes = newTexture.EncodeToPNG();
+				return Task.FromResult(bytes);
+			}
+			finally
+			{
+				//We need to destroy this temp object since unity doesn't automatically collect it
+
+				UnityEngine.Object.DestroyImmediate(newTexture);
+			}
 		}
 
 		public Task<object> Deserialize(Type type, byte[] bytes, string uri, CancellationToken cancellationToken)
