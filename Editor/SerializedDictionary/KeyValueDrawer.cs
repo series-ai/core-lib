@@ -96,7 +96,7 @@ namespace Padoru.Core.Editor
 			return new Rect(keyValueRect.x + (keyValueRect.width * KEY_WIDTH_MULTIPLIER) + BOX_BORDER + KEY_AND_VALUE_SPACING * 2f, // <-- Spacing multiplied by 2 because of the folding arrow. Remove if able to remove the folding arrow
 							keyValueRect.y + BOX_BORDER, 
 							keyValueRect.width * (1 - KEY_WIDTH_MULTIPLIER) - BOX_BORDER * 2f - KEY_AND_VALUE_SPACING * 2f, // <-- Same here
-							keyValueRect.height - BOX_BORDER * 2f);
+							keyValueRect.height);
 		}
 
 		private Rect GetMinusButtonBoxRect(Rect keyValueRect)
